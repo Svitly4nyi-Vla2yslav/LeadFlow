@@ -1,7 +1,0 @@
-{
-  "name": "send-email-function",
-  "version": "1.0.0",
-  "dependencies": {
-    "nodemailer": "^6.10.1"
-  }
-}
