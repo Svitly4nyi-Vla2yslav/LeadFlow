@@ -1,0 +1,2419 @@
+{
+  "header": {
+    "logoAlt": "SRM Logo",
+    "nav": {
+      "home": "Home",
+      "service": "Services",
+      "about": "About",
+      "pricing": "Pricing",
+      "contacts": "Contacts"
+    },
+    "services": {
+      "customerExperience": "Customer Experience Suite",
+      "posStaff": "POS & Staff Operations",
+      "kitchen": "Kitchen & Fulfillment",
+      "inventory": "Inventory & Warehousing",
+      "analytics": "Analytics & Management",
+      "marketing": "Marketing & Customization",
+      "integration": "Integration & Scaling"
+    }
+  },
+  "hero": {
+    "innovative": "Innovative Solutions",
+    "title": "You're building your own system",
+    "description": "A powerful, white-label platform to run your restaurant or retail business. Launch your own branded mobile app, POS, CRM, and delivery system — with no hidden fees or aggregator cuts. Full control. Full ownership.",
+    "trustText": "Over 1200 businesses already trust us",
+    "buttons": {
+      "tryFree": "Try For Free",
+      "viewDemo": "View demo"
+    }
+  },
+  "swipper": {
+    "stats": [
+      {
+        "value": "2M+",
+        "description": "Users daily"
+      },
+      {
+        "value": "$1B+",
+        "description": "In processed transactions"
+      },
+      {
+        "value": "99%",
+        "description": "Acceleration of business processes"
+      },
+      {
+        "value": "4+",
+        "description": "Fully Multilingual Interface"
+      }
+    ]
+  },
+  "whyChoosePlatform": {
+    "title": "Why choose our platform",
+    "mainTitle": "Beyond POS<br />A system that grows with you",
+    "description": "We built an ecosystem that removes vendor lock-ins, works on any device, and adapts to any business — from corner cafés to international chains."
+  },
+  "featureSwiper": {
+    "features": [
+      {
+        "id": "Custom Identity",
+        "title": "White-label Branding",
+        "subtitle": "Custom app, site & receipts",
+        "overlay": {
+          "title": "Explore our CRM system!",
+          "text": "Access available for cashiers and chefs alike."
+        }
+      },
+      {
+        "id": "Role Access",
+        "title": "Smart Permissions",
+        "subtitle": "Access for cashiers and chefs",
+        "overlay": {
+          "title": "Explore our CRM system!",
+          "text": "Access available for cashiers and chefs alike."
+        }
+      },
+      {
+        "id": "Dynamic Offers",
+        "title": "AI & Automation",
+        "subtitle": "Dynamic offers & upsells",
+        "overlay": {
+          "title": "Explore our CRM system!",
+          "text": "Access available for cashiers and chefs alike."
+        }
+      },
+      {
+        "id": "Expandability",
+        "title": "Open API Integration",
+        "subtitle": "Connect tools, terminals & more",
+        "overlay": {
+          "title": "Explore our CRM system!",
+          "text": "Access available for cashiers and chefs alike."
+        }
+      }
+    ],
+    "buttons": {
+      "tryFree": "Try For Free",
+      "viewDemo": "View demo"
+    }
+  },
+  "allInOne": {
+    "mainText": "All-in-one CRM, POS & APP platform",
+    "mainTitle": "Everything your store, café, or delivery business needs — in one ecosystem",
+    "description": "Our platform connects orders, payments, inventory, staff, loyalty, and marketing in one place. No extra integrations, just growth.",
+    "cards": [
+      {
+        "title": "Customer Experience Suite",
+        "text": "Mobile app, CRM, loyalty & user comfort in one place.",
+        "buttons": [
+          "Mobile app",
+          "Delivery",
+          "Loyalty",
+          "CRM",
+          "UX"
+        ]
+      },
+      {
+        "title": "POS & Staff Operations",
+        "text": "Smart cashier system + team control + flexible flows.",
+        "buttons": [
+          "POS",
+          "Staff",
+          "QR",
+          "Orders",
+          "Shifts"
+        ]
+      },
+      {
+        "title": "Kitchen & Fulfillment",
+        "text": "Streamlined kitchen workflows and real-time cooking status.",
+        "buttons": [
+          "Kitchen",
+          "Assembly",
+          "Timers",
+          "Recipes"
+        ]
+      },
+      {
+        "title": "Inventory & Warehousing",
+        "text": "Full control over ingredients, supplies, and stock flow.",
+        "buttons": [
+          "Stock",
+          "Inventory",
+          "Ingredients"
+        ]
+      },
+      {
+        "title": "Analytics & Management",
+        "text": "Finance, reports, performance metrics — visually and smart.",
+        "buttons": [
+          "Analytics",
+          "Finance",
+          "Reports",
+          "AI"
+        ]
+      },
+      {
+        "title": "Marketing & Customization",
+        "text": "Push your brand forward with full control.",
+        "buttons": [
+          "Marketing",
+          "Branding",
+          "White-label",
+          "Multilingual",
+          "Promos"
+        ]
+      },
+      {
+        "title": "Integration & Scaling",
+        "text": "Open infrastructure. Grow as you go.",
+        "buttons": [
+          "API",
+          "Integration",
+          "Scaling",
+          "Multiformat",
+          "Offline"
+        ]
+      }
+    ]
+  },
+  "results": {
+    "mainText": "Results from Businesses",
+    "mainTitle": "How teams grow faster with our CRM ecosystem",
+    "description": "No hidden fees. No hardware lock-ins. Launch for free, scale on demand, or fully own your ecosystem under your brand.",
+    "cards": [
+      {
+        "title": "430%",
+        "text": "ROI after 3 years"
+      },
+      {
+        "title": "+37%",
+        "text": "Average revenue growth"
+      },
+      {
+        "title": "510%",
+        "text": "Conversion rate monthly average"
+      }
+    ]
+  },
+  "feedback": {
+    "title": "Trusted by 2000+ award-winning agencies and firms",
+    "ratings": [
+      {
+        "value": "4.8",
+        "source": "TechRadar CRM"
+      },
+      {
+        "value": "5.0",
+        "source": "ChroStartupTools"
+      },
+      {
+        "value": "4.9",
+        "source": "SaaS Advisor"
+      }
+    ],
+    "testimonials": [
+      {
+        "text": "Switching was easy thanks to outstanding support and clear onboarding. We now have a better overview of finances and staff management than ever before.",
+        "name": "Lucas Nguyen",
+        "position": "Operations Manager at Pizzario"
+      },
+      {
+        "text": "The platform has transformed how we manage our restaurant chain. Inventory tracking is now 3 times faster!",
+        "name": "Sarah Johnson",
+        "position": "CEO of BurgerHouse"
+      },
+      {
+        "text": "Customer support is exceptional. They helped us migrate all our data seamlessly during the transition.",
+        "name": "Michael Chen",
+        "position": "CFO at SushiTime"
+      },
+      {
+        "text": "Reporting features saved us dozens of hours each month. Highly recommend to any food business!",
+        "name": "Emma Wilson",
+        "position": "Marketing Director at CafeDelight"
+      },
+      {
+        "text": "We reduced food waste by 22% in the first month thanks to better inventory management tools.",
+        "name": "David Kim",
+        "position": "Operations Director at NoodleBar"
+      },
+      {
+        "text": "The mobile app allows me to check business performance anytime, anywhere. Game changer!",
+        "name": "Olivia Martinez",
+        "position": "Owner of TacoFiesta"
+      },
+      {
+        "text": "Integration with our accounting software was flawless. No more manual data entry!",
+        "name": "James Wilson",
+        "position": "Finance Manager at PizzaHeaven"
+      },
+      {
+        "text": "Staff scheduling became so much easier with the drag-and-drop interface. Saved us countless hours.",
+        "name": "Sophia Lee",
+        "position": "HR Manager at WokExpress"
+      },
+      {
+        "text": "Real-time sales analytics helped us optimize our menu and increase profits by 18%.",
+        "name": "Robert Taylor",
+        "position": "Owner of SteakMaster"
+      },
+      {
+        "text": "The loyalty program integration boosted our repeat customers by 35%. Amazing results!",
+        "name": "Jennifer Brown",
+        "position": "Marketing at CoffeeBreak"
+      }
+    ]
+  },
+  "pricePlan": {
+    "mainText": "Pricing Plans",
+    "title": "Flexible for startups. Scalable for enterprise",
+    "description": "No hidden fees. No hardware lock-ins. Launch for free, scale on demand, or fully own your ecosystem under your brand.",
+    "switch": {
+      "monthly": "Pay Monthly",
+      "annually": "Pay Annually"
+    },
+    "plans": {
+      "monthly": [
+        {
+          "title": "SaaS model",
+          "tiers": [
+            {
+              "name": "Start 1",
+              "discount": "-43%",
+              "price": "$50"
+            },
+            {
+              "name": "Standard up to 3",
+              "discount": "-32%",
+              "price": "$100"
+            },
+            {
+              "name": "Business up to 10",
+              "discount": "-51%",
+              "price": "$140"
+            }
+          ],
+          "features": [
+            "1 project",
+            "Basic support",
+            "Community access"
+          ],
+          "button": "Get Started",
+          "note": "Includes core features:",
+          "noteList": [
+            "POS, CRM, delivery, inventory, finance, analytics, support, and updates.",
+            "Suitable for those who want to quickly start using our platform without launching their own application.",
+            "Start - 1 establishment",
+            "Standard - up to 3 establishments",
+            "Business - up to 10 establishments"
+          ]
+        },
+        {
+          "title": "White-label",
+          "tiers": [
+            {
+              "name": "White Start 1",
+              "discount": "-39%",
+              "price": "$150"
+            },
+            {
+              "name": "White Standard",
+              "discount": "-59%",
+              "price": "$200"
+            },
+            {
+              "name": "White Business",
+              "discount": "-44%",
+              "price": "$500"
+            }
+          ],
+          "features": [
+            "5 projects",
+            "Priority support",
+            "Team access"
+          ],
+          "button": "Try 14 Days Free",
+          "note": "Everything in SaaS, plus:",
+          "noteList": [
+            "Mobile app for iOS/Android and website under your brand.",
+            "Ideal for restaurants and chains looking to develop their own brand and customer base."
+          ]
+        },
+        {
+          "title": "White-label buyout",
+          "discount": "-32%",
+          "tiers": [
+            {
+              "name": "1 Location",
+              "discount": "-64%",
+              "price": "$5,000"
+            },
+            {
+              "name": "Up to 3 Locations",
+              "discount": "-60%",
+              "price": "$10,000"
+            },
+            {
+              "name": "Up to 5–10 Locations",
+              "discount": "-57%",
+              "price": "$15,000"
+            }
+          ],
+          "features": [
+            "Unlimited projects",
+            "24/7 support",
+            "Custom solutions"
+          ],
+          "button": "Request Demo",
+          "note": "Everything in White-label, plus:",
+          "noteList": [
+            "You receive a lifetime right to use the app and website under your brand. Included: publishing, connecting all modules, databases, CRM, delivery, POS, etc. Hosting, databases, and integrations come under your control. The source code is not transferred.",
+            "Updates are available with an active maintenance subscription. One year of maintenance is free, then $50 per month for updates."
+          ],
+          "highlight": true
+        }
+      ],
+      "annually": [
+        {
+          "title": "SaaS model",
+          "tiers": [
+            {
+              "name": "Start 1",
+              "discount": "-73%",
+              "price": "$35"
+            },
+            {
+              "name": "Standard up to 3",
+              "discount": "-62%",
+              "price": "$70"
+            },
+            {
+              "name": "Business up to 10",
+              "discount": "-81%",
+              "price": "$98"
+            }
+          ],
+          "features": [
+            "1 project",
+            "Basic support",
+            "Community access"
+          ],
+          "button": "Get Started",
+          "note": "Includes core features:",
+          "noteList": [
+            "POS, CRM, delivery, inventory, finance, analytics, support, and updates.",
+            "Suitable for those who want to quickly start using our platform without launching their own application.",
+            "Start - 1 establishment",
+            "Standard - up to 3 establishments",
+            "Business - up to 10 establishments"
+          ]
+        },
+        {
+          "title": "White-label",
+          "tiers": [
+            {
+              "name": "White Start 1",
+              "discount": "-69%",
+              "price": "$105"
+            },
+            {
+              "name": "White Standard",
+              "discount": "-89%",
+              "price": "$140"
+            },
+            {
+              "name": "White Business",
+              "discount": "-74%",
+              "price": "$350"
+            }
+          ],
+          "features": [
+            "5 projects",
+            "Priority support",
+            "Team access"
+          ],
+          "button": "Try 14 Days Free",
+          "note": "Everything in SaaS, plus:",
+          "noteList": [
+            "Mobile app for iOS/Android and website under your brand.",
+            "Ideal for restaurants and chains looking to develop their own brand and customer base."
+          ]
+        },
+        {
+          "title": "White-label buyout",
+          "discount": "-22%",
+          "tiers": [
+             {
+              "name": "1 Location",
+              "discount": "-64%",
+              "price": "$5,000"
+            },
+            {
+              "name": "Up to 3 Locations",
+              "discount": "-60%",
+              "price": "$10,000"
+            },
+            {
+              "name": "Up to 5–10 Locations",
+              "discount": "-57%",
+              "price": "$15,000"
+            }
+          ],
+          "features": [
+            "Unlimited projects",
+            "24/7 support",
+            "Custom solutions"
+          ],
+          "button": "Request Demo",
+          "note": "Everything in White-label, plus:",
+          "noteList": [
+            "You receive a lifetime right to use the app and website under your brand. Included: publishing, connecting all modules, databases, CRM, delivery, POS, etc. Hosting, databases, and integrations come under your control. The source code is not transferred.",
+            "Updates are available with an active maintenance subscription. One year of maintenance is free, then $50 per month for updates."
+          ],
+          "highlight": true
+        }
+      ]
+    }
+  },
+  "startSmall": {
+    "title": "Start small, grow without limits",
+    "text": "Launch your CRM and App platform in minutes — no code, no stress. We scale with you.",
+    "buttons": {
+      "getStarted": "Get started",
+      "viewDemo": "View demo"
+    }
+  },
+  "partnersBanner": {
+    "trustedText": "Trusted by 1200+ businesses and entrepreneurs"
+  },
+  "footer": {
+    "sections": {
+      "home": "Home",
+      "product": "Product",
+      "company": "Company",
+      "demo": "Watch the live demo"
+    },
+    "links": {
+      "benefits": "Benefits",
+      "service": "Service",
+      "prices": "Prices",
+      "customerExperience": "Customer Experience Suite",
+      "posStaff": "POS & Staff Operations",
+      "kitchen": "Kitchen & Fulfillment",
+      "inventory": "Inventory & Warehousing",
+      "analytics": "Analytics & Management",
+      "marketing": "Marketing & Customization",
+      "integration": "Integration & Scaling",
+      "ourServices": "Our Services",
+      "aboutUs": "About Us",
+      "contactUs": "Contact Us"
+    },
+    "buttons": {
+      "viewDemo": "View demo"
+    },
+    "legal": {
+      "cookiePolicy": "Cookie Policy",
+      "privacyStatement": "Privacy Statement",
+      "termsOfUse": "Terms of Use",
+      "copyright": "© 2025  Sabsus LLC. All rights reserved."
+    }
+  },
+  "languageSwitcher": {
+    "english": "Eng",
+    "spanish": "Spa",
+    "russian": "Rus",
+    "ukrainian": "Ukr",
+    "selectLanguage": "🌎{{language}} ⌄"
+  },
+  "performanceHubHero": {
+    "innovativeText": "Performance Hub",
+    "title": "Make confident decisions with real-time insights.",
+    "buttons": {
+      "tryFree": "Try for free",
+      "viewDemo": "View demo"
+    }
+  },
+  "howWeWorkSection": {
+    "header": {
+      "title": "How We Work",
+      "mainHeading": "From raw numbers to clear insights",
+      "description": "Monitor performance, improve decisions, and align your entire business with what really moves the needle."
+    },
+    "cards": {
+      "card1": {
+        "title": "Dashboard with real metrics",
+        "description": "Track revenue, active orders, customer counts, and employee performance — all in one customizable view."
+      },
+      "card2": {
+        "title": "Time-based analytics",
+        "description": "Break down results by hour, day, week, or custom date range. Spot peak hours and downtime."
+      },
+      "card3": {
+        "title": "Order insights",
+        "description": "Analyze average check size, top-selling items, conversion rates, and ordering behavior by platform or channel."
+      },
+      "card4": {
+        "title": "Cost & revenue structure",
+        "description": "Compare income vs expenses by source: dine-in, delivery, self-service, etc. Add manual inputs for cashflow tracking."
+      },
+      "card5": {
+        "title": "Staff productivity",
+        "description": "Measure employee output: orders handled, hours worked, speed of service, and customer feedback."
+      },
+      "card6": {
+        "title": "Location comparison",
+        "description": "Compare performance across multiple venues or kitchens. Spot weak spots and replicate success."
+      },
+      "card7": {
+        "title": "Automated reporting",
+        "description": "Receive scheduled reports by email or export data anytime. Share with stakeholders or accounting teams."
+      },
+      "card8": {
+        "title": "AI-powered forecasts",
+        "description": "Use AI to predict demand, recommend price adjustments, and spot emerging trends in customer behavior."
+      }
+    }
+  },
+  "keyCapabilitiesSection": {
+    "header": {
+      "title": "Key Capabilities",
+      "mainHeading": "See the big picture<br/>And the small ones",
+      "description": "Smart reports by time, staff, category or order type. Real-time stats.<br/>Tax-ready exports."
+    },
+    "cards": {
+      "card1": {
+        "title": "Sales Overview",
+        "text": "Track daily sales performance by order type. Compare delivery, dine-in, and pickup at a glance."
+      },
+      "card2": {
+        "title": "Employee Performance",
+        "text": "Visual breakdown of staff productivity. Filter by role, time period, or venue."
+      },
+      "card3": {
+        "title": "Payment Method Insights",
+        "text": "Analyze how customers pay. Helps optimize processor choices and lower costs."
+      },
+      "card4": {
+        "title": "Shift Reports",
+        "text": "Each day ends with auto-generated reports. Includes cash counts, tips, and reconciliations."
+      },
+      "card5": {
+        "title": "Order Flow Analysis",
+        "text": "See how orders move through your system. Helps detect bottlenecks in prep or handoff."
+      },
+      "card6": {
+        "title": "Forecasting Tools",
+        "text": "Predict future demand using historical data. Adjust staffing and stock accordingly."
+      },
+      "card7": {
+        "title": "Tax & Legal",
+        "text": "Automatically generate reports for tax compliance. Set up VAT, tips, service charges."
+      },
+      "card8": {
+        "title": "AI Suggestions",
+        "text": "Get improvement tips based on customer behavior. From pricing to prep timing."
+      }
+    }
+  },
+  "livePrepInsightsSection": {
+    "header": {
+      "title": "Live Prep Insights",
+      "mainHeading": "From warehouse to kitchen — always in sync",
+      "description": "Avoid shortages and waste with live inventory data. From back-of-house logistics to kitchen-ready visibility — everything flows seamlessly, saving time and reducing errors.",
+      "additionalDescription": "Timers, alerts, and zone assignments make sure every dish is ready exactly when it should be. Designed to reduce chaos and maximize performance."
+    }
+  },
+  "brandEngineHero": {
+    "innovativeText": "Brand Engine",
+    "title": "Manage campaigns and loyalty, control identity",
+    "buttons": {
+      "tryFree": "Try for free",
+      "viewDemo": "View demo"
+    }
+  },
+  "marketingHowWeWork": {
+    "header": {
+      "title": "How We Work",
+      "mainHeading": "Grow your brand and reach the right audience",
+      "description": "From branded interfaces to automated campaigns — marketing becomes effortless when it's built right into the system."
+    },
+    "cards": {
+      "card1": {
+        "title": "White-label everything",
+        "description": "Customize the app, website, emails, and even receipts — your logo, your colors, your brand everywhere."
+      },
+      "card2": {
+        "title": "Multilingual interface",
+        "description": "Handle dine-in, delivery, and pickup in one flow. Assign tables, print kitchen tickets, or send to the app with a tap."
+      },
+      "card3": {
+        "title": "Smart discounts & coupons",
+        "description": "Create offers by time, audience segment, purchase history, or special events like birthdays — automatically applied."
+      },
+      "card4": {
+        "title": "Loyalty programs",
+        "description": "Reward repeat customers with points, bonuses, or exclusive deals — fully automated and personalized."
+      },
+      "card5": {
+        "title": "Targeted push & SMS",
+        "description": "Send messages based on user behavior, location, or preferences. Works for promos, reminders, and reactivation."
+      },
+      "card6": {
+        "title": "Visual homepage editor",
+        "description": "Display banners and promos right in the app or website. Highlight new items or campaigns in real time."
+      },
+      "card7": {
+        "title": "Segmentation & analytics",
+        "description": "Group customers by behavior, value, or custom tags. Track the effectiveness of every campaign."
+      },
+      "card8": {
+        "title": "Promotional scheduling",
+        "description": "Plan future campaigns and set automatic activation times — run seasonal offers without lifting a finger."
+      }
+    }
+  },
+  "marketingKeySection": {
+    "header": {
+      "title": "Key Capabilities",
+      "mainHeading": "Promote smarter<br/>Customize deeper",
+      "description": "Automated discounts, personalized offers, multilingual UI, and full white-label design flexibility."
+    },
+    "cards": {
+      "card1": {
+        "title": "Multichannel Campaigns",
+        "text": "Launch marketing via push, SMS, email, and in-app banners. Schedule campaigns based on behavior."
+      },
+      "card2": {
+        "title": "Loyalty Programs",
+        "text": "Create rewarding experiences with automated points. Customize offers for customer groups."
+      },
+      "card3": {
+        "title": "Branded Interface",
+        "text": "Style the app and web with your visual identity. From logo to colors, everything is tailored."
+      },
+      "card4": {
+        "title": "Promo Automation",
+        "text": "Activate discounts based on cart size or customer tags. Set it once and let it run."
+      },
+      "card5": {
+        "title": "Multilingual & Localization",
+        "text": "Ensure seamless UX in RU, EN, ES, or UA. Customize formats for date, currency, and address."
+      },
+      "card6": {
+        "title": "Personalized Offers",
+        "text": "Use AI to recommend items based on preferences. Make customers feel understood."
+      },
+      "card7": {
+        "title": "Banner Designer",
+        "text": "Create visuals and banners for promos from your dashboard. No third-party tools needed."
+      },
+      "card8": {
+        "title": "Campaign Analytics",
+        "text": "See which campaign brought more clicks and visits. Fine-tune messaging based on numbers."
+      }
+    }
+  },
+  "marketingLivePrep": {
+    "header": {
+      "title": "Live Prep Insights",
+      "mainHeading": "Create campaigns. Customize UX.",
+      "description": "Reach your customers via push, email, SMS, and in-app banners. Localize every detail — from text to currency — and match the entire UI to your brand identity.",
+      "additionalDescription": "Birthday rewards, promo automations, and banner editing boost retention and brand consistency. One dashboard, full control."
+    }
+  },
+  "faqSection": {
+    "title": "Frequently asked questions",
+    "subtitle": "You've got questions. We've got honest answers.",
+    "questions": {
+      "q1": {
+        "question": "What is SABSUS and what does it include?",
+        "answer": "SABSUS is an all-in-one ecosystem for restaurants, cafés, bakeries, dark kitchens, and retail.\n\nIncluded in every plan:\n\n• POS system\n• CRM & loyalty\n• Warehouse & ingredients management\n• Delivery with zone pricing\n• Finances, tips, salaries\n• Real-time analytics & reports\n• Order tracking & table layout\n• Cloud infrastructure + multilingual support\n• Web and mobile apps"
+      },
+      "q2": {
+        "question": "Do I need to install any hardware?",
+        "answer": "No. SABSUS runs in any browser and on any device:\n\n• Tablets (Android/iOS)\n• Desktops, POS terminals\n• Smartphones\n\nAll interfaces are responsive and touch-optimized."
+      },
+      "q3": {
+        "question": "How is SABSUS different from other POS/CRM solutions?",
+        "answer": "Most systems give you 1–2 modules. We give you everything:\n\n• Full cycle from order to delivery\n• Loyalty, feedback, barcode scanner\n• Promotions, staff salaries, table maps\n• Multi-language interfaces + AI-translations\n• App + website under your brand (white-label option)\n• No hidden fees, no commissions (unless you choose them)."
+      },
+      "q4": {
+        "question": "What's the difference between SaaS and White-label plans?",
+        "answer": "SaaS Subscription vs White-label Subscription:\n\n• Works under SABSUS brand vs Branded app & website\n• $89–289/mo vs $249–899/mo\n• No app store presence vs Published on App Store & Google Play\n• Common server vs Separate server & database"
+      },
+      "q5": {
+        "question": "Can I buy the app instead of subscribing?",
+        "answer": "Yes. You can fully buy out the white-label app without any subscription.\n\nWhat you get:\n\n• Lifetime license\n• 1 year of updates and support\n• Full control of your database & integrations\n• $50/month optional maintenance after 1 year\n\nPrices start from:\n\n• $14,000 (1 venue, 1 language)\n• $25,000 (up to 3 venues, 2 languages)\n• $35,000 (up to 10 venues, all languages)"
+      },
+      "q6": {
+        "question": "Are future updates included in the lifetime model?",
+        "answer": "Yes — the first year is included.\n\nAfter that, updates and support are available at a fixed price of $50/month.\n\nYou are not forced to update if you don't want to."
+      },
+      "q7": {
+        "question": "Can I migrate my existing data from other POS/CRM systems?",
+        "answer": "Yes. We provide data import tools or help you migrate from systems like Square, Toast, Loyverse, Poster, iiko, and others."
+      },
+      "q8": {
+        "question": "What languages are supported?",
+        "answer": "Currently:\n\n• English\n• Spanish\n• Russian\n• Ukrainian\n\nThe system auto-switches based on user preference. White-label apps can be locked to 1–4 languages depending on plan."
+      },
+      "q9": {
+        "question": "How do I manage multiple locations or brands?",
+        "answer": "SABSUS is built for this:\n\n• Centralized dashboards\n• Custom tax & menu per location\n• Analytics and staff per venue\n• Inventory sync with separate warehouse settings\n\nYou can manage 1 to 100+ venues easily."
+      },
+      "q10": {
+        "question": "What is the refund policy?",
+        "answer": "Monthly subscriptions can be canceled anytime.\n\nApp buyout and branding fees are non-refundable (as they include custom development, publication, and assets).\n\nWe recommend starting with a demo or 1-month subscription first."
+      },
+      "q11": {
+        "question": "How secure is my data?",
+        "answer": "• Hosted on Google Cloud / Supabase\n• Encrypted backups\n• Staff logs & permission controls\n• GDPR/SOC2-ready infrastructure\n\nYou control your database (in white-label or buyout mode)"
+      },
+      "q12": {
+        "question": "What if my internet goes down?",
+        "answer": "SABSUS supports offline mode for POS operations.\n\nOrders and receipts sync automatically when the network is restored."
+      },
+      "q13": {
+        "question": "Do you offer custom development or API access?",
+        "answer": "Yes:\n\n• API available in white-label & buyout plans\n• Integration with Stripe, Telegram, Uber Eats, Google Maps, etc.\n\nYou can request features or pay for custom modules"
+      },
+      "q14": {
+        "question": "Can I connect external printers, card readers, or delivery aggregators?",
+        "answer": "Yes.\n\nSupported:\n\n• Star, Epson, Sunmi, Payoneer, Stripe Terminals\n• Uber Eats (ready), Doordash (coming)\n• SMS, email, and push integrations built-in"
+      },
+      "q15": {
+        "question": "How do I get started?",
+        "answer": "Choose your model:\n\n• SaaS? → Start your subscription now\n• White-label? → Submit brand + logo\n• Want to buy it all? → Contact sales for one-time payment & ownership\n\nWe'll take care of setup, publication, and onboarding."
+      }
+    }
+  },
+  "howWeWorkSection1": {
+    "title": "How We Work",
+    "heading": "We provide a step-by-step guide to help you understand our process.",
+    "description": "Our Customer Experience Suite creates seamless, branded interactions throughout the customer journey. Here’s how it works, from order to retention:",
+    "cards": {
+      "fastOrdering": {
+        "title": "Fast & intuitive ordering",
+        "desc": "Customers browse the menu, apply promos, and place orders in seconds through a sleek, branded mobile app. No logins, no friction — just smooth UX."
+      },
+      "loyaltyPrograms": {
+        "title": "Personalized loyalty programs",
+        "desc": "Automated bonuses, discounts, and birthday rewards are applied in real time. Every purchase strengthens customer connection."
+      },
+      "deliveryFlow": {
+        "title": "Smart delivery & pickup flow",
+        "desc": "Delivery, pickup, and table service options — all managed via one interface. Customers can reorder, track couriers, and save delivery addresses."
+      },
+      "reservationSystem": {
+        "title": "Reservation & waitlist system",
+        "desc": "Book a table, join a waitlist, or reschedule — all without calls. Instant confirmation and calendar integration included."
+      },
+      "notifications": {
+        "title": "Real-time notifications",
+        "desc": "Customers stay informed at every step — from order accepted to courier en route. Push, email, or SMS — it’s all covered."
+      },
+      "feedback": {
+        "title": "Track feedback",
+        "desc": "Built-in review flow and personal taste memory. Gather insights, spot regulars, and offer tailored experiences."
+      },
+      "selfService": {
+        "title": "Self-service & reorders",
+        "desc": "Repeat your last order in one tap, adjust items, and skip the line with table QR codes or app integration."
+      },
+      "customerProfile": {
+        "title": "Centralized customer profile",
+        "desc": "Every interaction feeds the CRM: purchase history, order preferences, bonuses, delivery zones — ready for support and upsell."
+      }
+    }
+  },
+  "keyCapabilitiesSection1": {
+    "title": "Key Capabilities",
+    "heading": "Speed up orders, streamline every shift",
+    "description": "Instant processing, QR payments, team roles, shift tracking — designed for smooth in-store flow.",
+    "cards": {
+      "orderManagement": {
+        "title": "Order Management",
+        "desc": "Manage orders in real-time with a sleek interface. Keep your workflow organized."
+      },
+      "shiftTracking": {
+        "title": "Shift Tracking",
+        "desc": "Monitor employee hours, breaks, and turnover. Shift data is logged and visualized."
+      },
+      "tableLayout": {
+        "title": "Table Layout",
+        "desc": "Edit interactive seating maps for efficient service. Tables link to live order status and guest count."
+      },
+      "qrPayments": {
+        "title": "QR Payments",
+        "desc": "Customers can pay quickly and securely with QR codes linked to each order."
+      },
+      "accessControl": {
+        "title": "Access Control",
+        "desc": "Assign permissions by role. PIN access ensures security at every point."
+      },
+      "receiptPrinting": {
+        "title": "Receipt Printing",
+        "desc": "Print receipts and orders instantly. Customize formats and languages for your brand."
+      },
+      "depositTips": {
+        "title": "Deposit & Tips",
+        "desc": "Track prepaid deposits and digital tips with full transparency. Tied directly into each customer profile and order."
+      },
+      "roleManagement": {
+        "title": "Role Management",
+        "desc": "Control visibility in the system with role templates. Suitable for cafes, bakeries, restaurants, and retail."
+      }
+    }
+  },
+  "livePrepInsights1": {
+    "title": "Live Prep Insights",
+    "heading": "All-in-one engagement platform",
+    "description": "Unify every user-facing channel into one seamless experience. From mobile orders to loyalty rewards — everything is built to feel intuitive and fast.",
+    "footerText": "Your brand, your flow. Customize touchpoints with full control over visuals, behavior, and engagement logic — all while delivering delight across the customer journey."
+  },
+  "mobileUXSection1": {
+    "title": "Mobile UX",
+    "heading": "Create personalized customer journeys",
+    "buttons": {
+      "tryFree": "Try for free",
+      "viewDemo": "View demo"
+    }
+  },
+  "stepByStepGuidance1": {
+    "title": "Step-by-step guidance",
+    "heading": "Master your CRM in minutes",
+    "description": "Watch a walkthrough of our CRM system — from setting up profiles to managing your pipeline. This guide shows how to maximize every feature."
+  },
+  "integrationScalingHero": {
+    "title": "Open Infra",
+    "heading": "Scale your operations — plug into anything, anytime",
+    "buttons": {
+      "tryFree": "Try for free",
+      "viewDemo": "View demo"
+    }
+  },
+  "integrationScalingSection": {
+    "title": "How We Work",
+    "heading": "Expand without limits",
+    "description": "Connect services, scale operations, and adapt the system to any size or geography — all with zero friction.",
+    "cards": {
+      "oneClick": {
+        "title": "One-click integrations",
+        "desc": "Seamlessly connect with payment gateways, delivery platforms (like UberEats), printers, and more — no coding required."
+      },
+      "openApi": {
+        "title": "Open API access",
+        "desc": "Build custom features, sync with external tools, or create new workflows — the platform is developer-ready."
+      },
+      "multivenue": {
+        "title": "Multivenue management",
+        "desc": "Add and manage multiple stores, restaurants, or warehouses under one dashboard — each with unique settings."
+      },
+      "roleAccess": {
+        "title": "Role-based access & permissions",
+        "desc": "Create roles for staff, couriers, suppliers, or marketers — each with tailored permissions and visibility."
+      },
+      "domainConfig": {
+        "title": "Domain & SSL configuration",
+        "desc": "Set up your own domain name and enable secure HTTPS with ease — ideal for branded web portals."
+      },
+      "offlineMode": {
+        "title": "Offline mode",
+        "desc": "Run operations without internet — process payments, print receipts, and sync data when connection is restored."
+      },
+      "responsiveDesign": {
+        "title": "Responsive design",
+        "desc": "Access everything from desktop, tablet, or mobile — built to work perfectly across all devices."
+      },
+      "scalableInfra": {
+        "title": "Scalable infrastructure",
+        "desc": "Whether it's one venue or one hundred, the system adapts without performance drops or extra complexity."
+      }
+    }
+  },
+  "integrationScalingCards": {
+    "apiFirst": {
+      "title": "API-First Approach",
+      "text": "Connect your ecosystem to external tools with a public API. It's open to partners and processors."
+    },
+    "scalableInfra": {
+      "title": "Scalable Infrastructure",
+      "text": "Add new venues, roles, or workflows without overhauls. Your growth doesn't require a redesign."
+    },
+    "deviceFlexibility": {
+      "title": "Device Flexibility",
+      "text": "Use the system on tablets, phones, desktops, or POS terminals. No proprietary hardware needed."
+    },
+    "offlineMode": {
+      "title": "Offline Mode",
+      "text": "Keep processing even if internet drops — data syncs automatically when you're back online."
+    },
+    "multiFormat": {
+      "title": "Multi-format Access",
+      "text": "Switch between delivery, dine-in, or pickup modes across interfaces. It adapts instantly."
+    },
+    "customDomains": {
+      "title": "Custom Domains & SSL",
+      "text": "Brand your web version with your domain and keep data secure. SSL certificates included by default."
+    },
+    "paymentIntegrations": {
+      "title": "Payment Integrations",
+      "text": "Easily connect Stripe, Apple Pay, or bank systems. Transactions go through without friction."
+    },
+    "deliveryAggregators": {
+      "title": "Delivery Aggregators",
+      "text": "Connect to UberEats, DoorDash and more — and manage orders from one place."
+    }
+  },
+  "keyCapabilitiesSection2": {
+    "title": "Key Capabilities",
+    "heading": "Connect, expand, repeat",
+    "description": "API access, terminal and delivery integrations, multi-venue scaling, and offline mode included."
+  },
+  "brandedGrowthTools": {
+    "title": "Branded Growth Tools",
+    "heading": "Create campaigns. Customize UX.",
+    "description": "Reach your customers via push, email, SMS, and in-app banners. Localize every detail — from text to currency — and match the entire UI to your brand identity.",
+    "footerText": "Birthday rewards, promo automations, and banner editing boost retention and brand consistency. One dashboard, full control."
+  },
+  "inventoryHero": {
+    "title": "Stock Logic",
+    "heading": "Track ingredients and metrics from source to plate",
+    "features": {
+      "inventorySync": "Inventory Sync",
+      "smartFlow": "Smart Flow"
+    },
+    "buttons": {
+      "tryFree": "Try for free",
+      "viewDemo": "View demo"
+    }
+  },
+  "inventoryManagementSection": {
+    "title": "How We Work",
+    "heading": "Total control over ingredients, stock, and supply chains",
+    "description": "Stay ahead of shortages, streamline logistics, and keep your operations smooth — from kitchen to warehouse.",
+    "cards": {
+      "realTimeTracking": {
+        "title": "Real-time stock tracking",
+        "desc": "Track ingredients, goods, and packaging across all storage locations. Get live counts as orders and supplies flow."
+      },
+      "smartWriteOffs": {
+        "title": "Smart write-offs",
+        "desc": "Auto-deduct ingredients based on dish recipes and portion sizes. Manual write-offs also supported for spoilage or breakage."
+      },
+      "inventoryByZones": {
+        "title": "Inventory by zones",
+        "desc": "Organize warehouses by storage zones (freezer, dry, cold prep). Filter and search by category, SKU, or custom tag."
+      },
+      "prepsProducts": {
+        "title": "Preps & semi-finished products",
+        "desc": "Track bulk items like dough or sauces. Define their shelf life, consumption rate, and production dependencies"
+      },
+      "transfersMovement": {
+        "title": "Transfers & movement",
+        "desc": "Move stock between locations in just a few taps. System records source, destination, and staff responsible."
+      },
+      "deliveriesSuppliers": {
+        "title": "Deliveries & suppliers",
+        "desc": "Add deliveries manually or via import. Link items to supplier profiles, invoices, and purchase histories."
+      },
+      "inventoryAudits": {
+        "title": "Inventory audits",
+        "desc": "Run full or partial stock takes with mobile devices. Track discrepancies, expiration dates, and overstock warnings."
+      },
+      "packagingBundles": {
+        "title": "Packaging & bundles",
+        "desc": "Set rules for packaging by order type (e.g. delivery vs dine-in). Link items to box types, napkins, or utensils."
+      }
+    }
+  },
+  "inventoryKeyFeatures": {
+    "title": "Key Capabilities",
+    "heading": "Know what's in stock Always",
+    "description": "Track supplies, move stock, auto-write-off ingredients, and simplify warehouse logistics.",
+    "cards": {
+      "ingredientTracking": {
+        "title": "Ingredient Tracking",
+        "text": "Monitor product from supplier to storage. Minimize spoilage and waste with automation."
+      },
+      "stockLevels": {
+        "title": "Stock Levels",
+        "text": "Overview of inventory across locations for ingredients, packaging, and semi-finished goods."
+      },
+      "warehouseTransfers": {
+        "title": "Transfers Between Warehouses",
+        "text": "Move stock with full digital paperwork. Keep inventory balanced across venues."
+      },
+      "smartCategorization": {
+        "title": "Smart Categorization",
+        "text": "Tag items by category, supplier, expiration, and more. Fast filtering and search anytime."
+      },
+      "supplyDeliveries": {
+        "title": "Supply Deliveries",
+        "text": "Log new deliveries, match invoices, update quantities. Works seamlessly with purchase orders."
+      },
+      "wasteManagement": {
+        "title": "Waste Management",
+        "text": "Mark spoiled or expired items with reason codes. Improves analytics and ordering habits."
+      },
+      "costCalculation": {
+        "title": "Cost of Goods Calculation",
+        "text": "Automatic COGS updates based on purchase prices. Helps determine accurate margins per item."
+      },
+      "ingredientBundling": {
+        "title": "Ingredient Bundling",
+        "text": "Create prep kits and semi-finished components. Ideal for pizza doughs, sauces, etc."
+      }
+    }
+  },
+  "inventoryHero1": {
+    "title": "Live Prep Insights",
+    "heading": "From warehouse to kitchen — always in sync",
+    "description": "Track stock, transfers, and supplies in one smart system. Monitor ingredients, packaging, and prep kits with instant updates across all venues.",
+    "footerText": "Timers, alerts, and zone assignments make sure every dish is ready exactly when it should be. Designed to reduce chaos and maximize performance."
+  },
+  "kitchenHero1": {
+    "title": "Mobile UX",
+    "heading": "Create personalized customer journeys",
+    "buttons": {
+      "tryFree": "Try for free",
+      "viewDemo": "View demo"
+    }
+  },
+  "howWeWorkSection2": {
+    "title": "How We Work",
+    "heading": "From order to ready light — organized, fast, and clear",
+    "description": "The kitchen and fulfillment system brings precision to your back-of-house flow. Here's how your team stays in sync:",
+    "cards": {
+      "instantOrderProcessing": {
+        "title": "Instant order processing",
+        "desc": "Take orders in seconds with smart presets, modifiers, and intuitive navigation. Works equally fast on tablets, terminals, or smartphones."
+      },
+      "multiModeOrderTypes": {
+        "title": "Multi-mode order types",
+        "desc": "Handle dine-in, delivery, and pickup in one flow. Assign tables, print kitchen tickets, or send to the app with a tap."
+      },
+      "dynamicTableManagement": {
+        "title": "Dynamic table management",
+        "desc": "Visual map of your venue with live updates. Move, merge, split checks — all in real time."
+      },
+      "shiftStaffTracking": {
+        "title": "Shift & staff tracking",
+        "desc": "Logins with PINs, auto time tracking, and per-role permissions. Built-in attendance, tips, and performance overview."
+      },
+      "qrPaymentsDeposits": {
+        "title": "QR payments & deposits",
+        "desc": "Print QR codes for instant checkout or deposits. Customers scan, pay, and go — no hardware required."
+      },
+      "kitchenPrinterRouting": {
+        "title": "Kitchen & printer routing",
+        "desc": "Orders are automatically sent to the right station — drinks to bar, mains to kitchen. Supports multilingual receipts and multiple printers."
+      },
+      "onTheFlyMenuUpdates": {
+        "title": "On-the-fly menu updates",
+        "desc": "Add, disable, or edit products in seconds. Changes sync instantly across POS, kitchen, and app."
+      },
+      "endOfShiftReports": {
+        "title": "End-of-shift reports",
+        "desc": "Close shifts with full financial breakdowns. Track card, cash, and delivery payments, plus tips and staff bonuses."
+      }
+    }
+  },
+  "kitchenManagement1": {
+    "title": "Key Capabilities",
+    "heading": "Manage the kitchen in real time — without delays.",
+    "description": "Increase team efficiency: order statuses, step-by-step recipes, timers, and task distribution — all synchronized from screen to delivery.",
+    "cards": {
+      "realTimeStatus": {
+        "title": "Real-Time Prep Status",
+        "desc": "Orders go to the kitchen with updates at every stage. Staff knows what's cooking."
+      },
+      "visualRecipes": {
+        "title": "Visual Recipes",
+        "desc": "Each dish has a digital card with ingredients and prep steps, ensuring quality."
+      },
+      "timersAlerts": {
+        "title": "Timers & Alerts",
+        "desc": "Set preparation timers and alerts for each item. Kitchen stays synced with front-of-house and delivery."
+      },
+      "zoneAssignment": {
+        "title": "Zone Assignment",
+        "desc": "Orders are routed to the right kitchen. This optimizes workload and reduces delays."
+      },
+      "frontNotifications": {
+        "title": "Notifications to Front",
+        "desc": "When dishes are ready, front-of-house is notified. This improves delivery speed and dining."
+      },
+      "displayScreens": {
+        "title": "Display Screens",
+        "desc": "Track orders on digital displays. Customers see when their order is ready."
+      },
+      "ingredientVisibility": {
+        "title": "Ingredient Visibility",
+        "desc": "See every component of a dish at a glance. From allergies to calorie counts, it's all mapped."
+      },
+      "stationAssignment": {
+        "title": "Station Assignment",
+        "desc": "Each kitchen team member sees only their relevant tasks. Boosts speed, reduces mistakes."
+      }
+    }
+  },
+  "kitchenPrepInsights1": {
+    "title": "Live Prep Insights",
+    "heading": "Precision and speed from prep to plate",
+    "description": "Track real-time cooking progress across all stations with synced kitchen displays. Each order flows through clear stages — prep, cook, serve — with glowing indicators.",
+    "footerText": "Timers, alerts, and zone assignments make sure every dish is ready exactly when it should be. Designed to reduce chaos and maximize performance."
+  },
+  "terminalControlSection": {
+    "title": "Terminal Control",
+    "heading": "Simplify shifts with smarter POS and role tools",
+    "buttons": {
+      "tryFree": "Try for free",
+      "viewDemo": "View demo"
+    }
+  },
+  "howWeWork1": {
+    "title": "How We Work",
+    "heading": "Your staff's new favorite tool",
+    "description": "From first tap to end-of-shift reporting — the POS & Staff system is built for speed, clarity, and flexibility. Here's how the workflow runs:",
+    "cards": {
+      "instantOrderProcessing": {
+        "title": "Instant order processing",
+        "desc": "Take orders in seconds with smart presets, modifiers, and intuitive navigation. Works equally fast on tablets, terminals, or smartphones."
+      },
+      "multiModeOrderTypes": {
+        "title": "Multi-mode order types",
+        "desc": "Handle dine-in, delivery, and pickup in one flow. Assign tables, print kitchen tickets, or send to the app with a tap."
+      },
+      "dynamicTableManagement": {
+        "title": "Dynamic table management",
+        "desc": "Visual map of your venue with live updates. Move, merge, split checks — all in real time."
+      },
+      "shiftStaffTracking": {
+        "title": "Shift & staff tracking",
+        "desc": "Logins with PINs, auto time tracking, and per-role permissions. Built-in attendance, tips, and performance overview."
+      },
+      "qrPaymentsDeposits": {
+        "title": "QR payments & deposits",
+        "desc": "Print QR codes for instant checkout or deposits. Customers scan, pay, and go — no hardware required."
+      },
+      "kitchenPrinterRouting": {
+        "title": "Kitchen & printer routing",
+        "desc": "Orders are automatically sent to the right station — drinks to bar, mains to kitchen. Supports multilingual receipts and multiple printers."
+      },
+      "onTheFlyMenuUpdates": {
+        "title": "On-the-fly menu updates",
+        "desc": "Add, disable, or edit products in seconds. Changes sync instantly across POS, kitchen, and app."
+      },
+      "endOfShiftReports": {
+        "title": "End-of-shift reports",
+        "desc": "Close shifts with full financial breakdowns. Track card, cash, and delivery payments, plus tips and staff bonuses."
+      }
+    }
+  },
+  "keyCapabilitiesSection3": {
+    "title": "Key Capabilities",
+    "heading": "From screen to service, without delays",
+    "description": "Live order statuses, recipe breakdowns, timers and pickup coordination built for your kitchen crew.",
+    "cards": {
+      "brandedMobileApp": {
+        "title": "Branded Mobile App",
+        "desc": "Get a custom app with your brand's logo and colors. Great for user engagement and repeat orders."
+      },
+      "loyaltyPrograms": {
+        "title": "Loyalty Programs",
+        "desc": "Set up bonuses, cashback or discounts based on user activity. Build habits and retain your best."
+      },
+      "smartDeliveryOptions": {
+        "title": "Smart Delivery Options",
+        "desc": "Choose from delivery, pickup, or dine-in. Auto-location and saved addresses included."
+      },
+      "pushNotifications": {
+        "title": "Push Notifications",
+        "desc": "Send timely updates about orders, promos or new arrivals. Drive engagement and reduce no-shows."
+      },
+      "orderHistoryRepeats": {
+        "title": "Order History & Repeats",
+        "desc": "Let users reorder in seconds from their past purchases. Track preferences for experience."
+      },
+      "tableReservations": {
+        "title": "Table Reservations",
+        "desc": "Book tables in advance with time slots and guest count. Reduce queues and optimize floor space."
+      },
+      "customerFeedback": {
+        "title": "Customer Feedback",
+        "desc": "Collect reviews and ratings per order. Show you listen, and build trust."
+      },
+      "personalAccountArea": {
+        "title": "Personal Account Area",
+        "desc": "Manage orders, loyalty status, saved data, and preferences. A seamless all-in-one experience for users."
+      }
+    }
+  },
+  "kitchenPrepInsights2": {
+    "title": "Live Prep Insights",
+    "heading": "Precision and speed from prep to plate",
+    "description": "Track real-time cooking progress across all stations with synced kitchen displays. Each order flows through clear stages — prep, cook, serve — with glowing indicators.",
+    "footerText": "Timers, alerts, and zone assignments make sure every dish is ready exactly when it should be. Designed to reduce chaos and maximize performance."
+  },
+  "howWeWorkSection3": {
+    "header": {
+      "title": "How We Work",
+      "heading": "Our approach is built on transparency, speed, and care",
+      "description": "Here’s How Collaboration with Sabsus Works:"
+    },
+    "cards": {
+      "discovery": {
+        "title": "Business Analysis First",
+        "desc": "We dive into how your business operates: workflows, audience, and pain points. We examine how orders are taken, inventory is tracked, and deliveries are managed. Then we form growth hypotheses: what modules to connect, where you're losing money, how to win back customers. We only launch what brings real value."
+      },
+      "scope": {
+        "title": "Clear Scope and Plan",
+        "desc": "We don't sell 'the box.' Instead, we discuss the exact modules you need: POS, CRM, terminals, online orders, delivery. You know in advance what will be connected, how the interface will look, and what results to expect. We simplify decision-making and remove the fog around 'what will come out of this.'"
+      },
+      "prototyping": {
+        "title": "Setup & Build — Together",
+        "desc": "You're never left with just instructions. Our team helps upload your menu, design your system, set up payments, couriers, inventory, and analytics. We test every step live — during setup. Your team is fully involved, as if it were their own product."
+      },
+      "syncs": {
+        "title": "Constant Feedback Loop",
+        "desc": "We conduct regular check-ins: what works, what can be improved. We stay in touch via WhatsApp/Telegram, Zoom, and in-app support. You're part of the process — not stuck waiting. We keep tasks visible, share demo reports, and develop new ideas together."
+      },
+      "design": {
+        "title": "Branded Design and Real Results",
+        "desc": "All interfaces — from mobile apps to terminals — are tailored to your brand. Ease of use never compromises efficiency. Every decision is tested on real orders and customers. The focus is not just on looks, but on boosting your average check and speeding up service."
+      },
+      "flexibility": {
+        "title": "Flexibility Without Chaos",
+        "desc": "Switched to a new format? Added deliveries or dine-in? Changed staff? Sabsus adapts seamlessly to your evolving needs — no technical headaches. We preserve your structure and progress, even if you switch from a competitor or scale up rapidly."
+      },
+      "quality": {
+        "title": "Quality in Every Detail",
+        "desc": "Every receipt, order, translation, and QR code is checked. Interfaces are built not 'as they turn out,' but for real-world use — by cashiers, waiters, chefs, and clients. Fonts, loading speed, autocomplete, multilingual support — every detail matters."
+      },
+      "support": {
+        "title": "Long-Term Partnership",
+        "desc": "Our goal isn't just to launch your POS — but to grow with you. You get updates, new modules, analytics, marketing tools, and team training. We don't just hand over a system. We walk with you toward profit and scale."
+      }
+    }
+  },
+  "hero1": {
+    "aboutUs": "About us",
+    "title": "We believe in clarity, innovation, and integrity",
+    "description": "Our mission is to empower businesses by simplifying operations and enhancing customer experiences through cutting-edge technology and solutions.",
+    "stats": {
+      "satisfaction": "Client satisfaction in all segments",
+      "launchSpeed": "Faster launch than traditional systems",
+      "scaling": "Customers say we help them scale"
+    }
+  },
+  "contact": {
+    "getStarted": "Get started",
+    "title": "Get started with SABSUS",
+    "description": "Schedule a 30-minute product demo with our team",
+    "form": {
+      "emailLabel": "What's your professional email?",
+      "emailPlaceholder": "john21@gmail.com",
+      "emailError": "Please enter a valid email address",
+      "teammatesLabel": "How many teammates will be using CRM?",
+      "teammatesOptions": {
+        "select": "Select option",
+        "1-5": "from 1 to 5",
+        "5-15": "from 5 to 15",
+        "15-30": "from 15 to 30",
+        "30-50": "from 30 to 50",
+        "50-100": "from 50 to 100"
+      },
+      "terms": "By continuing, you agree to our Terms of Use and Privacy policy",
+        "submit": "Book an appointment",
+      "submitting": "Sending..."
+    },
+    "help": {
+      "title": "Need help or want to talk to our team?",
+      "support": "Support:",
+      "supportEmail": "support@sabsus.com",
+      "supportBadge": "24/7",
+      "helpCenter": "Visit Help Center & Chat",
+      "helpText": "Browse instructions, setup guides, and contact live support — anytime."
+    }
+  },
+  "feedback1": {
+    "title": "Have more than 10 locations or any questions?",
+    "subtitle": "Our team will help you build a custom plan tailored to your needs",
+    "description": "From scaling to integrations, we've got you covered",
+    "form": {
+      "name": "Name (Full Name)",
+      "company": "Company Name",
+      "email": "Email",
+      "phone": "Phone",
+      "optional": "optional",
+      "locations": "Number of Locations",
+      "message": "Message / Questions",
+      "scheduleCall": "I'd like to schedule a call",
+      "submit": "Contact Sales",
+      "selectOption": "Select an option"
+    }
+  },
+   "businessSwiper": {
+    "title": "Choose your business format",
+    "subtitle": "All types of businesses we automate",
+    "businessTypes": {
+      "restaurant": "Restaurant",
+      "bistro": "Bistro",
+      "veganRestaurant": "Vegan Restaurant",
+      "sushi": "Sushi",
+      "fastFood": "Fast Food",
+      "buffet": "Buffet",
+      "foodTruck": "Food Truck",
+      "coffeeShop": "Coffee Shop",
+      "pizzeria": "Pizzeria",
+      "bakery": "Bakery",
+      "iceCreamParlor": "Ice Cream Parlor",
+      "candyShop": "Candy Shop",
+      "darkKitchen": "Dark Kitchen",
+      "delivery": "Delivery",
+      "franchiseOwners": "Franchise Owners",
+      "cateringServices": "Catering Services",
+      "eventFoodStands": "Event Food Stands",
+      "mealPrepBusiness": "Meal Prep Business",
+      "store": "Store",
+      "onlineShop": "Online Shop",
+      "giftShop": "Gift Shop",
+      "beautyShop": "Beauty Shop",
+      "smokeShop": "Smoke Shop",
+      "healthStore": "Health Store",
+      "florist": "Florist",
+      "petShop": "Pet Shop"
+    }
+  },
+  "comparisonTable": {
+    "title": "Comparison of <highlight>Sabsus</highlight> with competitors",
+    "headers": {
+      "feature": "Feature / Costs",
+      "sabsus": "Sabsus",
+      "toast": "Toast",
+      "square": "Square",
+      "clover": "Clover",
+      "otter": "Otter",
+      "skytab": "SkyTab"
+    },
+    "rows": {
+      "annualCost": "Annual costs/1k orders",
+      "savings": "Annual savings with Sabsus"
+    },
+    "features": [
+      {
+        "name": "Branded customer app",
+        "sabsus": "✔️",
+        "toast": "❌ $349/month",
+        "square": "❌",
+        "clover": "❌",
+        "otter": "❌",
+        "skytab": "❌"
+      },
+      {
+        "name": "White-label entire system",
+        "sabsus": "✔️",
+        "toast": "❌",
+        "square": "❌",
+        "clover": "❌",
+        "otter": "❌",
+        "skytab": "❌"
+      },
+      {
+        "name": "Website + Online ordering",
+        "sabsus": "✔️",
+        "toast": "✔️ $75/month",
+        "square": "✔️ Free / $29",
+        "clover": "✔️",
+        "otter": "💲 $55/month",
+        "skytab": "✔️"
+      },
+      {
+        "name": "Self-service kiosk",
+        "sabsus": "✔️",
+        "toast": "💲 $3,499 + $69/month",
+        "square": "💲 $30/month",
+        "clover": "💲 $3,499 + $34.95/month",
+        "otter": "💲 $85/month",
+        "skytab": "💲 $29.99/month"
+      },
+      {
+        "name": "Kitchen display (KDS)",
+        "sabsus": "✔️ ",
+        "toast": "💲 $25-100/month",
+        "square": "💲 $20/month",
+        "clover": "💲 $799 + $25/month",
+        "otter": "💲 $75/month",
+        "skytab": "💲 $29.99/month"
+      },
+      {
+        "name": "Customer display",
+        "sabsus": "✔️",
+        "toast": "❌",
+        "square": "❌",
+        "clover": "💲 $25/month",
+        "otter": "💲 $30/month",
+        "skytab": "💲 $29.99/month"
+      },
+      {
+        "name": "Push notifications",
+        "sabsus": "✔️",
+        "toast": "💲 Only with Premium",
+        "square": "❌",
+        "clover": "❌",
+        "otter": "❌",
+        "skytab": "❌"
+      },
+      {
+        "name": "Inventory + recipes",
+        "sabsus": "✔️",
+        "toast": "💲 $35/month",
+        "square": "💲 $69/month",
+        "clover": "💲 $90/month",
+        "otter": "❌",
+        "skytab": "❌"
+      },
+      {
+        "name": "AI: GPT, photo invoices, translations",
+        "sabsus": "✔️",
+        "toast": "✔️ Invoices",
+        "square": "❌",
+        "clover": "❌",
+        "otter": "❌",
+        "skytab": "❌"
+      },
+      {
+        "name": "Time tracking & payroll",
+        "sabsus": "✔️",
+        "toast": "✔️ $69/month",
+        "square": "✔️ $69/month",
+        "clover": "✔️ App Market $20-40/month",
+        "otter": "❌",
+        "skytab": "❌"
+      },
+      {
+        "name": "Promos, banners, automation",
+        "sabsus": "✔️",
+        "toast": "💲 Premium",
+        "square": "💲 Partially",
+        "clover": "💲 App Market",
+        "otter": "❌",
+        "skytab": "💲 Partially"
+      },
+      {
+        "name": "In-app games",
+        "sabsus": "✔️",
+        "toast": "❌",
+        "square": "❌",
+        "clover": "❌",
+        "otter": "❌",
+        "skytab": "❌"
+      },
+      {
+        "name": "Custom payment gateways",
+        "sabsus": "✔️ North, Stripe, PayPal etc.",
+        "toast": "❌ Built-in only",
+        "square": "❌ Square only",
+        "clover": "❌ Clover only",
+        "otter": "Stripe / Adyen",
+        "skytab": "❌"
+      },
+      {
+        "name": "QR payments",
+        "sabsus": "✔️",
+        "toast": "💲 Premium",
+        "square": "✔️",
+        "clover": "✔️",
+        "otter": "💲 $30/month",
+        "skytab": "✔️"
+      },
+      {
+        "name": "Delivery + zones + pricing",
+        "sabsus": "✔️",
+        "toast": "💲 Separate",
+        "square": "💲 Partially",
+        "clover": "💲 from $99",
+        "otter": "💲 from $99",
+        "skytab": "💲 from $99"
+      },
+      {
+        "name": "Courier tracking, zones, packaging",
+        "sabsus": "✔️",
+        "toast": "💲 Partially",
+        "square": "💲 Partially",
+        "clover": "💲 from $89/month",
+        "otter": "❌",
+        "skytab": "❌"
+      },
+      {
+        "name": "Multilingual interface",
+        "sabsus": "✔️",
+        "toast": "❌",
+        "square": "✔️",
+        "clover": "❌",
+        "otter": "❌",
+        "skytab": "❌"
+      },
+      {
+        "name": "Uber Eats / DoorDash integration",
+        "sabsus": "✔️ (auto-import)",
+        "toast": "💲 via Chowly: from $99/month + % fees",
+        "square": "💲 via Zapier ($99-299/month)",
+        "clover": "💲 App Market ($99-150/month)",
+        "otter": "✔️",
+        "skytab": "💲 Checkmate / Otter ($99+)"
+      },
+      {
+        "name": "System buyout option",
+        "sabsus": "✔️",
+        "toast": "❌",
+        "square": "❌",
+        "clover": "❌",
+        "otter": "❌",
+        "skytab": "❌"
+      },
+      {
+        "name": "Works on any device",
+        "sabsus": "✔️",
+        "toast": "❌",
+        "square": "❌",
+        "clover": "❌",
+        "otter": "❌",
+        "skytab": "❌"
+      },
+      {
+        "name": "Employee scheduling",
+        "sabsus": "✔️",
+        "toast": "💲 Premium only",
+        "square": "💲 Partially",
+        "clover": "💲 via App Market",
+        "otter": "❌",
+        "skytab": "❌"
+      },
+      {
+        "name": "Contract obligations",
+        "sabsus": "❌",
+        "toast": "✔️",
+        "square": "✔️",
+        "clover": "✔️",
+        "otter": "✔️",
+        "skytab": "✔️"
+      }
+    ],
+    "costs": {
+      "sabsus": "$18,528",
+      "toast": "$28,692",
+      "square": "$23,496",
+      "clover": "$24,408",
+      "otter": "$24,288",
+      "skytab": "$22,955.64"
+    },
+    "savings": {
+      "toast": "$10,164",
+      "square": "$4,968",
+      "clover": "$5,880",
+      "otter": "$5,760",
+      "skytab": "$4,427.64"
+    },
+    "controls": {
+      "start": "Start",
+      "toggleAutoScroll": "Toggle auto-scroll",
+      "end": "End"
+    }
+  },
+   "policies": {
+    "privacy": {
+      "title": "USER AGREEMENT AND PRIVACY POLICY of the Sabsus Platform: 16 May 2025",
+      "text": [
+        "Welcome to the Sabsus Platform. This document constitutes a unified User Agreement and Privacy Policy applicable to the website, mobile application and other Sabsus services (together, the \"Sabsus Platform\" or \"Service\"). By using or registering on the Sabsus Platform, you (the \"User,\" \"you\") agree to the terms of this Agreement and confirm that you have read our personal-data processing policy. If you do not agree with any provision, please do not use the Service.",
+        "We recommend that you read the following terms carefully. The document sets out the rules for using the Sabsus Platform, the rights and obligations of Users, and the conditions for processing and protecting personal data in accordance with global requirements (GDPR, CCPA/CPRA, PIPEDA, UK GDPR, etc.), as well as regional clauses for different jurisdictions. This Agreement is written in Russian but is intended to apply to all users worldwide (in the relevant parts, taking regional specifics into account). If any local law conflicts with the provisions of this Agreement, the mandatory rules of your jurisdiction prevail to the extent of the conflict."
+      ]
+    },
+    "terms": {
+      "1": {
+        "title": "1. Terms and Definitions",
+        "SabsusPlatform": {
+          "title": "Sabsus Platform (or Service)",
+          "text": "The combination of software and hardware that powers the Sabsus website, mobile app and other digital tools designed for interaction between partner restaurants and their customers. The Platform allows Users to register, order restaurant goods and services, pay online, participate in loyalty programs, use gift cards, leave reviews, etc."
+        },
+        "SabsusCompany": {
+          "title": "Sabsus Company (or we/our)",
+          "text": "The owner of the Sabsus Platform responsible for its operation. It is assumed to be a legal entity incorporated under the laws of the State of California, USA (e.g., Sabsus, Inc.), acting as the personal-data controller of Users"
+        },
+        "User": {
+          "title": "User (or you)",
+          "text": "Any natural person who is a customer of restaurants and uses the Sabsus Platform to order goods/services, participate in loyalty programs, submit reviews and other interactions. The User must have reached the age allowing them to enter into legally binding agreements (normally 18 years) or use the Service with the consent of a legal guardian."
+        },
+        "Restaurant": {
+          "title": "Restaurant",
+          "text": "A business entity or entrepreneur, partner of Sabsus, offering its goods and services (e.g., dishes, drinks, gift certificates) to Users through the Platform. Each purchase transaction via the Service is concluded between the User and the relevant Restaurant."
+        },
+        "Account": {
+          "title": "Account",
+          "text": "The User's account on the Sabsus Platform created during registration and used to access the Service's features. Registration requires providing current and accurate information (e.g., name, phone number, email address) and creating a strong password"
+        },
+        "PersonalData": {
+          "title": "Personal data",
+          "text": "Any information relating to an identified or identifiable natural person. Such data may include: name, contact details, payment information, order data, reviews, as well as technical data about the device and network used to access the Service, and other information that directly or indirectly identifies the User. See examples at opentable.comopentable.com."
+        },
+        "PrivacyPolicy": {
+          "title": "Privacy Policy",
+          "text": "The section of this document that describes how Sabsus collects, uses, discloses and protects Users' Personal Data, and explains Users' privacy rights and how to exercise them."
+        },
+        "PaymentProviders": {
+          "title": "Payment providers",
+          "text": "Third-party electronic-payment services integrated with the Sabsus Platform. In particular, we use Stripe and PayPal to process payments. These providers may request and process a User's financial data (e.g., card details) under their own rules and privacy policies"
+        },
+        "BonusProgram": {
+          "title": "Bonus program",
+          "text": "A loyalty program implemented through the Sabsus Platform under which the User may accumulate bonus points or receive other rewards for orders and certain actions, and redeem them for discounts or prizes under established terms."
+        },
+        "GiftCard": {
+          "title": "Gift card",
+          "text": "A digital or physical certificate (voucher) granting the right to receive Restaurant goods/services for a specific amount or volume. Gift cards may be purchased or issued in promotions and are subject to special terms (see Section 5 below)."
+        },
+        "UserContent": {
+          "title": "User Content",
+          "text": "Materials that the User posts on the Sabsus Platform, including reviews, ratings, comments, photos and other content. The User retains rights to their Content but grants Sabsus a non-exclusive right to use, reproduce, publish and display such Content within the Service's operation (see Section 7 for details)."
+        },
+        "Cookie": {
+          "title": "Cookie",
+          "text": "A small data fragment placed by the Service (or third parties on our behalf) on the User's device when visiting the website. Cookies remember User actions and preferences (e.g., interface language, cart contents) and collect usage statistics to personalise the Service."
+        },
+        "Pixel": {
+          "title": "Pixel (tracking pixel)",
+          "text": "A snippet of code or invisible image on a webpage or email used to track User activity (e.g., page view or email open). Marketing and analytics services may use pixels on our Platform to gather information on User interaction with content."
+        },
+        "SDK": {
+          "title": "SDK",
+          "text": "A set of development tools integrated into our mobile app and provided by third parties for additional functions. In particular, the Service may include Firebase SDK (Google Firebase platform) and Supabase SDK (Supabase platform) for authentication, data storage, analytics, push notifications, etc. These SDKs may automatically collect certain device data (e.g., identifiers, technical info) and use cookies or similar technologies."
+        },
+        "GDPR": {
+          "title": "GDPR",
+          "text": "Regulation (EU) 2016/679, the General Data Protection Regulation—see privacyaffairs.com."
+        },
+        "CCPA": {
+          "title": "CCPA",
+          "text": "California Consumer Privacy Act 2018, as amended (including CPRA 2020); see prioritypass.comprioritypass.com."
+        },
+        "PIPEDA": {
+          "title": "PIPEDA",
+          "text": "Canada's Personal Information Protection and Electronic Documents Act; see myemail-api.constantcontact.com."
+        },
+        "UKGDPR": {
+          "title": "UK GDPR",
+          "text": "UK data-protection law equivalent to EU GDPR; see ico.org.uk."
+        }
+      },
+      "2": {
+        "title": "2. Account Registration",
+        "2.1": {
+          "title": "2.1 Creating an account.",
+          "text": "To access the main features of the Sabsus Platform (placing orders, receiving bonuses, etc.), you must create an account. During registration you must provide accurate and complete information, including at least your full name, valid email address and phone number, and set a strong password. Choosing a unique password and keeping it secret is recommended. Registering an account confirms your agreement with this User Agreement and Privacy Policy."
+        },
+        "2.2": {
+          "title": "2.2 User requirements.",
+          "text": "The Service is intended for persons aged 18 years or the age of majority in your country. Persons under 18 must not register or use the Platform for monetary transactions on their own. If you are under the age of majority, you may register and use the Service only under the supervision and with the consent of a parent or legal guardian. By registering, you confirm that you have the legal capacity to enter into a binding agreement, or that you act with the appropriate permission of a legal representative."
+        },
+        "2.3": {
+          "title": "2.3 One user – one account.",
+          "text": "Each User may have no more than one active account unless Sabsus permits otherwise. Accounts are personal: you may not transfer login credentials to others, nor sell, gift or otherwise dispose of the account. You are personally responsible for all actions performed under your account."
+        },
+        "2.4": {
+          "title": "2.4 Data accuracy.",
+          "text": "The User agrees to keep their registration and profile data up to date. If your address, phone number, payment details or other essential information changes, please update it in your account settings. Sabsus is not liable for negative consequences arising from the User providing inaccurate or outdated data (e.g., failure to receive an important notice, delivery issues)."
+        },
+        "2.5": {
+          "title": "2.5 Account security.",
+          "text": "You are responsible for keeping your password confidential and for restricting access to devices on which your account is logged in. If you suspect your password has been compromised or that there is unauthorised access to your account, change your password immediately and contact us. We may request additional information to verify your identity when restoring access or changing security settings."
+        },
+        "2.6": {
+          "title": "2.6 Completion of registration and electronic consent",
+          "text": "By completing the registration process (e.g., clicking a \"Register\" button) and/or ticking a checkbox indicating consent to the terms, you give your electronic consent to enter into this Agreement. Electronic consent has the same legal force as a written signature under applicable law. You also agree to receive notifications and other information from Sabsus in electronic form (e.g., by email, push notifications, or within the Service interface)."
+        }
+      },
+      "3": {
+        "title": "3. Using the Service: General Terms",
+        "3.1": {
+          "title": "3.1 Provision of Sabsus Services.",
+          "text": "By completing the registration process (e.g., clicking a \"Register\" button) and/or ticking a checkbox indicating consent to the terms, you give your electronic consent to enter into this Agreement. Electronic consent has the same legal force as a written signature under applicable law. You also agree to receive notifications and other information from Sabsus in electronic form (e.g., by email, push notifications, or within the Service interface)."
+        },
+        "3.2": {
+          "title": "3.2 Applicability to Website and Mobile App.",
+          "text": "These terms apply to your use of both our website and the Sabsus mobile application. Regardless of the method of access, you must comply with this Agreement. Use of the mobile app may also be governed by the rules of app stores (App Store, Google Play, etc.); you must comply with those third-party terms. Sabsus is not responsible for the policies or actions of external application-distribution platforms."
+        },
+        "3.3": {
+          "title": "3.3 Updates and Availability.",
+          "text": "We constantly improve the Service and reserve the right to change functionality, interface or content of the Platform without prior notice. We may release updates to the mobile app that are mandatory for continued proper use. You acknowledge that technical failures and interruptions may occasionally occur, although we strive to minimise inconvenience. Sabsus does not warrant uninterrupted, error-free operation of the Service (see the disclaimer of warranties in Section 8)."
+        },
+        "3.4": {
+          "title": "3.4 Device Compatibility and Internet Access.",
+          "text": "To use the Sabsus Platform you must have a compatible device (computer, smartphone, etc.), internet access and necessary software (including a current operating system, web browser or app version). Sabsus is not liable if the Service is partly or wholly unavailable on outdated or incompatible devices or software. You are responsible for any ISP or mobile-network fees required to access the Service"
+        },
+        "3.5": {
+          "title": "3.5 Restrictions and Prohibitions.",
+          "text": "When using the Service, it is strictly prohibited to: \n- impersonate another person or organisation, or otherwise mislead as to your identity; \n- hack, interfere with, or disrupt the Platform, distribute viruses or malicious code, run automated scripts or actions that impair normal Service operation; \n- bypass technical limitations, attempt unauthorised access to other accounts, restricted areas or other Users' data; \n- use the Platform for illegal activity, including fraud, money-laundering, financing prohibited organisations or any violation of law; \n- post prohibited content, including extremist or pornographic material, insults, threats, false information, spam advertising, or materials infringing intellectual-property or privacy rights; \n- harvest data about other Users or the Platform automatically (e.g., bots, scraping) without our written permission. \n\nViolation may result in measures up to suspension or blocking of the account without notice, removal of illegal content and notification of competent authorities."
+        },
+        "3.6": {
+          "title": "3.6 User Rights and Obligations.",
+          "text": "User rights: You may use the Sabsus Platform's features as intended: browse restaurant menus and offers, place orders, pay using authorised methods, earn and redeem bonuses per loyalty-programme terms, purchase and use gift certificates, and leave reviews. You have a right to proper quality of electronic services, to contact Sabsus support and receive timely professional responses, and—regarding your personal data—to the rights set out in the Privacy Policy (Section 9), including access, deletion and other jurisdiction-specific rights. \n\nUser obligations: You must comply with this Agreement and applicable law, provide truthful information, pay for orders on time, and respect the rights and dignity of others (restaurant staff, other Users). When participating in bonus programmes, you must follow their rules; abuse of promotions, coupons or bonuses (e.g., fake orders, multiple accounts) is forbidden. You are responsible for safeguarding account access and all actions taken under your credentials. Suspected security breaches must be reported to Sabsus immediately. You also agree to respect Sabsus' and partners' intellectual property: do not reproduce, distribute, copy or extract software code, databases or Service content without permission."
+        }
+      },
+      "4": {
+        "title": "4. Placing Orders and Payment",
+        "4.1": {
+          "title": "4.1 Role of Sabsus and the Restaurant.",
+          "text": "Sabsus is a technology platform connecting Users with Restaurants. When you place an order (e.g., food delivery, pickup, table booking, gift certificate purchase), you enter into a transaction directly with the relevant Restaurant. Sabsus is not the seller or provider of the goods/services ordered; it merely facilitates the transaction and interaction. We are not responsible for quality, safety, description accuracy or availability of Restaurant goods/services, but we make reasonable efforts to collaborate only with reliable partners."
+        },
+        "4.2": {
+          "title": "4.2 Order Process.",
+          "text": "Select items from a Restaurant menu or catalogue, specify quantity and options, add to cart and proceed to checkout. Before confirming, you will see a summary: items, price, taxes, delivery fee (if applicable) and total payable, plus estimated fulfilment time. Check the information carefully before confirming. Once confirmed, the order is sent to the Restaurant. Ability to cancel or change an order after confirmation may be limited (see 4.6)."
+        },
+        "4.3": {
+          "title": "4.3 Price and Payment.",
+          "text": "Prices are set by Restaurants and shown in the User's local currency unless stated otherwise. We strive to keep prices current, but rare delays in updates may occur; the final price is confirmed at checkout. Payment is usually online through our Platform using integrated payment systems. Sabsus receives payments on behalf of the Restaurant as its payment agent; your obligation to pay is fulfilled when funds are successfully charged via the Service."
+        },
+        "4.4": {
+          "title": "4.4 Payment Methods.",
+          "text": "Currently, Sabsus supports card and e-wallet payments processed by Stripe and PayPal. You may be redirected to a secure page of the provider or an embedded interface. Card details are transmitted directly to the provider and are not stored on our servers, except for a token allowing transaction confirmation. By completing payment you agree to the provider's terms (including any fees, refund rules and security policies set by Stripe or PayPal) paypal.com. A payment may be declined by your card-issuing bank for various reasons; in that case the order is not considered paid, and you must choose another method or contact the bank."
+        },
+        "4.5": {
+          "title": "4.5 Taxes and Tips.",
+          "text": "Depending on the Restaurant's and User's jurisdictions, applicable taxes (e.g., VAT, sales tax) may be added and shown separately at checkout. If the Platform allows tipping, you can specify a tip amount before payment. The final amount, including taxes and tips, is displayed before charging. Tips are optional and may be changed by you until payment confirmation."
+        },
+        "4.6": {
+          "title": "4.6 Cancellation and Refunds.",
+          "text": "Food/drink orders: Once a Restaurant has accepted an order, cancellation without charge is usually impossible. If you request cancellation immediately after ordering, contact Sabsus support—we will try to help but cannot guarantee cancellation if the Restaurant has confirmed it.\n\nTable bookings: If a deposit is taken, refund rules depend on the Restaurant's policy (e.g., free cancellation 24 hours in advance). \n\nGift cards/coupons: Purchased gift certificates are non-refundable except as required by law. \n\nOther services: Terms are agreed individually. If service quality is unsatisfactory or an order is not fulfilled, contact Sabsus support with a claim. If confirmed, we will process a refund or other compensation. Refunds, if approved, are made via the original payment method. Posting times depend on bank/payment-system procedures (usually 5–10 business days)."
+        },
+        "4.7": {
+          "title": "4.7 Electronic Receipts",
+          "text": "After successful payment you receive an electronic receipt at your account email or within the app. Keep these receipts for warranty service, refunds or accounting."
+        },
+        "4.8": {
+          "title": "4.8 Payment Disputes.",
+          "text": "Report double charges, incorrect amounts or other payment issues to Sabsus as soon as possible. We will investigate with the provider and, if an error is confirmed, correct it. Also contact your bank if disputing a transaction. Notifications received more than 30 days after the transaction may be harder to investigate."
+        },
+        "4.9": {
+          "title": "4.9 Promotions and Promo Codes.",
+          "text": "Sabsus or Restaurants may offer promo codes or discounts. Terms are communicated separately. Generally: one promo code per User (unless stated otherwise); codes are not cash-redeemable and cannot be applied retroactively. Abuse (e.g., multiple registrations for repeated bonuses) may lead to denial of the discount and account blocking."
+        }
+      },
+      "5": {
+        "title": "5. Bonus Programmes and Gift Cards",
+        "5.1": {
+          "title": "5.1 Loyalty Programme.",
+          "text": "Sabsus may operate a loyalty programme (e.g., earning points per purchase). Participation is voluntary and automatic for registered Users: qualifying actions credit points to your loyalty account (e.g., 1 point per 10 currency units spent). Current accrual structure and redemption rules are available in the \"Bonus Programme\" section of the Platform or our website."
+        },
+        "5.2": {
+          "title": "5.2 Earning and Using Points",
+          "text": "Points are not electronic money; they have no cash value. They cannot be cashed out or transferred (unless the programme explicitly allows, e.g., a family account). You may redeem points for rewards according to the reward catalogue (e.g., order discount, free item). When applying points, the corresponding amount is deducted and the order total reduced."
+        },
+        "5.3": {
+          "title": "5.3 Programme Limitations.",
+          "text": "Each promotion may impose point expiry (e.g., valid for one year), maximum account balance, monthly redemption limits, etc. Sabsus may change the programme terms, notifying Users (e.g., via site update or email). Continued participation after changes constitutes acceptance. If unacceptable, you may stop participating; previously earned points remain valid until expiry or programme termination."
+        },
+        "5.4": {
+          "title": "5.4 Programme Termination or Suspension.",
+          "text": "Sabsus may end or replace the loyalty programme at any time. Users will have a reasonable period (e.g., 30 days) to use remaining points. After that, unused points are cancelled without compensation. We will notify Users in advance through electronic channels."
+        },
+        "5.5": {
+          "title": "5.5 Gift Cards.",
+          "text": "The Platform supports issuance and use of electronic Restaurant gift cards. Purchase: Users can buy cards of specified denominations (e.g., 1 000 RUB, 5 000 RUB) for themselves or as gifts. Payment is processed via the Service. After payment, a unique gift-card code is generated and sent to your email or printable. Use: The holder enters the code in the \"Gift card / promo code\" field at checkout. If the order exceeds the card value, the balance is paid by another method; if lower, unused balance remains on the card."
+        },
+        "5.6": {
+          "title": "5.6 Gift-Card Terms.",
+          "text": "The card is not personalised and can be used by anyone who knows the code—treat it like cash. Protect the code; we are not liable for unauthorised use of lost/stolen codes. Non-refundability: purchase is final unless required by law. Validity: unless stated otherwise, cards are valid indefinitely (or the maximum term allowed by local law). Some regions require expiry or dormancy fees—if so, we will disclose this at purchase. No cash exchange: cards cannot be redeemed for cash except where mandated (certain US states allow cash-out of small remaining balances). Use restriction: a card pays only for goods/services of the specified Restaurant (or group). It cannot buy another gift card. Fraud suspicion: Sabsus may suspend a card and request additional information if fraud is suspected."
+        },
+        "5.7": {
+          "title": "5.7 Additional Promotional Conditions.",
+          "text": "During marketing campaigns a Restaurant or Sabsus may issue promo cards or codes equivalent to gift cards (e.g., \"electronic voucher for a free dessert\"). Such offers follow the campaign terms (e.g., single use, date limits). Unless stated otherwise, promo cards are subject to rules similar to regular gift cards."
+        }
+      },
+      "6": {
+        "title": "6. Reviews and User-Generated Content",
+        "6.1": {
+          "title": "6.1 Posting reviews.",
+          "text": "After completing an order, you may leave a review of your experience (e.g., food quality, service, delivery). The review feature exists to encourage honest feedback—helping other Users make informed choices and helping Restaurants improve. We welcome constructive, well-reasoned reviews."
+        },
+        "6.2": {
+          "title": "6.2 Review content requirements.",
+          "text": "A review must reflect your own opinion and experience with a specific order or Restaurant. It is prohibited to post knowingly false statements, defamation, insults, obscene language, or content unrelated to the Restaurant's service. Do not disclose third-party personal data (e.g., staff names, phone numbers, addresses) without consent. Reviews may not contain advertising or links to external resources. Extortion is also forbidden—for example, demanding bonuses or compensation from a Restaurant under threat of a negative review."
+        },
+        "6.3": {
+          "title": "6.3 Content moderation",
+          "text": "Sabsus reserves the right to review and moderate reviews or any user content posted via the Platform. We do not edit subjective opinions, but we may reject or remove a review (in whole or in part) if it violates § 6.2 or any other provision of this Agreement. Grounds for moderation include: profanity, extremism, manifestly false statements, plagiarism (copying another review), personal data, spam. If your review is removed or rejected, you may receive a notice stating the reason. Users who systematically post prohibited content may lose the right to post reviews or have their accounts blocked."
+        },
+        "6.4": {
+          "title": "6.4 Sabsus' right to use reviews.",
+          "text": "By posting a review or other content on the Sabsus Platform you retain ownership of your material, but you grant Sabsus a non-exclusive, worldwide, perpetual, royalty-free licence to use, reproduce, publicly display, adapt and distribute your content in connection with operation of the Service. We may show your review on our site/app, share it with the Restaurant, or quote it in marketing materials (e.g., social-media posts, newsletters) without further approval. We will not distort your opinion—reviews are reproduced as posted (save minor spelling/typography edits). The licence terminates when you delete the content from the Service, except where it has already been used (e.g., in a promotional asset). You represent and warrant that you hold all rights necessary to grant this licence."
+        },
+        "6.5": {
+          "title": "6.5 Review authenticity.",
+          "text": "Sabsus takes measures to ensure reviews come from real Users who placed the relevant orders (e.g., only Users who ordered through the Platform can review that Restaurant). Nevertheless, Sabsus cannot absolutely guarantee the truthfulness of every review. A review expresses the author's subjective opinion and may not reflect Sabsus' or other Users' views. We are not liable for Users' statements, but upon justified complaints (e.g., a Restaurant claiming defamation) we may act accordingly."
+        },
+        "6.6": {
+          "title": "6.6 Other user content.",
+          "text": "Besides reviews, you may post other content—e.g., food photos, comments, support-chat messages. All such content is subject to the same rules: legality, no unacceptable material, no infringement of third-party rights. By uploading any content you warrant it does not violate copyright, trademarks or other rights. If you upload a photo, ensure you own it (took it yourself) or have permission. We may remove infringing material upon a rights-holder notice or our own findings."
+        },
+        "6.7": {
+          "title": "6.7 Takedown requests.",
+          "text": "If your copyrighted material has been posted without permission, or you find other unlawful content, notify us via the feedback form or the contacts in the Privacy Policy. We will promptly investigate and, if appropriate, remove the content."
+        }
+      },
+      "7": {
+        "title": "7. Intellectual Property and Licence",
+        "7.1": {
+          "title": "7.1 Sabsus intellectual property.",
+          "text": "All software, source and object code, design, Sabsus trademarks and logos, trade dress, databases, and text/graphics on the Platform (except content uploaded by Users or Restaurants) are the intellectual property of Sabsus and/or its licensors and are protected by law. Using the Service does not grant you ownership of any Service elements."
+        },
+        "7.2": {
+          "title": "7.2 Use of our content.",
+          "text": "You receive a limited right to use the Service interface and functionality solely for personal purposes as allowed by this Agreement. You may not copy, modify, distribute or publicly display Service materials without Sabsus' prior written consent, except as permitted by law (e.g., quotation with attribution). Unauthorised use constitutes a breach and may lead to legal liability."
+        },
+        "7.3": {
+          "title": "7.3 Feedback.",
+          "text": "If you voluntarily provide ideas, suggestions or feedback for improving Sabsus (e.g., bug reports, feature requests), you agree such feedback is non-confidential and non-proprietary to you. Sabsus may freely use and implement the feedback without obligation to compensate you. We value your input but are not bound to implement specific suggestions."
+        },
+        "7.4": {
+          "title": "7.4 Trademarks.",
+          "text": "The names, logos and slogans of Sabsus, as well as those of our partners (Restaurants), may be registered trademarks. You may not use them except as necessary for legitimate use of the Service, without the owner's express permission (e.g., printing our logo on third-party materials is forbidden)."
+        },
+        "7.5": {
+          "title": "7.5 Restaurant rights.",
+          "text": "Content supplied by Restaurants (menus, descriptions, photos, logos) remains the property of those Restaurants or their suppliers. Sabsus displays such content under licence. Users may view it only for information and ordering. Any other use (e.g., commercial copying of a menu) is prohibited unless you obtain permission directly from the content owner."
+        },
+        "7.6": {
+          "title": "7.6 IP-rights violations.",
+          "text": "We respect intellectual property and expect Users to do the same. If a User repeatedly infringes copyright or other IP rights (e.g., uploads third-party text/photos without permission), the User may be blocked and infringing materials removed. Rights-holders may use the DMCA procedure (where applicable) or similar local mechanisms to notify us of infringements—we review all proper notices."
+        }
+      },
+      "8": {
+        "title": "8. Disclaimer and Limitation of Liability",
+        "8.1": {
+          "title": "8.1 Service \"as is\"",
+          "text": "The Sabsus Platform is provided \"as is\" and \"as available\". We make no express warranties or promises regarding the Service. Specifically, we do not guarantee that: (a) the Service will meet all your expectations or requirements; (b) operation will be uninterrupted, error-free, secure or virus-free; (c) information obtained through the Service is always accurate or reliable; (d) the quality of any goods, services or information (especially from Restaurants) will meet your expectations."
+        },
+        "8.2": {
+          "title": "8.2 No implied warranties.",
+          "text": "To the fullest extent permitted by law, Sabsus disclaims all implied warranties or conditions, including merchantability, fitness for a particular purpose, non-infringement, and warranties arising from course of dealing or trade usage. You bear the risk associated with using the Service."
+        },
+        "8.3": {
+          "title": "8.3 Third-party actions.",
+          "text": "As Sabsus acts as an intermediary between Users and Restaurants, we are not liable for acts or omissions of third parties involved (Restaurants, couriers, payment systems, hosting providers, etc.). In disputes over order quality or content, the Restaurant bears final legal responsibility; Sabsus may mediate but is not the seller. Likewise, we cannot guarantee resolution of issues caused by external partners (e.g., payment-system failures), though we will assist where possible."
+        },
+        "8.4": {
+          "title": "8.4 Liability cap.",
+          "text": "To the maximum extent allowed by law, Sabsus and its affiliates, officers, employees and agents shall not be liable for any indirect, incidental, consequential, punitive or special damages—such as lost profits, data loss, reputational harm, business interruption, or cost of substitute goods/services—arising from or related to use (or inability to use) the Sabsus Platform, even if advised of the possibility. The maximum aggregate liability of Sabsus to you for all claims relating to the Service or this Agreement is limited to USD 100 (or local-currency equivalent) or the total Sabsus fees actually paid by you in the last six months, whichever is less. Some jurisdictions do not allow exclusion or limitation of liability for certain damages (e.g., personal injury, wilful misconduct); nothing in this section limits liability beyond what applicable law permits."
+        },
+        "8.5": {
+          "title": "8.5 Content responsibility.",
+          "text": "You understand that, while using the Service, you may encounter content (e.g., Restaurant descriptions, reviews) that seems inaccurate, incomplete or questionable. Sabsus is not responsible for the legality or accuracy of third-party content. Opinions in reviews belong solely to their authors. Although we may moderate content, ultimate responsibility rests with the person who posted it."
+        },
+        "8.6": {
+          "title": "8.6 Force majeure.",
+          "text": "Sabsus is not liable for delays or failures caused by events beyond our reasonable control, including natural disasters, power outages, internet/telecom failures, hacking attacks, epidemics, war, civil unrest, or government actions that render service provision illegal or impossible. During such force-majeure events our obligations are suspended for the duration."
+        },
+        "8.7": {
+          "title": "8.7 Your indemnification.",
+          "text": "You agree to indemnify and hold harmless Sabsus, its affiliates, officers, employees and agents from any claims, losses, expenses (including reasonable attorneys' fees) arising out of: (a) your breach of this Agreement; (b) your misuse of the Service; or (c) your violation of law or third-party rights. If your actions lead to a complaint or legal proceeding against Sabsus, you will cover our related costs and damages."
+        },
+        "8.8": {
+          "title": "8.8 Statutory rights.",
+          "text": "Nothing in this section limits or excludes consumer rights that cannot be limited or excluded under applicable law. If your jurisdiction does not allow certain exclusions or limitations, the relevant provision applies only to the extent permitted, and the remainder of this Agreement remains in effect."
+        }
+      },
+      "9": {
+        "title": "9. Privacy Policy",
+        "intro": {
+          "text": "This Privacy Policy explains which data Sabsus collects about Users, the purposes of processing, how we protect that data, and the privacy rights available to Users. We strive to comply with all applicable data-protection laws, including the GDPR for EU/EEA Users, the CCPA/CPRA for California residents, U.S. state privacy statutes, Canada's PIPEDA, the UK GDPR, and others. Additional regional disclosures appear in Appendices A–E below. By using the Sabsus Platform you entrust us with certain information about yourself. We value that trust and take steps to process your data securely. Your continued use of the Service constitutes consent to the collection and use of personal data as described in this Policy."
+        },
+        "9.1": {
+          "title": "9.1 Data we collect",
+          "text": [
+            "● Data you provide. Information you supply when registering or using the Service—e.g., name, e-mail address, phone number, delivery address (if required), partial payment details, profile information (avatar, saved preferences), messages to support, survey answers, reviews, etc.",
+            "● Payment data. When you pay via Stripe/PayPal we receive status information, a masked card number or transaction ID. We do not store full card numbers or CVV codes—only the certified payment provider processes that sensitive data.",
+            "● Usage data (collected automatically). \n○ Device details (model, OS version, browser type, system language, mobile carrier). \n○ Identifiers: IP address, cookie IDs, mobile-device or advertising IDs (e.g., IDFA). \n○ Activity logs: timestamps, search queries, pages/screens viewed, interface clicks. \n○ Order data: order history (items, amounts, dates, Restaurant selected), promo codes, bonuses, reviews. \n○ Geolocation (if you grant permission) for nearby Restaurant search; accuracy depends on device settings (GPS/Wi-Fi). You may disable location sharing in device settings—some features may then be unavailable.",
+            "● Data from third parties. Examples: basic profile from a social-network login (Facebook, Google); external reviews supplied by a Restaurant; payment-status callbacks from Stripe/PayPal; delivery updates from carriers. Such data are linked to your account. We minimise collection to what is necessary; some fields are optional, but certain data are required for core functions (e.g., no delivery order without a phone number)."
+          ]
+        },
+        "9.2": {
+          "title": "9.2 How and why we use data",
+          "text": [
+            "Service delivery. Create/maintain your account, communicate about orders, transmit orders to Restaurants, process payments, show local offers, publish your reviews.",
+            "Support. Use account/order data to resolve issues; retain support chats to improve service.",
+            "Service improvement. Aggregate/anonymous analytics to enhance functionality and UI; analyse feedback to improve Restaurant offerings.",
+            "Personalisation & marketing (with consent). Recommend Restaurants/dishes based on order history; send marketing e-mails or push notifications. You may opt out at any time.",
+            "Loyalty programme. Maintain balance of bonus points and inform you about rewards.",
+            "Security & fraud prevention. Log/IP data detect suspicious activity (multiple sign-ups, hacking attempts); we may consult anti-fraud services (e.g., Stripe Radar).",
+            "Legal obligations. Retain or disclose data when required—for example, tax records of transactions, or lawful requests from authorities. We also use contact data for legally required notices."
+          ]
+        },
+        "9.3": {
+          "title": "9.3 Legal bases (EU/EEA Users)",
+          "text": [
+            "● Contract necessity. Most processing (orders, payments, account maintenance) is required to perform our contract with you.",
+            "● Consent. Marketing e-mails, push notifications with personalised offers, geolocation, and certain cookies are processed only with your prior consent, which you may withdraw at any time.",
+            "● Legitimate interests. Analytics, fraud prevention, non-marketing service communications—balanced against your rights.",
+            "● Legal obligations. E.g., retention of tax data, compliance with court orders.",
+            "● Vital interests / public tasks rarely apply to this Service."
+          ]
+        },
+        "9.4": {
+          "title": "9.4 Cookies and similar technologies",
+          "text": [
+            "Our website and app use cookies, pixels and SDKs (including Firebase and Supabase).",
+            "● Necessary cookies – essential for log-in sessions, basket contents, etc.; set by default.",
+            "● Analytics cookies – e.g., Google Analytics for Firebase, collecting aggregated usage statistics termsfeed.com (consent banner shown where required).",
+            "● Advertising / functional cookies – used only with your consent; may include social-media pixels for remarketing.",
+            "● Firebase SDKs – Authentication, Cloud Messaging, Crashlytics, Analytics (device IDs, event data). Session cookies may be set termsfeed.com.",
+            "● Supabase SDK – stores session tokens for authentication.",
+            "● Social-network pixels – Facebook Pixel, Twitter Pixel, etc., activated only if you consent to advertising cookies.",
+            "You can manage cookies through your browser's settings, our cookie banner, in-app privacy settings, or via \"Do Not Track\"/Global Privacy Control signals where supported."
+          ]
+        },
+        "9.5": {
+          "title": "9.5 Storage and security",
+          "text": [
+            "● Security. HTTPS encryption in transit; encrypted storage of sensitive data; hashed passwords; least-privilege employee access; firewalls and intrusion-detection. No method is 100 % secure, but we employ commercially reasonable safeguards.",
+            "● Retention. We keep data only as long as necessary for stated purposes or as required by law (e.g., transaction records ≥ 5 years dlapiperdataprotection.com). Back-ups are purged on schedule. Reviews already public may remain (anonymised) after account deletion unless you request removal.",
+            "● Hosting locations. Our infrastructure may reside in the United States or Europe (AWS, GCP). Partners (Stripe, Firebase, Supabase) may store data outside your country—see § 9.6.",
+            "● Children. The Service is not directed to children under 13. We do not knowingly collect their data without parental consent; if discovered, such data will be deleted."
+          ]
+        },
+        "9.6": {
+          "title": "9.6 Data sharing with third parties",
+          "text": [
+            "We do not sell personal data for money prioritypass.com. Data may be shared with:",
+            "Restaurant partners Order details (name, items, amount, phone, delivery address). Contractual restriction to fulfil the order only.",
+            "Delivery services Name, delivery address, phone, order number. Use limited to delivery execution.",
+            "Payment providers (Stripe, PayPal) Transaction amount, order ID, e-mail; receive masked card info & status. Providers act as independent controllers; see their privacy policies.",
+            "Infrastructure providers (AWS, GCP, CDN) Hosting/storage of Service data. SCCs or equivalent safeguards.",
+            "Analytics / support tools (e.g., Firebase, Intercom) Cookie IDs, technical data, support chat content. NDAs; data-processing agreements.",
+            "Advertising / social media (with consent) Hashed identifiers, pixel events for remarketing. Consent mechanism; platform privacy rules.",
+            "Legal / governmental requests Disclose data when legally required. Notify you where lawful.",
+            "Business transfers Data may transfer to successor entity in a merger or acquisition. Prior notice and equivalent protection assured.",
+            "All processors are bound by contracts to protect data and act only on our instructions (unless they are independent controllers, e.g., banks, authorities). Transfers outside your jurisdiction are protected via SCCs, EU-U.S. Data Privacy Framework participation, or other recognised mechanisms."
+          ]
+        },
+        "9.7": {
+          "title": "9.7 Your privacy rights",
+          "text": [
+            "Depending on your jurisdiction you may have:",
+            "Access Obtain confirmation and a copy of your data (GDPR Art. 15, CCPA \"right to know\").",
+            "Correction Request rectification of inaccurate data (GDPR Art. 16; CPRA).",
+            "Deletion \"Right to be forgotten\" / delete personal data (GDPR Art. 17; CCPA).",
+            "Restriction Temporarily pause processing (GDPR Art. 18).",
+            "Objection Object to processing based on legitimate interests, incl. direct marketing (GDPR Art. 21).",
+            "Portability Receive data in a structured, machine-readable format (GDPR Art. 20).",
+            "No automated decisions We do not make solely automated decisions with legal effect.",
+            "Withdraw consent Withdraw marketing / geolocation / cookie consent at any time.",
+            "CCPA/CPRA specific Opt-out of \"sale\" or \"sharing\"; non-discrimination; correction; limit sensitive PI.",
+            "U.S. state laws Similar rights in CO, CT, VA, UT, OR, etc.—including opt-out of targeted ads."
+          ]
+        },
+        "9.8": {
+          "title": "9.8 Regional appendices",
+          "text": [
+            "● Appendix A – California residents (USA)",
+            "● Appendix B – Other U.S. states",
+            "● Appendix C – Canada",
+            "● Appendix D – EU/EEA",
+            "● Appendix E – United Kingdom",
+            "Each appendix contains region-specific disclosures (e.g., \"Do Not Sell or Share\" mechanism for California, cross-border transfer notice for Canada dlapiperdataprotection.com, our DPO contact, local representative, etc.). They form an integral part of this Policy."
+          ]
+        },
+        "9.9": {
+          "title": "9.9 Processing public-sector restaurant data",
+          "text": "(Not applicable: the Service targets private consumers; corporate public-entity data processing is therefore omitted.)"
+        },
+        "9.10": {
+          "title": "9.10 Contacting us about privacy",
+          "text": "If you have questions or complaints regarding this Policy or our data practices, please contact our Data Protection Officer (DPO) or privacy team using the details in How to contact us. We will respond promptly. If you remain unsatisfied, you may contact your local data-protection authority (ICO in the UK, your national EU DPA, the OPC in Canada, or your state Attorney General in the U.S.)."
+        },
+        "9.11": {
+          "title": "9.11 Policy updates",
+          "text": "We may update this Policy periodically to reflect changes in the Service or law. Material changes (e.g., new processing purposes, new data categories) will be announced clearly—via website notice, in-app pop-up, or e-mail—and, where required, we will seek renewed consent. The header shows the latest revision date. Continued use of the Service after changes take effect signifies acceptance of the updated Policy. If you disagree with material changes, you may stop using the Service and delete your account."
+        }
+      },
+      "10": {
+        "title": "10. Miscellaneous Provisions",
+        "10.1": {
+          "title": "10.1 Amendments to the Terms of Use",
+          "text": "Sabsus reserves the right to modify these Terms of Use from time to time. Reasons may include: adding new Service features, security updates, or bringing the Terms into line with changes in law. We will notify Users of any material changes—typically by (i) posting the revised Terms on our website and in-app, and (ii) sending an information notice to registered Users (e.g., by e-mail or an in-app pop-up). The effective date of the amendments will appear at the top of the document. Continued use of the Service after that date constitutes acceptance of the updated Terms. If you do not agree, you must stop using the Platform before the changes take effect and, if desired, delete your account. For significant revisions that affect Users' rights or obligations, we may request your explicit consent (e.g., by ticking a box) on next sign-in."
+        },
+        "10.2": {
+          "title": "10.2 Assignment of Rights and Obligations",
+          "text": "Sabsus may assign its rights and obligations under these Terms to a third party in the event of a business reorganisation, merger, or asset sale. Such assignment will not diminish your rights, and we will inform you of the transfer. You may not assign or otherwise transfer your rights under this Agreement to any third party without Sabsus' written consent; any unauthorised transfer is void."
+        },
+        "10.3": {
+          "title": "10.3 Severability",
+          "text": "If any provision of these Terms is held by a competent court to be unlawful, invalid, or unenforceable, the remaining provisions shall remain in full force. The invalid provision will be deemed severed and replaced by a valid one that most closely reflects the original intent of the parties."
+        },
+        "10.4": {
+          "title": "10.4 No Waiver",
+          "text": "Sabsus' failure to insist on strict performance of any provision or to exercise a right shall not be deemed a waiver of that provision or right in the future."
+        },
+        "10.5": {
+          "title": "10.5 Entire Agreement",
+          "text": "These Terms of Use, together with the incorporated policies (Privacy Policy, regional appendices, promotion rules, etc.), constitute the entire agreement between you and Sabsus regarding the Platform and supersede all prior agreements, written or oral. Any additional arrangements are binding only if made in writing and signed by both parties (except unilateral amendments by Sabsus pursuant to § 10.1)."
+        },
+        "10.6": {
+          "title": "10.6 Language",
+          "text": "This document is drafted in Russian. Translations may be supplied for convenience, but in the event of discrepancies the Russian version prevails (unless contrary to mandatory law in your jurisdiction). Notices and communications may be provided in Russian or in a preferred language you select (where a translation of the Terms exists)."
+        },
+        "10.7": {
+          "title": "10.7 Governing Law",
+          "text": "These Terms and any disputes arising out of or relating to them are governed by the substantive law of the State of California, USA, without regard to conflict-of-law principles. If you are a consumer residing outside the USA, you also retain the protection of mandatory rules of the law of your residence"
+        },
+        "10.8": {
+          "title": "10.8 Dispute Resolution and Arbitration",
+          "text": [
+            "Mandatory Arbitration. Except as expressly provided below, all disputes, controversies, or claims arising out of or relating to these Terms or your use of the Sabsus Platform shall be settled by binding, final arbitration instead of court litigation. By agreeing to arbitration, both you and Sabsus waive the right to a jury trial and to participate in class actions (details below). Arbitration will be conducted on an individual basis only.",
+            "Arbitration Rules. The arbitration shall be administered by the American Arbitration Association (AAA) under its Commercial (or Consumer, where applicable) Arbitration Rules. If the AAA is unwilling or unable to administer, the parties shall select another reputable arbitral organisation or arbitrator. California law shall apply. The arbitrator may award the same damages or relief that a court could, but may not award remedies inconsistent with these Terms.",
+            "Venue and Format. Arbitration may proceed on written submissions, by telephone/video, or in person, as the parties agree. If an in-person hearing is required, it will take place in San Francisco County, California, unless you and Sabsus agree otherwise. Consumers in the USA may request a hearing in their home state if Sabsus consents (we will consider reasonable requests). Proceedings will be in English unless otherwise agreed.",
+            "Exceptions. Either party may: (a) pursue a claim in small-claims court within its jurisdictional limits; (b) seek injunctive relief in court pending arbitration to prevent irreparable harm (e.g., misuse of IP, data breaches); (c) rely on mandatory local laws that prohibit compulsory arbitration of consumer disputes (e.g., certain EU countries)—in that event, disputes may be brought before competent courts.",
+            "Class-Action Waiver. You and Sabsus agree that all proceedings shall be conducted only on an individual basis, not in a class, consolidated, or representative action zenimax.com tos.ea.com. The arbitrator may not consolidate claims or preside over any representative proceeding. If this clause is held unenforceable as to a particular dispute, the arbitration agreement is void as to that dispute, which shall then proceed in court; other disputes remain subject to arbitration.",
+            "Pre-Arbitration Notice & Limitations Period. Before commencing arbitration, a party must send a written notice of the dispute and engage in informal negotiations for 30 days tos.ea.com. Claims must be filed within one (1) year after they arise, otherwise they are permanently barred, unless a longer period is mandated in your jurisdiction (e.g., standard EU consumer limitation periods)."
+          ]
+        },
+        "10.9": {
+          "title": "10.9 Courts of Exclusive Jurisdiction",
+          "text": "Subject to the arbitration provisions, any permitted court proceedings shall be brought exclusively in the state or federal courts located in San Francisco County, California. You consent to personal jurisdiction and waive objections to inconvenient forum. Consumers outside the USA may still initiate actions in their home jurisdictions where mandatory law allows, but the substantive law chosen remains California law."
+        },
+        "10.10": {
+          "title": "10.10 EU Online Dispute Resolution",
+          "text": "For EU consumers: the European Commission's Online Dispute Resolution platform is available at https://ec.europa.eu/consumers/odr. Sabsus is currently not obliged to and does not undertake to participate in ODR proceedings, preferring to resolve issues directly with Users."
+        },
+        "10.11": {
+          "title": "10.11 Electronic Communications",
+          "text": "You agree to receive communications from Sabsus in electronic form (e-mail, in-app, SMS). Electronic communications satisfy any legal requirement that such communications be in writing."
+        },
+        "10.12": {
+          "title": "10.12 Contact Information",
+          "text": [
+            "Company: Sabsus, Inc.",
+            "Postal address: 1234 Market St., Suite 100, San Francisco, CA 94111, USA",
+            "General e-mail: support@sabsus.com",
+            "Privacy / DPO e-mail: info@sabsus.com",
+            "Electronic correspondence is preferred for a documented trail of inquiries."
+          ]
+        }
+      },
+      "appendixA": {
+        "title": "Appendix A – Additional Terms for Residents of the State of California (USA)",
+        "intro": "The following provisions apply only to Users who reside in California and supplement all other sections of the Privacy Policy and the Terms of Use.",
+        "A1": {
+          "title": "A1. Categories of Personal Information Collected",
+          "text": [
+            "During the past 12 months we have collected the following categories of personal information from California consumers (as those categories are defined in the CCPA):",
+            "Identifiers Real name, alias (nickname), street address, e-mail address, telephone number, user ID, IP address, device identifier, cookie IDs.",
+            "Personal information described in Cal. Civ. Code §1798.80(e) Name, contact details, tokenised bank-card number (we do not store the full PAN), other financial information you voluntarily provide (e.g., via PayPal).",
+            "Characteristics protected under California / federal law Gender or age if you choose to provide them (e.g., in a profile or support message); we do not request birth dates by default.",
+            "Commercial information Records of orders (purchases) and use of services, applied discounts, redeemed gift cards.",
+            "Internet / electronic-network activity Browsing history within our website or app, interactions with pages, search queries, login timestamps.",
+            "Geolocation data Approximate location or the precise delivery address you enter.",
+            "Inferences E.g., your likely preferred cuisine based on order history (for personalised recommendations)."
+          ]
+        },
+        "A2": {
+          "title": "A2. Sources of Personal Information",
+          "text": [
+            "We obtain this information:",
+            "1. Directly from you (registration, checkout, support correspondence);",
+            "2. Automatically from your device (cookies, log files);",
+            "3. From third parties (payment processors, social-login providers, partner Restaurants)."
+          ]
+        },
+        "A3": {
+          "title": "A3. Purposes of Collection and Use",
+          "text": "All categories above are collected and used for the business purposes set out in § 9.2 of our Privacy Policy: delivering the requested services (registration, ordering), customer support, payment processing, analytics and service improvement, marketing with your consent, legal compliance, fraud prevention, etc. We do not collect or use \"sensitive personal information\" (as defined by the CPRA) for inferring characteristics—except login credentials and limited payment data strictly for authentication and transaction purposes."
+        },
+        "A4": {
+          "title": "A4. Disclosure of Personal Information (Business Purposes)",
+          "text": [
+            "In the past 12 months we have disclosed certain categories of personal information to the following third-party recipients solely for business purposes:",
+            "Identifiers (name, phone, address) Partner Restaurants (order fulfilment); delivery services (shipping); IT service-providers (hosting, analytics); e-mail platforms (transactional & marketing e-mails).",
+            "Financial / transaction data Payment processors Stripe and PayPal (payment execution).",
+            "Internet activity (logs, cookies) Analytics providers (e.g., Google Analytics) and, if consented, advertising networks (retargeting); security services (anomaly detection).",
+            "Geolocation Mapping services (Google Maps API) when embedding maps; Restaurants / couriers (delivery address).",
+            "Support communications Support platforms such as Intercom or Zendesk (ticket processing).",
+            "All such disclosures are covered by contracts that prohibit the recipients from using the information for any purpose other than those stated."
+          ]
+        },
+        "A5": {
+          "title": "A5. Sale of Personal Information",
+          "text": "Sabsus has not sold California consumers' personal information for monetary or other valuable consideration in the past 12 months [prioritypass.com]. Nor have we \"shared\" personal information for cross-context behavioural advertising. Should we ever plan to \"sell\" or \"share\" data in the future, we will notify you in advance and provide a clear opt-out mechanism."
+        },
+        "A6": {
+          "title": "A6. Your Rights under the CCPA / CPRA",
+          "text": [
+            "Know / Access Request the categories or specific pieces of personal information we have collected, the sources, business purposes, categories of third-party disclosures, and whether data was sold acasom.com acasom.com.",
+            "Deletion Request deletion of personal information (subject to statutory exceptions) acasom.com acasom.com.",
+            "Correction Request correction of inaccurate personal information.",
+            "Opt-out of Sale / Sharing Exercise the right to direct us not to sell or share personal information. (Currently not applicable, as we do not sell or share.)",
+            "Limit Use of Sensitive PI Not applicable—Sabsus does not use sensitive personal information for purposes beyond those allowed by the CPRA.",
+            "Non-discrimination We will not discriminate against you for exercising CCPA rights prioritypass.com."
+          ]
+        },
+        "A7": {
+          "title": "A7. Submitting CCPA Requests",
+          "text": [
+            "To exercise your rights, you may:",
+            "● E-mail us at privacy@sabsus.com with the subject \"CCPA Request\", providing your name and the e-mail linked to your account; or",
+            "● Use the in-app Privacy settings (if available) to submit a request.",
+            "We must verify your identity (requests sent from your registered e-mail usually suffice; we may ask additional questions, e.g., recent order details). You may authorise an agent to act on your behalf—please supply proof of agent authorisation (e.g., notarised power of attorney) plus your written confirmation. We will confirm receipt within 10 days and respond within 45 days (extendable once by 45 days with notice). Statistics: during the past 12 months Sabsus has received zero verifiable CCPA requests for access, correction, or deletion."
+          ]
+        },
+        "A8": {
+          "title": "A8. \"Shine the Light\" (Cal. Civ. Code §1798.83)",
+          "text": "We do not disclose personal information to third parties for their direct marketing without your consent. You may nonetheless submit inquiries to privacy@sabsus.com and we will confirm this practice"
+        },
+        "A9": {
+          "title": "A9. California Children's Privacy",
+          "text": "Our Service is not directed to children under 13. We do not sell or knowingly collect their data. If you are a California resident under 18 who has posted content on the Service, you may request its removal (Cal. Bus. & Prof. Code §22581). We will delete or anonymise such content, subject to statutory exceptions (e.g., where content has been re-posted by others)."
+        },
+        "A10": {
+          "title": "A10. Future Regulations & Global Privacy Control",
+          "text": "If new California regulations require automatic honouring of signals such as Global Privacy Control (GPC), Sabsus will comply. When your browser sends a GPC signal, we will treat it as an opt-out from sale/share for that browser or user, as mandated by the CPRA."
+        }
+      },
+      "appendixB": {
+        "title": "Appendix B – Additional Terms for Other U.S. States (Outside California)",
+        "intro": "Several U.S. states (e.g., Colorado, Connecticut, Utah, Virginia) have enacted consumer privacy laws. If you reside in such a state, the following terms apply in addition to our main Privacy Policy.",
+        "B1": {
+          "title": "B1. Consumer Rights",
+          "text": [
+            "Generally, these state laws grant rights similar to the CCPA/GDPR:",
+            "● Confirm / Access personal data processed about you.",
+            "● Correction of inaccuracies.",
+            "● Deletion of personal data (subject to statutory exceptions).",
+            "● Data Portability in a usable format.",
+            "● Opt-out of (i) targeted advertising, (ii) sale of personal data, and (iii) automated profiling with legal / significant effects."
+          ]
+        },
+        "B2": {
+          "title": "B2. Targeted Advertising",
+          "text": "Sabsus currently does not serve third-party ads inside the Service. If we engage advertising networks to display Sabsus promotions elsewhere, you will be able to opt-out of such personalised ads."
+        },
+        "B3": {
+          "title": "B3. Sale of Data",
+          "text": "Sabsus does not sell personal data for monetary consideration. Should broader state definitions deem certain exchanges a \"sale\", we affirm we do not engage in such practices. If that changes, you will have the right to opt-out."
+        },
+        "B4": {
+          "title": "B4. Right to Appeal",
+          "text": "If we deny your request regarding personal data, you may appeal the decision. We will review and respond within statutory deadlines (typically 45 days). If you remain unsatisfied, you may escalate to your state Attorney General or relevant authority."
+        },
+        "B5": {
+          "title": "B5. State-Specific Disclosures",
+          "text": "Where a state law imposes additional disclosures, we will update this section. E.g., Colorado requires us to state how to submit requests—see privacy@sabsus.com or the in-app privacy settings."
+        },
+        "B6": {
+          "title": "B6. Automated Opt-Out Signals",
+          "text": "From 2024-2025 certain states (e.g., Colorado) require businesses to honour universal opt-out mechanisms (such as Global Privacy Control). Sabsus intends to respect such signals for all U.S. users whenever technically feasible."
+        },
+        "B7": {
+          "title": "B7. Data Security",
+          "text": "State laws mandate \"reasonable security.\" See § 9.5 of our main Policy: we implement encryption, access controls, and other industry-standard safeguards. We will notify affected users and authorities of any data breach as required by state breach-notification statutes."
+        },
+        "B8": {
+          "title": "B8. Minors",
+          "text": "If your state grants special rights to minors (similar to California's right to delete posted content), Sabsus extends equivalent protections nationwide."
+        },
+        "B9": {
+          "title": "B9. Contact",
+          "text": "In addition to e-mail, U.S. residents may mail written requests to our California address (see § 10.12 of the Terms). The date of submission will be the date we receive the letter. Sabsus strives to uniformly respect the privacy rights of all U.S. users, even where a particular state law has yet to take effect. If you have questions about how your specific state law applies, please contact us—we will provide the relevant details."
+        }
+      },
+      "appendixC": {
+        "title": "Appendix C – Additional Terms for Users in Canada",
+        "intro": "hese provisions take into account Canadian privacy legislation, including the federal PIPEDA and substantially-similar provincial acts (e.g., Alberta PIPA, British Columbia PIPA, Québec Act 25), as they apply to Sabsus' commercial activities with Canadian residents.",
+        "C1": {
+          "title": "C1. Consent to Collection & Processing",
+          "text": [
+            "Canadian law requires an informed consent for the collection, use and disclosure of personal information, with limited exceptions.",
+            "● Implied consent. When you voluntarily provide information in order to use the Sabsus Platform—e.g., you enter a phone number so we can confirm your order—we treat this as implied consent for obvious purposes.",
+            "● Express consent. For any use beyond the obvious (or for sensitive information) we will ask for explicit opt-in. Example: receiving marketing e-mails—unless you actively subscribe, we will not send them.",
+            "● You may withdraw consent at any time by contacting us, but this may limit our ability to deliver the Service (e.g., without your contact data we cannot fulfil an order)."
+          ]
+        },
+        "C2": {
+          "title": "C2. Your Rights (Canada)",
+          "text": [
+            "Under Canadian privacy principles you have the right to:",
+            "1. Access / transparency – request details about the existence, use and disclosure of your personal information and obtain a copy (PIPEDA requires a reply within ~30 days).",
+            "2. Correction – have inaccurate or incomplete information amended; we will also notify third parties to whom we disclosed it, where appropriate.",
+            "3. Complaint – lodge a complaint with us; if unresolved, you may bring it to the Office of the Privacy Commissioner of Canada (OPC)."
+          ]
+        },
+        "C3": {
+          "title": "C3. Restrictions on Third-Party Transfer",
+          "text": "We remain accountable for personal information transferred to service-providers and contractually require them to afford comparable protection. Data may be disclosed only for the purposes set out in § 9.6 of the Privacy Policy."
+        },
+        "C4": {
+          "title": "C4. Cross-Border Transfers & Storage outside Canada",
+          "text": "Your information may be stored or processed outside Canada, including in the United States. While abroad, data may be subject to the laws of that country (e.g., U.S. Patriot Act). PIPEDA permits such transfers provided users are notified – this notice fulfils that obligation. We employ safeguards (encryption, contractual clauses, etc.) regardless of location. If you require data to remain solely in Canada, unfortunately Sabsus cannot guarantee this; by continuing to use the Service you consent to cross-border processing."
+        },
+        "C5": {
+          "title": "C5. Language",
+          "text": "This agreement is provided in Russian at your request. Upon demand we can provide an English or French version (notably for francophone Québec residents). Please indicate your preferred language for privacy communications."
+        },
+        "C6": {
+          "title": "C6. Délégué à la protection des renseignements personnels (Québec)",
+          "text": "Our Data Protection Officer (DPO) acts as the personal-information officer under Québec Act 25. Contact: privacy@sabsus.com. Ultimate accountability remains with Sabsus' CEO, but authority is delegated to the DPO."
+        },
+        "C7": {
+          "title": "C7. Privacy Impact Assessments (Québec)",
+          "text": "We conduct internal PIAs when implementing new technologies that may affect sensitive information or involve cross-border transfers, as required by Québec law."
+        },
+        "C8": {
+          "title": "C8. Policy Updates",
+          "text": "Material changes will be announced in advance (see § 9.11 of the main Policy). Canadian users will receive clear notice."
+        },
+        "C9": {
+          "title": "C9. Marketing & CASL Compliance",
+          "text": "All commercial electronic messages to Canadian recipients comply with CASL: sent only with express consent or an existing business relationship, clearly identify Sabsus, and include an easy unsubscribe link."
+        },
+        "C10": {
+          "title": "C10. Questions",
+          "text": [
+            "E-mail: privacy@sabsus.com",
+            "OPC website: www.priv.gc.ca | Toll-free: 1-800-282-1376"
+          ]
+        }
+      },
+      "appendixD": {
+        "title": "Appendix D – Additional Terms for Users in the EU / EEA",
+        "intro": "These provisions ensure compliance with the EU General Data Protection Regulation (GDPR) for Users located in the European Union or European Economic Area.",
+        "D1": {
+          "title": "D1. Data Controller",
+          "text": "Controller: Sabsus, Inc., 2560 N Buena Vista St., Burbank CA 91504, USA (see § 10.12)."
+        },
+        "D2": {
+          "title": "D2. EU Representative (Art. 27 GDPR)",
+          "text": [
+            "We have appointed an EU representative: GDPR-Rep.eu [Full address of representative in an EU Member State]",
+            "E-mail: eu-rep@sabsus.com",
+            "You may contact them on matters related to EU data processing."
+          ]
+        },
+        "D3": {
+          "title": "D3. Data Protection Officer",
+          "text": "Voluntarily appointed DPO: privacy@sabsus.com (also indicated in the main Policy)."
+        },
+        "D4": {
+          "title": "D4. Legal Bases for Processing (Art. 6 GDPR)",
+          "text": [
+            "● Performance of a contract – registration, order processing.",
+            "● Consent – marketing e-mails / push notifications, optional geolocation, non-essential cookies.",
+            "● Legitimate interests – analytics, fraud prevention, product improvement (Art. 6 (1)(f); balancing tests performed).",
+            "● Legal obligation – fiscal retention, lawful disclosure.",
+            "● Vital interests / public interest – unlikely, but may apply in emergencies."
+          ]
+        },
+        "D5": {
+          "title": "D5. Data Subject Rights",
+          "text": [
+            "Rights of access, rectification, erasure, restriction, objection, portability, withdrawal of consent, and complaint (Art. 15-23 GDPR).",
+            "Requests: privacy@sabsus.com.",
+            "We reply within 1 month (extendable by two months). Free of charge unless manifestly unfounded / excessive"
+          ]
+        },
+        "D6": {
+          "title": "D6. Right to Lodge a Complaint",
+          "text": "You may complain to your national Data Protection Authority (contact list available on edpb.europa.eu)."
+        },
+        "D7": {
+          "title": "D7. International Data Transfers",
+          "text": [
+            "Personal data are transferred to the USA:",
+            "● Standard Contractual Clauses (SCC) approved by the European Commission are incorporated into all relevant contracts .",
+            "● Additional safeguards (encryption, access controls) are applied.",
+            "● Sabsus is evaluating certification under the EU-U.S. Data Privacy Framework; we will update this Appendix upon certification."
+          ]
+        },
+        "D8": {
+          "title": "D8. Mandatory / Optional Data",
+          "text": "Compulsory fields are marked during collection; refusing to provide them may prevent us from delivering the Service. Optional fields (e.g., profile photo) can be left blank without functional loss."
+        },
+        "D9": {
+          "title": "D9. Automated Decision-Making",
+          "text": "Sabsus does not engage in solely automated decision-making with legal or similarly significant effects as per Art. 22 GDPR. Automated filters (e.g., fraud flags) are subject to human review."
+        },
+        "D10": {
+          "title": "D10. Independent Controllers (Restaurants)",
+          "text": "Partner Restaurants become independent controllers for the order data they receive; they are responsible for any further processing (e.g., their own record-keeping or marketing). Please contact a Restaurant directly about its subsequent use of your data."
+        }
+      },
+      "appendixE": {
+        "title": "Appendix E – Additional Terms for Users in the United Kingdom",
+        "intro": "Post-Brexit, personal data of UK residents is governed by the UK GDPR and the Data Protection Act 2018.",
+        "E1": {
+          "title": "E1. Controller & UK Representative",
+          "text": [
+            "Controller: Sabsus, Inc.",
+            "UK Representative (per Art. 27 UK GDPR): DataRep UK Ltd [London address]",
+            "E-mail: uk-rep@sabsus.com"
+          ]
+        },
+        "E2": {
+          "title": "E2. DPO",
+          "text": "Our DPO covers UK queries as well: privacy@sabsus.com"
+        },
+        "E3": {
+          "title": "E3. Your Rights",
+          "text": "Equivalent to EU rights (see Appendix D5). Requests via the same channels."
+        },
+        "E4": {
+          "title": "E4. Complaints",
+          "text": [
+            "Supervisory authority: Information Commissioner's Office (ICO)",
+            "Website: ico.org.uk | Tel.: +44 303 123 1113 | Address: Wycliffe House, Water Lane, Wilmslow, Cheshire SK9 5AF."
+          ]
+        },
+        "E5": {
+          "title": "E5. International Transfers",
+          "text": "Transfers to the USA rely on the UK Standard Contractual Clauses / International Data Transfer Addendum (IDTA) until an adequacy decision or UK-U.S. framework is adopted"
+        },
+        "E6": {
+          "title": "E6. Age-Appropriate Design",
+          "text": "Although Sabsus targets adults, default privacy-protective settings comply with the UK Age-Appropriate Design Code (e.g., no precise geolocation or marketing without opt-in)."
+        },
+        "E7": {
+          "title": "E7. Marketing (UK PECR)",
+          "text": "Marketing e-mails or SMS to UK users are sent only with prior consent or under a soft opt-in, always providing an unsubscribe option."
+        },
+        "E8": {
+          "title": "E8. Jurisdiction",
+          "text": "If mandatory UK consumer law overrides the California forum clause (§ 10.9), UK consumers may bring proceedings in the courts of England & Wales. We nevertheless aim to resolve disputes amicably."
+        }
+      },
+      "contact": {
+        "title": "How to Contact Us",
+        "text": [
+          "General enquiries: support@sabsus.com",
+          "Privacy / DPO: info@sabsus.com",
+          "Postal address: Sabsus, Inc. 2560 N Buena Vista St. Burbank, CA 91504 USA",
+          "We appreciate your attention to our terms and our commitment to transparency. Thank you for being a Sabsus User!"
+        ]
+      }
+    }
+  },
+    "alert": {
+    "success": "Success! Your request has been submitted.",
+    "error": "Error! Please try again later."
+  },
+  "contact2": {
+    "form": {
+      "success": "Thank you! We'll contact you soon.",
+      "error": "Failed to submit. Please try again."
+    }
+  },
+  "feedback2": {
+    "form": {
+      "success": "Thank you for your feedback!",
+      "error": "Failed to send feedback. Please try again."
+    }
+  }
+}
