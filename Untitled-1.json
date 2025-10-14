@@ -1,0 +1,20 @@
+[
+  {
+    "id": "ba844c63-443b-460d-b743-558ef752ceaf",
+    "name": "RINGO Hairstyle",
+    "website": "https://www.ringo-hairstyle.de/",
+    "email": "",
+    "phone": "05121 7557549",
+    "notes": "Almsstraße 33, 31134 Hildesheim, Germany",
+    "tags": "establishment|hair_care|point_of_interest"
+  },
+  {
+    "id": "99fe6453-1763-401e-b89e-bbd71a654720",
+    "name": "Friseursalon & Kosmetikstudio Louisa",
+    "website": "https://friseursalon-louisa.de/",
+    "email": "",
+    "phone": "05121 7556783",
+    "notes": "Hannoversche Str. 1, 31134 Hildesheim, Germany",
+    "tags": "establishment|hair_care|point_of_interest"
+  }
+]
