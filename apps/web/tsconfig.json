@@ -12,9 +12,7 @@
     "noEmit": true,
     "esModuleInterop": true,
     "strict": true,
-    "forceConsistentCasingInFileNames": true,
-    "baseUrl": "./src",
-    "ignoreDeprecations": "6.0"
+    "baseUrl": "./src"
   },
   "include": ["src"]
 }

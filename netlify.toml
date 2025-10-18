@@ -1,12 +1,12 @@
 [build]
   base = "apps/web"
-  publish = "apps/web/dist"
+  publish = "dist"
   command = "npm ci && npm run build"
 
 [build.environment]
   NODE_VERSION = "20"
 
-# SPA fallback (якщо забув покласти _redirects)
+# SPA fallback на випадок, якщо _redirects загубиться
 [[redirects]]
   from = "/*"
   to = "/index.html"
