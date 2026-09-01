@@ -126,6 +126,17 @@ npm run build:web
 npm run build:server
 ```
 
+## Verification workflow
+
+The repository currently has no root-level automated test or lint script. Before sharing or deploying a change, the minimum repeatable verification is to build both applications:
+
+```bash
+npm run build:web
+npm run build:server
+```
+
+The frontend build runs TypeScript project checks before creating the Vite production bundle. Automated tests and a repository-wide lint command are still useful follow-up improvements, especially before the prototype is treated as production software.
+
 ## Main application routes
 
 The current frontend exposes routes for:
