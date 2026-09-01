@@ -38,6 +38,17 @@ The repository is structured as a small monorepo with a React frontend and an Ex
 - dotenv
 - node-fetch
 
+## Architecture and data flow
+
+LeadFlow separates the browser UI and API into two applications:
+
+1. `apps/web` renders the React interface and calls the backend through API helpers.
+2. `apps/server` exposes the REST endpoints and external-service integration points.
+3. The current local data layer is implemented in `apps/server/src/db/memory.ts`, so prototype records are memory-backed rather than production-persistent.
+4. Google Places functionality is enabled only when a `GOOGLE_API_KEY` is supplied to the server environment.
+
+This separation keeps the frontend independent from the storage implementation and leaves a clear migration path to a real database later. For production use, the in-memory layer should be replaced with persistent storage and authenticated API boundaries.
+
 ## Project structure
 
 ```text
@@ -53,7 +64,7 @@ LeadFlow/
 │   │       └── types/       # TypeScript types
 │   └── server/              # Express API
 │       └── src/
-│           ├── db/          # Data access / local data layer
+│           ├── db/          # Current in-memory data layer
 │           ├── routes/      # API routes
 │           ├── env.ts       # Environment configuration
 │           └── index.ts     # Server entry point
@@ -127,6 +138,19 @@ The current frontend exposes routes for:
 - `/maps` — map/local lead tools
 - `/settings` — settings
 - `/login` — login screen
+
+## Production gaps
+
+Before treating LeadFlow as a production CRM, the following areas need explicit implementation or review:
+
+- persistent database storage instead of the current memory-backed layer
+- real authentication and authorization enforcement
+- validation and error handling at API boundaries
+- secure handling of external-service credentials
+- rate limiting and abuse protection for public endpoints
+- privacy/retention rules for customer and prospect data
+- automated tests for critical client and message workflows
+- deployment-specific CORS and environment configuration
 
 ## Current status
 
