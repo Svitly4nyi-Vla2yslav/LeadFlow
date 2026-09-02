@@ -2,7 +2,10 @@ node_modules
 dist
 .env
 .DS_Store
+*.tsbuildinfo
 apps/server/dist
+apps/server/data/*.json
+apps/server/data/*.tmp
 
 # Local Netlify folder
 .netlify

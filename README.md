@@ -1,8 +1,10 @@
 # LeadFlow
 
-LeadFlow is a full-stack CRM-style prototype for managing prospects, clients, communication and local lead research from one interface.
+LeadFlow is a full-stack CRM for managing VS Web Studio prospects, clients, communication and local lead research from one interface.
 
-The repository is structured as a small monorepo with a React frontend and an Express API. The current implementation includes working client-facing flows alongside several prototype sections that are still being developed.
+The repository is structured as a small monorepo with a React frontend and an Express API. The core local single-user CRM flow is working; authentication, cloud storage and outbound integrations remain production work.
+
+The current project review and completion plan are documented in [docs/PROJECT_STATUS_UA.md](docs/PROJECT_STATUS_UA.md).
 
 ## Features
 
@@ -10,12 +12,26 @@ The repository is structured as a small monorepo with a React frontend and an Ex
 - Individual client detail pages
 - Messages and email sections
 - Maps/local lead research section
-- Settings and login screens
+- Persistent local JSON storage with atomic writes
+- Search, status filtering and overdue follow-up filtering
+- Lead detail editor, contact journal and unified timeline
+- Canonical JSON import and CSV export
+- Automated CRM validation tests and GitHub Actions CI
 - REST API routes for clients and messages
 - Places search/import endpoints
 - CSV export support
 - Internationalization support with `i18next`
 - Responsive UI built with `styled-components`
+- One shared CRM pipeline: `NEW`, `AUDITED`, `CONTACTED`, `REPLY`, `CALL`, `OFFER`, `FOLLOW-UP`, `WON`, `LOST`
+- Evidence validation before status changes, approved lost reasons, status history, CSV export and funnel dashboard
+
+## CRM standard
+
+Every lead has exactly one current CRM status. Status changes must reflect an actual event and are rejected when the required evidence is missing. In particular, `AUDITED` requires a concrete confirmed audit point; `CONTACTED` requires date, channel and contact summary; `OFFER` requires amount and offer details; `FOLLOW-UP` requires a next follow-up date; and `LOST` requires one of the approved lost reasons.
+
+The canonical export columns are: Lead ID, Company, Branche, Ort, Website, Contact Person, Phone, Email, CRM Status, Audit Problem, Proposed Solution, Contact Channel, Last Contact Date, Next Follow-up Date, Offer Amount, Lost Reason and Notes.
+
+Dashboard conversion rates use recorded status history rather than inferring past events from the current status.
 
 ## Tech stack
 
@@ -44,10 +60,10 @@ LeadFlow separates the browser UI and API into two applications:
 
 1. `apps/web` renders the React interface and calls the backend through API helpers.
 2. `apps/server` exposes the REST endpoints and external-service integration points.
-3. The current local data layer is implemented in `apps/server/src/db/memory.ts`, so prototype records are memory-backed rather than production-persistent.
+3. The local data layer is implemented in `apps/server/src/db/memory.ts` and persists atomically to `apps/server/data/leadflow.json` by default. That file is private and Git-ignored.
 4. Google Places functionality is enabled only when a `GOOGLE_API_KEY` is supplied to the server environment.
 
-This separation keeps the frontend independent from the storage implementation and leaves a clear migration path to a real database later. For production use, the in-memory layer should be replaced with persistent storage and authenticated API boundaries.
+This separation keeps the frontend independent from the storage implementation and leaves a clear migration path to PostgreSQL. The JSON store is suitable for local single-user use, not concurrent production instances.
 
 ## Project structure
 
@@ -64,7 +80,8 @@ LeadFlow/
 │   │       └── types/       # TypeScript types
 │   └── server/              # Express API
 │       └── src/
-│           ├── db/          # Current in-memory data layer
+│           ├── db/          # Persistent local data layer
+│           ├── crm.ts       # Canonical sanitization and evidence rules
 │           ├── routes/      # API routes
 │           ├── env.ts       # Environment configuration
 │           └── index.ts     # Server entry point
@@ -97,6 +114,7 @@ The server reads the following variables:
 PORT=3001
 ALLOWED_ORIGIN=http://localhost:5173
 GOOGLE_API_KEY=your_google_api_key
+LEADFLOW_DATA_FILE=data/leadflow.json
 ```
 
 `PORT` and `ALLOWED_ORIGIN` have local defaults. `GOOGLE_API_KEY` is only needed for functionality that uses the Google Places integration. Never commit real API keys to the repository.
@@ -128,14 +146,11 @@ npm run build:server
 
 ## Verification workflow
 
-The repository currently has no root-level automated test or lint script. Before sharing or deploying a change, the minimum repeatable verification is to build both applications:
+Run the automated CRM/API tests and both production builds:
 
 ```bash
-npm run build:web
-npm run build:server
+npm run check
 ```
-
-The frontend build runs TypeScript project checks before creating the Vite production bundle. Automated tests and a repository-wide lint command are still useful follow-up improvements, especially before the prototype is treated as production software.
 
 ## Main application routes
 
@@ -154,7 +169,7 @@ The current frontend exposes routes for:
 
 Before treating LeadFlow as a production CRM, the following areas need explicit implementation or review:
 
-- persistent database storage instead of the current memory-backed layer
+- PostgreSQL or equivalent multi-user database instead of the local JSON store
 - real authentication and authorization enforcement
 - validation and error handling at API boundaries
 - secure handling of external-service credentials
@@ -165,7 +180,7 @@ Before treating LeadFlow as a production CRM, the following areas need explicit 
 
 ## Current status
 
-LeadFlow is a portfolio and development project rather than a finished production CRM. Some modules are more complete than others, and authentication, persistence and external integrations should be reviewed before any production deployment.
+LeadFlow now works as a local single-user CRM with the canonical VS Web Studio pipeline and persistent data. It is not yet a secure public multi-user production CRM; authentication, cloud database, backups, privacy rules, deployment and external communication integrations must be completed first.
 
 ## Security note
 
