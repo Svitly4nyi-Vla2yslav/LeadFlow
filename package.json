@@ -6,7 +6,8 @@
     "dev:server": "npm --prefix ./apps/server run dev",
     "dev": "concurrently -k -n web,server -c blue,green \"npm:dev:web\" \"npm:dev:server\"",
     "build:web": "npm --prefix ./apps/web run build",
-    "build:server": "npm --prefix ./apps/server run build"
+    "build:server": "npm --prefix ./apps/server run build",
+    "build": "npm run build:web && npm run build:server"
   },
   "devDependencies": { "concurrently": "^9.0.0" }
 }
