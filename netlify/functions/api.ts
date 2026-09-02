@@ -23,25 +23,14 @@ const isDatabaseMutation = (event: FunctionEvent) => {
 
 export const handler = async (event: FunctionEvent, context: unknown): Promise<FunctionResponse> => {
   connectLambda(event as never);
-  const store = getStore({ name: 'leadflow-crm', consistency: 'strong' });
-  const entry = await store.getWithMetadata(DATABASE_KEY, { type: 'json' }) as { data: StoredDatabase; etag: string } | null;
-  hydrateDatabase(entry?.data || null);
+  const store = getStore('leadflow-crm');
+  const stored = await store.get(DATABASE_KEY, { type: 'json' }) as StoredDatabase | null;
+  hydrateDatabase(stored);
 
   const response = await expressHandler(event as never, context as never) as FunctionResponse;
   if (!isDatabaseMutation(event) || response.statusCode >= 500) return response;
 
   const snapshot: StoredDatabase = { clients: db.clients, messages: db.messages };
-  const saved = entry
-    ? await store.setJSON(DATABASE_KEY, snapshot, { onlyIfMatch: entry.etag })
-    : await store.setJSON(DATABASE_KEY, snapshot, { onlyIfNew: true });
-
-  if (!saved.modified) {
-    return {
-      statusCode: 409,
-      headers: { 'content-type': 'application/json; charset=utf-8' },
-      body: JSON.stringify({ error: 'CRM data changed concurrently. Reload and retry.' })
-    };
-  }
-
+  await store.setJSON(DATABASE_KEY, snapshot);
   return response;
 };
