@@ -1,17 +1,23 @@
-import { createHash, randomBytes, timingSafeEqual } from 'node:crypto';
+import { createHash, createHmac, randomBytes, timingSafeEqual } from 'node:crypto';
 import { Router, type NextFunction, type Request, type Response } from 'express';
 import { ENV } from './env';
 
 const COOKIE_NAME = 'leadflow_session';
 const MAX_FAILED_ATTEMPTS = 5;
 const ATTEMPT_WINDOW_MS = 15 * 60 * 1000;
-const sessions = new Map<string, number>();
 const failedAttempts = new Map<string, number[]>();
 
 const digest = (value: string) => createHash('sha256').update(value).digest();
 const passwordMatches = (candidate: string) => timingSafeEqual(digest(candidate), digest(ENV.ADMIN_PASSWORD));
 const now = () => Date.now();
 const authConfigured = () => ENV.ADMIN_PASSWORD.length >= 12;
+const sessionSecret = () => ENV.SESSION_SECRET || ENV.ADMIN_PASSWORD;
+const sign = (payload: string) => createHmac('sha256', sessionSecret()).update(payload).digest('base64url');
+const safelyEqual = (left: string, right: string) => {
+  const leftBuffer = Buffer.from(left);
+  const rightBuffer = Buffer.from(right);
+  return leftBuffer.length === rightBuffer.length && timingSafeEqual(leftBuffer, rightBuffer);
+};
 
 const readCookie = (req: Request, name: string) => {
   const source = req.headers.cookie || '';
@@ -20,11 +26,6 @@ const readCookie = (req: Request, name: string) => {
     if (key === name) return decodeURIComponent(value.join('='));
   }
   return undefined;
-};
-
-const clearExpiredSessions = () => {
-  const current = now();
-  for (const [token, expiresAt] of sessions) if (expiresAt <= current) sessions.delete(token);
 };
 
 const cookieOptions = (maxAgeSeconds: number) => [
@@ -37,22 +38,25 @@ const cookieOptions = (maxAgeSeconds: number) => [
 ].filter(Boolean).join('; ');
 
 const issueSession = (res: Response) => {
-  const token = randomBytes(32).toString('base64url');
   const expiresAt = now() + ENV.SESSION_HOURS * 60 * 60 * 1000;
-  sessions.set(token, expiresAt);
+  const payload = `v1.${expiresAt}.${randomBytes(24).toString('base64url')}`;
+  const token = `${payload}.${sign(payload)}`;
   res.setHeader('Set-Cookie', cookieOptions(ENV.SESSION_HOURS * 60 * 60).replace(`${COOKIE_NAME}=`, `${COOKIE_NAME}=${token}`));
 };
 
-const revokeSession = (req: Request, res: Response) => {
-  const token = readCookie(req, COOKIE_NAME);
-  if (token) sessions.delete(token);
+const revokeSession = (_req: Request, res: Response) => {
   res.setHeader('Set-Cookie', cookieOptions(0));
 };
 
 const isAuthenticated = (req: Request) => {
-  clearExpiredSessions();
   const token = readCookie(req, COOKIE_NAME);
-  return Boolean(token && sessions.has(token));
+  if (!token) return false;
+  const [version, expiresAtValue, nonce, signature, ...extra] = token.split('.');
+  if (version !== 'v1' || !expiresAtValue || !nonce || !signature || extra.length) return false;
+  const expiresAt = Number(expiresAtValue);
+  if (!Number.isFinite(expiresAt) || expiresAt <= now()) return false;
+  const payload = `${version}.${expiresAtValue}.${nonce}`;
+  return safelyEqual(signature, sign(payload));
 };
 
 const requestKey = (req: Request) => req.ip || req.socket.remoteAddress || 'unknown';

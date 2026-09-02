@@ -11,5 +11,11 @@
     "test": "npm --prefix ./apps/server run test",
     "check": "npm run test && npm run build"
   },
-  "devDependencies": { "concurrently": "^9.0.0" }
+  "devDependencies": {
+    "concurrently": "^9.0.0"
+  },
+  "dependencies": {
+    "@netlify/blobs": "^11.0.3",
+    "serverless-http": "^4.0.0"
+  }
 }
