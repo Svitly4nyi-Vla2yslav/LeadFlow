@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "build": "tsc -b",
-    "test": "tsx --test src/**/*.test.ts"
+    "test": "tsx --test src/api.test.ts src/crm.test.ts"
   },
   "dependencies": {
     "cors": "^2.8.5",
