@@ -1,4 +1,4 @@
-import { getStore } from '@netlify/blobs';
+import { connectLambda, getStore } from '@netlify/blobs';
 import serverless from 'serverless-http';
 import app from '../../apps/server/src/app';
 import { db, type Client, type Message } from '../../apps/server/src/db/memory';
@@ -22,6 +22,7 @@ const isDatabaseMutation = (event: FunctionEvent) => {
 };
 
 export const handler = async (event: FunctionEvent, context: unknown): Promise<FunctionResponse> => {
+  connectLambda(event as never);
   const store = getStore({ name: 'leadflow-crm', consistency: 'strong' });
   const entry = await store.getWithMetadata(DATABASE_KEY, { type: 'json' }) as { data: StoredDatabase; etag: string } | null;
   hydrateDatabase(entry?.data || null);
