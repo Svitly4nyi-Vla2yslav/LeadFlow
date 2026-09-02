@@ -21,8 +21,14 @@ r.post('/import', async (req, res) => {
     if (!place_id) return res.status(400).json({ error: 'place_id required' });
     const p = await fetchPlace(place_id);
     if (!p) return res.status(404).json({ error: 'place not found' });
-    const created = addClient({ name:p.name, website:p.website, phone:p.formatted_phone_number, notes:p.formatted_address, tags:p.types });
-    res.json({ created, source:{ place_id } });
+    const saved = addClient({
+      company: p.name,
+      website: p.website,
+      phone: p.formatted_phone_number,
+      notes: [p.formatted_address, Array.isArray(p.types) ? `Google types: ${p.types.join('|')}` : ''].filter(Boolean).join(' | '),
+      crmStatus: 'NEW'
+    });
+    res.status(saved.created ? 201 : 200).json({ created: saved.item, duplicate: !saved.created, source:{ place_id } });
   } catch (e:any) { res.status(500).json({ error: e.message }); }
 });
 
@@ -37,8 +43,14 @@ r.post('/import-bulk', async (req, res) => {
       try{
         const p=await fetchPlace(id);
         if(!p) continue;
-        const created=addClient({ name:p.name, website:p.website, phone:p.formatted_phone_number, notes:p.formatted_address, tags:p.types });
-        out.push({ ok:true, id, name:created.name });
+        const saved=addClient({
+          company: p.name,
+          website: p.website,
+          phone: p.formatted_phone_number,
+          notes: [p.formatted_address, Array.isArray(p.types) ? `Google types: ${p.types.join('|')}` : ''].filter(Boolean).join(' | '),
+          crmStatus: 'NEW'
+        });
+        out.push({ ok:true, id, company:saved.item.company, duplicate:!saved.created });
       }catch(e:any){
         out.push({ ok:false, id, error: e.message });
       }
