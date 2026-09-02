@@ -83,6 +83,13 @@ const AccessPanel = styled.form`
   h2{margin:0 0 8px;color:#f4cc7e}p{color:rgba(255,255,255,.55);font-size:13px}label{display:grid;gap:8px;margin-top:22px}
   input{background:#080a0b;border-color:rgba(255,214,131,.24);font-size:17px;letter-spacing:.08em}
 `;
+const PasswordField = styled.div`
+  position:relative;
+  input{padding-right:92px}
+  button{position:absolute;right:6px;top:50%;transform:translateY(-50%);width:auto;min-height:30px;padding:5px 9px;border:0;border-radius:7px;background:rgba(231,183,93,.12);color:#e7c47d;font-size:12px;font-weight:700;cursor:pointer}
+  button:hover{background:rgba(231,183,93,.2);color:#ffe4ad}
+  button:focus-visible{outline:2px solid #e7b75d;outline-offset:2px}
+`;
 const Actions = styled.div`display:flex;justify-content:flex-end;gap:10px;margin-top:18px;button{width:auto;padding:10px 14px;border-radius:9px;border:1px solid rgba(255,255,255,.14);background:transparent;color:#eee;cursor:pointer}button[type=submit]{background:linear-gradient(120deg,#9a651a,#e7b75d);color:#161009;border:0;font-weight:800}`;
 const ErrorText = styled.p`color:#ff9a8e!important;min-height:18px`;
 const LoadingMark = styled.div`font-family:'Courier New',monospace;color:#d5b269;font-size:18px;letter-spacing:.2em`;
@@ -105,6 +112,7 @@ export default function LaunchGate({ children }: { children: ReactNode }) {
   const [countdown, setCountdown] = useState(calculateCountdown);
   const [accessOpen, setAccessOpen] = useState(false);
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const taps = useRef<number[]>([]);
@@ -144,7 +152,7 @@ export default function LaunchGate({ children }: { children: ReactNode }) {
     event.preventDefault(); setSubmitting(true); setError('');
     try {
       await api.post('/api/auth/login', { password });
-      setPassword(''); setAccessOpen(false); setAuthState('unlocked');
+      setPassword(''); setShowPassword(false); setAccessOpen(false); setAuthState('unlocked');
     } catch (exception: any) {
       const status = exception.response?.status;
       setError(status === 429 ? 'Zu viele Versuche. Bitte später erneut versuchen.' : status === 503 ? 'Der interne Zugang ist noch nicht konfiguriert.' : 'Zugang verweigert.');
@@ -168,7 +176,7 @@ export default function LaunchGate({ children }: { children: ReactNode }) {
     {accessOpen && <Overlay onMouseDown={event => { if (event.target === event.currentTarget) setAccessOpen(false); }}>
       <AccessPanel onSubmit={login}>
         <h2>Interner Zugang</h2><p>Authentifizierung für das VS Web Studio CRM.</p>
-        <label>Passwort<input autoFocus type="password" autoComplete="current-password" value={password} onChange={event => setPassword(event.target.value)} required /></label>
+        <label>Passwort<PasswordField><input autoFocus type={showPassword ? 'text' : 'password'} autoComplete="current-password" value={password} onChange={event => setPassword(event.target.value)} required /><button type="button" aria-pressed={showPassword} onClick={() => setShowPassword(value => !value)}>{showPassword ? 'Verbergen' : 'Anzeigen'}</button></PasswordField></label>
         <ErrorText role="alert">{error}</ErrorText>
         <Actions><button type="button" onClick={() => setAccessOpen(false)}>Abbrechen</button><button type="submit" disabled={submitting}>{submitting ? 'Prüfung…' : 'System öffnen'}</button></Actions>
       </AccessPanel>
