@@ -151,7 +151,7 @@ npm run build:server
 
 ## Netlify production
 
-Netlify serves the Vite application and routes `/api/*` to the bundled Express function. The function keeps append-only CRM snapshots in the site-wide `leadflow-crm` Netlify Blobs store, so production no longer depends on a visitor's `localhost:3001` and a stale edge read cannot overwrite the newest snapshot key.
+Netlify serves the Vite application and routes `/api/*` to the bundled Express function. The function keeps the CRM document in the site-wide `leadflow-crm` Netlify Blobs store and uses strong API reads plus ETag-protected writes, so production no longer depends on a visitor's `localhost:3001` and concurrent updates cannot silently overwrite each other.
 
 Configure `ADMIN_PASSWORD`, `SESSION_SECRET`, `SESSION_HOURS` and `ALLOWED_ORIGIN` in Netlify environment variables before deployment. Production sessions are signed HttpOnly cookies and remain valid across function instances.
 
