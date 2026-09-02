@@ -5,7 +5,6 @@ import Messages from './pages/Messages';
 import Email from './pages/Email';
 import Maps from './pages/Maps';
 import Settings from './pages/Settings';
-import Login from './pages/Login';
 import Leads from './pages/Leads';
 
 export const routes = [
@@ -16,6 +15,5 @@ export const routes = [
   { path: '/messages', element: <Messages/> },
   { path: '/email', element: <Email/> },
   { path: '/maps', element: <Maps/> },
-  { path: '/settings', element: <Settings/> },
-  { path: '/login', element: <Login/> }
+  { path: '/settings', element: <Settings/> }
 ];

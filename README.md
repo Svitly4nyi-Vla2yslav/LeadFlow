@@ -17,6 +17,8 @@ The current project review and completion plan are documented in [docs/PROJECT_S
 - Lead detail editor, contact journal and unified timeline
 - Canonical JSON import and CSV export
 - Automated CRM validation tests and GitHub Actions CI
+- Public launch countdown with the animated VS Web Studio gold mark
+- Hidden owner entry backed by server-side password verification, HttpOnly sessions and login throttling
 - REST API routes for clients and messages
 - Places search/import endpoints
 - CSV export support
@@ -115,9 +117,11 @@ PORT=3001
 ALLOWED_ORIGIN=http://localhost:5173
 GOOGLE_API_KEY=your_google_api_key
 LEADFLOW_DATA_FILE=data/leadflow.json
+ADMIN_PASSWORD=replace-with-a-long-unique-password
+SESSION_HOURS=12
 ```
 
-`PORT` and `ALLOWED_ORIGIN` have local defaults. `GOOGLE_API_KEY` is only needed for functionality that uses the Google Places integration. Never commit real API keys to the repository.
+`ADMIN_PASSWORD` must contain at least 12 characters or the private entrance remains disabled. `PORT` and `ALLOWED_ORIGIN` have local defaults. `GOOGLE_API_KEY` is only needed for Google Places. Never commit real passwords or API keys.
 
 ### Start frontend and backend together
 
@@ -163,14 +167,14 @@ The current frontend exposes routes for:
 - `/email` — email section
 - `/maps` — map/local lead tools
 - `/settings` — settings
-- `/login` — login screen
+- unauthorized visitors see only the launch countdown; the CRM routes render only after a valid server session
 
 ## Production gaps
 
 Before treating LeadFlow as a production CRM, the following areas need explicit implementation or review:
 
 - PostgreSQL or equivalent multi-user database instead of the local JSON store
-- real authentication and authorization enforcement
+- managed identity provider, roles and persistent sessions if the CRM becomes multi-user
 - validation and error handling at API boundaries
 - secure handling of external-service credentials
 - rate limiting and abuse protection for public endpoints

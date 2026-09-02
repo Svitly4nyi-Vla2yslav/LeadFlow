@@ -7,9 +7,16 @@ import type { Server } from 'node:http';
 
 const temporaryDirectory = mkdtempSync(join(tmpdir(), 'leadflow-api-'));
 process.env.LEADFLOW_DATA_FILE = join(temporaryDirectory, 'leadflow.json');
+process.env.ADMIN_PASSWORD = 'test-only-long-password';
 
 let server: Server;
 let baseUrl = '';
+let sessionCookie = '';
+
+const withSession = (options: RequestInit = {}): RequestInit => ({
+  ...options,
+  headers: { ...options.headers, cookie: sessionCookie }
+});
 
 before(async () => {
   const { default: app } = await import('./app');
@@ -34,35 +41,55 @@ test('health endpoint reports persistent storage', async () => {
   assert.deepEqual(await response.json(), { ok: true, storage: 'persistent-json' });
 });
 
+test('CRM API is hidden behind a rate-limited server session', async () => {
+  const blocked = await fetch(`${baseUrl}/api/clients`);
+  assert.equal(blocked.status, 401);
+
+  const denied = await fetch(`${baseUrl}/api/auth/login`, {
+    method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ password: 'wrong-password' })
+  });
+  assert.equal(denied.status, 401);
+
+  const login = await fetch(`${baseUrl}/api/auth/login`, {
+    method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ password: 'test-only-long-password' })
+  });
+  assert.equal(login.status, 200);
+  sessionCookie = (login.headers.get('set-cookie') || '').split(';')[0];
+  assert.match(sessionCookie, /^leadflow_session=/);
+
+  const session = await fetch(`${baseUrl}/api/auth/session`, withSession());
+  assert.deepEqual(await session.json(), { authenticated: true, configured: true });
+});
+
 test('lead API creates, validates, updates and reports dashboard history', async () => {
-  const createdResponse = await fetch(`${baseUrl}/api/clients`, {
+  const createdResponse = await fetch(`${baseUrl}/api/clients`, withSession({
     method: 'POST', headers: { 'content-type': 'application/json' },
     body: JSON.stringify({ company: 'API Test GmbH', crmStatus: 'NEW' })
-  });
+  }));
   assert.equal(createdResponse.status, 201);
   const created = await createdResponse.json() as { id: string };
 
-  const invalidResponse = await fetch(`${baseUrl}/api/clients/${created.id}`, {
+  const invalidResponse = await fetch(`${baseUrl}/api/clients/${created.id}`, withSession({
     method: 'PATCH', headers: { 'content-type': 'application/json' },
     body: JSON.stringify({ crmStatus: 'AUDITED' })
-  });
+  }));
   assert.equal(invalidResponse.status, 400);
 
-  const auditedResponse = await fetch(`${baseUrl}/api/clients/${created.id}`, {
+  const auditedResponse = await fetch(`${baseUrl}/api/clients/${created.id}`, withSession({
     method: 'PATCH', headers: { 'content-type': 'application/json' },
     body: JSON.stringify({ crmStatus: 'AUDITED', auditProblem: 'CTA is hidden below the mobile fold.', proposedSolution: 'Place a sticky contact CTA.' })
-  });
+  }));
   assert.equal(auditedResponse.status, 200);
 
-  const dashboard = await (await fetch(`${baseUrl}/api/dashboard`)).json() as { counts: Record<string, number> };
+  const dashboard = await (await fetch(`${baseUrl}/api/dashboard`, withSession())).json() as { counts: Record<string, number> };
   assert.equal(dashboard.counts.AUDITED, 1);
 });
 
 test('canonical bulk import skips duplicates', async () => {
-  const response = await fetch(`${baseUrl}/api/clients/import`, {
+  const response = await fetch(`${baseUrl}/api/clients/import`, withSession({
     method: 'POST', headers: { 'content-type': 'application/json' },
     body: JSON.stringify({ leads: [{ Company: 'Import GmbH', Ort: 'Hildesheim', 'CRM Status': 'NEW' }, { Company: 'Import GmbH', Ort: 'Hildesheim', 'CRM Status': 'NEW' }] })
-  });
+  }));
   assert.equal(response.status, 200);
   const result = await response.json() as { created: number; skipped: number };
   assert.deepEqual(result, { created: 1, skipped: 1, errors: [] });
