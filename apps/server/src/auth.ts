@@ -11,6 +11,7 @@ const digest = (value: string) => createHash('sha256').update(value).digest();
 const passwordMatches = (candidate: string) => timingSafeEqual(digest(candidate), digest(ENV.ADMIN_PASSWORD));
 const now = () => Date.now();
 const authConfigured = () => ENV.ADMIN_PASSWORD.length >= 12;
+const secureCookies = () => ENV.NODE_ENV === 'production' || Boolean(process.env.NETLIFY || process.env.AWS_LAMBDA_FUNCTION_NAME);
 const sessionSecret = () => ENV.SESSION_SECRET || ENV.ADMIN_PASSWORD;
 const sign = (payload: string) => createHmac('sha256', sessionSecret()).update(payload).digest('base64url');
 const safelyEqual = (left: string, right: string) => {
@@ -34,7 +35,7 @@ const cookieOptions = (maxAgeSeconds: number) => [
   'SameSite=Lax',
   'Path=/',
   `Max-Age=${maxAgeSeconds}`,
-  ENV.NODE_ENV === 'production' ? 'Secure' : ''
+  secureCookies() ? 'Secure' : ''
 ].filter(Boolean).join('; ');
 
 const issueSession = (res: Response) => {
