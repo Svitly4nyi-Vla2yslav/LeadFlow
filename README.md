@@ -143,6 +143,14 @@ npm run dev:server
 
 ## Build
 
+Build both applications with the root script:
+
+```bash
+npm run build
+```
+
+This runs `build:web` first and then `build:server`. The individual commands remain available when only one side needs to be checked:
+
 ```bash
 npm run build:web
 npm run build:server
@@ -150,11 +158,13 @@ npm run build:server
 
 ## Verification workflow
 
-Run the automated CRM/API tests and both production builds:
+Run the automated server/CRM tests followed by both production builds:
 
 ```bash
 npm run check
 ```
+
+The root `check` command is the preferred pre-push verification because it executes `npm run test` and then the combined `npm run build`.
 
 ## Main application routes
 
