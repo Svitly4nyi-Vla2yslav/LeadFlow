@@ -1,10 +1,20 @@
 [build]
-  base = "apps/web"
-  publish = "dist"
-  command = "npm ci && npm run build"
+  base = "."
+  publish = "apps/web/dist"
+  command = "npm ci && npm ci --prefix apps/web && npm ci --prefix apps/server && npm run build"
 
 [build.environment]
   NODE_VERSION = "20"
+
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
+
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/api/:splat"
+  status = 200
+  force = true
 
 # SPA fallback на випадок, якщо _redirects загубиться
 [[redirects]]

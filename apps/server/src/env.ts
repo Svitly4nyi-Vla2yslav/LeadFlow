@@ -8,5 +8,6 @@ export const ENV = {
   ALLOWED_ORIGIN: process.env.ALLOWED_ORIGIN || 'http://localhost:5173',
   GOOGLE_API_KEY: process.env.GOOGLE_API_KEY || '',
   ADMIN_PASSWORD: process.env.ADMIN_PASSWORD || '',
+  SESSION_SECRET: process.env.SESSION_SECRET || '',
   SESSION_HOURS: Number.isFinite(configuredSessionHours) ? Math.min(168, Math.max(1, configuredSessionHours)) : 12
 } as const;

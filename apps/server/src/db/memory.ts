@@ -93,6 +93,7 @@ const loadDatabase = (): Database => {
 export const db = loadDatabase();
 
 export const persistDb = () => {
+  if (process.env.NETLIFY || process.env.AWS_LAMBDA_FUNCTION_NAME) return;
   mkdirSync(dirname(dataFile), { recursive: true });
   const temporaryFile = `${dataFile}.tmp`;
   writeFileSync(temporaryFile, JSON.stringify(db, null, 2), 'utf8');

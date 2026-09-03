@@ -9,7 +9,7 @@ const statusColor: Record<CrmStatus, string> = {
   NEW: '#94a3b8', AUDITED: '#38bdf8', CONTACTED: '#818cf8', REPLY: '#a78bfa',
   CALL: '#f59e0b', OFFER: '#fb923c', 'FOLLOW-UP': '#facc15', WON: '#22c55e', LOST: '#ef4444'
 };
-const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+const apiUrl = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? '' : 'http://localhost:3001');
 
 export default function Leads() {
   const [items, setItems] = useState<Client[]>([]);

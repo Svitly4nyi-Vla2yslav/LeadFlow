@@ -118,10 +118,11 @@ ALLOWED_ORIGIN=http://localhost:5173
 GOOGLE_API_KEY=your_google_api_key
 LEADFLOW_DATA_FILE=data/leadflow.json
 ADMIN_PASSWORD=replace-with-a-long-unique-password
+SESSION_SECRET=replace-with-at-least-32-random-characters
 SESSION_HOURS=12
 ```
 
-`ADMIN_PASSWORD` must contain at least 12 characters or the private entrance remains disabled. `PORT` and `ALLOWED_ORIGIN` have local defaults. `GOOGLE_API_KEY` is only needed for Google Places. Never commit real passwords or API keys.
+`ADMIN_PASSWORD` must contain at least 12 characters or the private entrance remains disabled. `SESSION_SECRET` signs portable sessions across serverless instances and should be a separate random secret in production. `PORT` and `ALLOWED_ORIGIN` have local defaults. `GOOGLE_API_KEY` is only needed for Google Places. Never commit real passwords or API keys.
 
 ### Start frontend and backend together
 
@@ -155,6 +156,12 @@ This runs `build:web` first and then `build:server`. The individual commands rem
 npm run build:web
 npm run build:server
 ```
+
+## Netlify production
+
+Netlify serves the Vite application and routes `/api/*` to the bundled Express function. The function keeps the CRM document in the site-wide `leadflow-crm` Netlify Blobs store and uses strong API reads plus ETag-protected writes, so production no longer depends on a visitor's `localhost:3001` and concurrent updates cannot silently overwrite each other.
+
+Configure `ADMIN_PASSWORD`, `SESSION_SECRET`, `SESSION_HOURS` and `ALLOWED_ORIGIN` in Netlify environment variables before deployment. Production sessions are signed HttpOnly cookies and remain valid across function instances.
 
 ## Verification workflow
 
@@ -194,7 +201,7 @@ Before treating LeadFlow as a production CRM, the following areas need explicit 
 
 ## Current status
 
-LeadFlow now works as a local single-user CRM with the canonical VS Web Studio pipeline and persistent data. It is not yet a secure public multi-user production CRM; authentication, cloud database, backups, privacy rules, deployment and external communication integrations must be completed first.
+LeadFlow now works as a local or Netlify-hosted single-user CRM with the canonical VS Web Studio pipeline, protected API and persistent storage. It is not yet a multi-user CRM; roles, managed identity/2FA, relational storage, tested backups, privacy rules and external communication integrations remain future production work.
 
 ## Security note
 
