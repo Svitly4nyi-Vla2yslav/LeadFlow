@@ -21,7 +21,6 @@ The current project review and completion plan are documented in [docs/PROJECT_S
 - Hidden owner entry backed by server-side password verification, HttpOnly sessions and login throttling
 - REST API routes for clients and messages
 - Places search/import endpoints
-- CSV export support
 - Internationalization support with `i18next`
 - Responsive UI built with `styled-components`
 - One shared CRM pipeline: `NEW`, `AUDITED`, `CONTACTED`, `REPLY`, `CALL`, `OFFER`, `FOLLOW-UP`, `WON`, `LOST`
