@@ -189,7 +189,7 @@ The current frontend exposes routes for:
 
 Before treating LeadFlow as a production CRM, the following areas need explicit implementation or review:
 
-- PostgreSQL or equivalent multi-user database instead of the local JSON store
+- relational or transactional multi-user storage if the app grows beyond the current single-user local JSON / Netlify Blobs model
 - managed identity provider, roles and persistent sessions if the CRM becomes multi-user
 - validation and error handling at API boundaries
 - secure handling of external-service credentials
