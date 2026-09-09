@@ -121,7 +121,7 @@ SESSION_SECRET=replace-with-at-least-32-random-characters
 SESSION_HOURS=12
 ```
 
-`ADMIN_PASSWORD` must contain at least 12 characters or the private entrance remains disabled. `SESSION_SECRET` signs portable sessions across serverless instances and should be a separate random secret in production. `PORT` and `ALLOWED_ORIGIN` have local defaults. `GOOGLE_API_KEY` is only needed for Google Places. Never commit real passwords or API keys.
+`ADMIN_PASSWORD` must contain at least 12 characters or the private entrance remains disabled. `SESSION_SECRET` signs portable sessions across serverless instances and should be a separate random secret in production. `PORT` and `ALLOWED_ORIGIN` have local defaults. `GOOGLE_API_KEY` is only needed for Google Places. `LEADFLOW_DATA_FILE` controls the local Express JSON store; Netlify production hydrates and persists the CRM document through Netlify Blobs instead, so the local file path is not the durable production datastore. Never commit real passwords or API keys.
 
 ### Start frontend and backend together
 
