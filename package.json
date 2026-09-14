@@ -1,6 +1,9 @@
 {
   "name": "leadflow",
   "private": true,
+  "engines": {
+    "node": ">=18"
+  },
   "scripts": {
     "dev:web": "npm --prefix ./apps/web run dev",
     "dev:server": "npm --prefix ./apps/server run dev",
