@@ -23,9 +23,9 @@ router.post('/resolve-handoff', (req, res) => {
     lead: {
       id: lead.id,
       company: lead.company,
-      contactPerson: lead.contactPerson,
-      phone: lead.phone,
-      email: lead.email,
+      contactPerson: lead.contactPerson ?? null,
+      phone: lead.phone ?? null,
+      email: lead.email ?? null,
       crmStatus: lead.crmStatus
     }
   });

@@ -236,6 +236,24 @@ test('a valid handoff resolves the exact lead with only sanitized operator conte
   });
 });
 
+test('resolve-handoff returns absent optional contact fields explicitly as null', async () => {
+  const lead = await createLead('Nullable Contact GmbH');
+  const created = await (await createHandoff({ leadId: lead.id })).json() as { handoffToken: string };
+  const response = await resolveHandoff(created.handoffToken);
+  assert.equal(response.status, 200);
+  assert.deepEqual(await response.json(), {
+    ok: true,
+    lead: {
+      id: lead.id,
+      company: 'Nullable Contact GmbH',
+      contactPerson: null,
+      phone: null,
+      email: null,
+      crmStatus: 'NEW'
+    }
+  });
+});
+
 test('resolve-handoff confirms that the exact lead still exists', async () => {
   const lead = await createLead('Deleted Before Resolve GmbH');
   const created = await (await createHandoff({ leadId: lead.id })).json() as { handoffToken: string };
