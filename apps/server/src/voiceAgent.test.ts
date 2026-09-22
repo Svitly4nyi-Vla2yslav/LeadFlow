@@ -81,4 +81,7 @@ test('Netlify persistence recognizes integration writes and includes voiceIntera
   assert.match(source, /integrations\\\/voice-agent\\\/interactions/);
   assert.match(source, /db\.voiceInteractions\.splice/);
   assert.match(source, /voiceInteractions: db\.voiceInteractions/);
+  assert.match(source, /if \(!isDatabaseMutation\(event\) \|\| response\.statusCode >= 500\) return response/);
+  assert.match(source, /store\.setJSON\(DATABASE_KEY, snapshot/);
+  assert.match(source, /onlyIfMatch: entry\.etag/);
 });

@@ -148,6 +148,18 @@ Contract `VoiceAgentInteractionV1` uses `contractVersion: "1.0"`, source `vs-ai-
 
 In Netlify production, `voiceInteractions` is included alongside clients and messages in the strongly read, ETag/`onlyIfMatch`-protected Blobs snapshot. Configure a unique `VOICE_AGENT_INTEGRATION_TOKEN` in the Netlify server environment before enabling the sender.
 
+### Phase 5A verification
+
+LeadFlow is the CRM authority: the Voice Agent reports confirmed interaction facts, while LeadFlow validates those facts and decides whether they justify a CRM state transition. Automated receiver coverage verifies strict authentication/schema handling, exact German UTF-8 storage (`ä`, `ö`, `ü`, `ß`), timeline writeback, conservative status mapping, idempotent retries, event conflicts, terminal-status safety, and Netlify persistence wiring.
+
+An operator can exercise the local receiver against an existing canonical lead with the guarded HTTP test:
+
+```bash
+npm --prefix apps/server run voice:integration-test -- --lead-id=<LEAD_ID> --confirm-write
+```
+
+The command reads `VOICE_AGENT_INTEGRATION_TOKEN` from `apps/server/.env`, generates a fresh event UUID, submits one non-destructive `CALL_COMPLETED` fact with confirmed next-action evidence, verifies the identical retry, then verifies that changed content produces `409 event_conflict`. It never prints the token and performs no request unless both `--lead-id` and `--confirm-write` are supplied. The local API defaults to `http://localhost:3001`; use `--base-url=<URL>` only when intentionally testing another receiver.
+
 ### Start frontend and backend together
 
 ```bash
