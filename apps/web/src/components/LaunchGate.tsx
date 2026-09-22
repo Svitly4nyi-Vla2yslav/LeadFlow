@@ -116,6 +116,7 @@ export default function LaunchGate({ children }: { children: ReactNode }) {
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const taps = useRef<number[]>([]);
+  const devUnlockPending = useRef(false);
 
   useEffect(() => {
     api.get('/api/auth/session').then(response => setAuthState(response.data.authenticated ? 'unlocked' : 'locked')).catch(() => setAuthState('locked'));
@@ -142,10 +143,30 @@ export default function LaunchGate({ children }: { children: ReactNode }) {
     ['Tage', countdown.days], ['Stunden', countdown.hours], ['Minuten', countdown.minutes], ['Sekunden', countdown.seconds]
   ], [countdown]);
 
+  const tryDevUnlock = async () => {
+    if (devUnlockPending.current) return;
+    devUnlockPending.current = true;
+    setError('');
+    try {
+      const response = await api.post('/api/auth/dev-unlock');
+      if (response.data?.authenticated !== true || response.data?.mode !== 'development-bypass') {
+        throw new Error('Development unlock response was not authenticated');
+      }
+      setAccessOpen(false);
+      setAuthState('unlocked');
+    } catch (exception: any) {
+      const status = exception.response?.status;
+      if (status !== 403 && status !== 404) setError('Entwicklungszugang nicht verfÃ¼gbar. Bitte Passwort verwenden.');
+      setAccessOpen(true);
+    } finally {
+      devUnlockPending.current = false;
+    }
+  };
+
   const revealAccess = () => {
     const cutoff = Date.now() - TAP_WINDOW_MS;
     taps.current = [...taps.current.filter(time => time > cutoff), Date.now()];
-    if (taps.current.length >= REQUIRED_TAPS) { taps.current = []; setError(''); setAccessOpen(true); }
+    if (taps.current.length >= REQUIRED_TAPS) { taps.current = []; void tryDevUnlock(); }
   };
 
   const login = async (event: FormEvent) => {

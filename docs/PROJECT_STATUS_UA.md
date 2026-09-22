@@ -193,3 +193,8 @@ LeadFlow приведено до одного CRM-стандарту з дев�
 10. Рішення, чи GitHub-зміни після review можна merge у `main` і автоматично deploy у production.
 
 Секрети, паролі, API keys і приватні lead data не потрібно надсилати в чат або комітити в Git. Їх слід додавати тільки в secure environment variables обраного hosting provider.
+## Доповнення: Phase 5A — Voice Agent receiver
+
+LeadFlow приймає підтверджені факти від VS AI Voice Agent через `POST /api/integrations/voice-agent/interactions`. Окремий серверний `VOICE_AGENT_INTEGRATION_TOKEN` захищає маршрут; браузерна сесія для нього не використовується. `eventId` забезпечує постійну ідемпотентність, а валідовані `voiceInteractions` зберігаються локально та у production snapshot Netlify Blobs разом із `clients` і `messages`.
+
+Voice Agent не задає CRM-статус і не має прямого доступу до бази LeadFlow. Він передає лише структуровані підтверджені факти. LeadFlow залишається єдиним джерелом рішень про переходи канонічного pipeline та застосовує чинну перевірку доказів.

@@ -65,10 +65,42 @@ export type Message = {
   createdAt: string;
 };
 
-type Database = { clients: Client[]; messages: Message[] };
+export type VoiceInteraction = {
+  id: string;
+  eventId: string;
+  payloadHash: string;
+  leadId: string;
+  occurredAt: string;
+  summary: string;
+  outcome: 'NO_ANSWER' | 'CALL_COMPLETED' | 'CALLBACK_REQUESTED' | 'MEETING_BOOKED' | 'SEND_INFORMATION_REQUESTED' | 'HUMAN_HANDOFF_REQUESTED' | 'NOT_INTERESTED' | 'DO_NOT_CONTACT';
+  nextAction?: {
+    type: 'NONE' | 'CALLBACK' | 'FOLLOW_UP' | 'MEETING' | 'SEND_INFORMATION' | 'HUMAN_HANDOFF';
+    confirmed: boolean;
+    dueAt?: string;
+    note?: string;
+  };
+  followUp?: {
+    requested: boolean;
+    confirmed: boolean;
+    date?: string;
+    dueAt?: string;
+    timeWindow?: string;
+    reason?: string;
+  };
+  calendarEventId?: string;
+  calendarStart?: string;
+  calendarEnd?: string;
+  meetingMode?: 'GOOGLE_MEET' | 'PHONE' | 'IN_PERSON';
+  lostReason?: LostReason;
+  crmStatusBefore: CrmStatus;
+  crmStatusAfter: CrmStatus;
+  createdAt: string;
+};
+
+export type Database = { clients: Client[]; messages: Message[]; voiceInteractions: VoiceInteraction[] };
 
 const dataFile = resolve(process.env.LEADFLOW_DATA_FILE || 'data/leadflow.json');
-const emptyDatabase = (): Database => ({ clients: [], messages: [] });
+const emptyDatabase = (): Database => ({ clients: [], messages: [], voiceInteractions: [] });
 
 const loadDatabase = (): Database => {
   if (!existsSync(dataFile)) return emptyDatabase();
@@ -82,7 +114,8 @@ const loadDatabase = (): Database => {
         createdAt: client.createdAt || now,
         updatedAt: client.updatedAt || client.createdAt || now
       })) as Client[] : [],
-      messages: Array.isArray(parsed.messages) ? parsed.messages : []
+      messages: Array.isArray(parsed.messages) ? parsed.messages : [],
+      voiceInteractions: Array.isArray(parsed.voiceInteractions) ? parsed.voiceInteractions : []
     };
   } catch (error) {
     console.error(`Could not read LeadFlow data file ${dataFile}:`, error);
@@ -128,16 +161,23 @@ export const addClient = (data: Omit<Client, 'id' | 'statusHistory' | 'createdAt
   return { item, created: true };
 };
 
-export const updateClient = (item: Client, next: Client) => {
+export const updateClient = (item: Client, next: Client, persist = true) => {
   Object.assign(item, next, { updatedAt: new Date().toISOString() });
-  persistDb();
+  if (persist) persistDb();
   return item;
 };
 
-export const addMessage = (data: Omit<Message, 'id' | 'createdAt'>) => {
+export const addMessage = (data: Omit<Message, 'id' | 'createdAt'>, persist = true) => {
   const item: Message = { id: randomUUID(), createdAt: new Date().toISOString(), ...data };
   db.messages.push(item);
-  persistDb();
+  if (persist) persistDb();
+  return item;
+};
+
+export const addVoiceInteraction = (data: Omit<VoiceInteraction, 'id' | 'createdAt'>, persist = true) => {
+  const item: VoiceInteraction = { id: randomUUID(), createdAt: new Date().toISOString(), ...data };
+  db.voiceInteractions.push(item);
+  if (persist) persistDb();
   return item;
 };
 
@@ -146,6 +186,7 @@ export const removeClient = (id: string) => {
   if (index < 0) return false;
   db.clients.splice(index, 1);
   db.messages = db.messages.filter(message => message.clientId !== id);
+  db.voiceInteractions = db.voiceInteractions.filter(interaction => interaction.leadId !== id);
   persistDb();
   return true;
 };

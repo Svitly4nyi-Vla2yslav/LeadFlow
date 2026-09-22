@@ -9,8 +9,14 @@ const failedAttempts = new Map<string, number[]>();
 
 const digest = (value: string) => createHash('sha256').update(value).digest();
 const passwordMatches = (candidate: string) => timingSafeEqual(digest(candidate), digest(ENV.ADMIN_PASSWORD));
+const integrationTokenMatches = (candidate: string) => timingSafeEqual(digest(candidate), digest(ENV.VOICE_AGENT_INTEGRATION_TOKEN));
 const now = () => Date.now();
 const authConfigured = () => ENV.ADMIN_PASSWORD.length >= 12;
+const devAuthBypassEnabled = () => ENV.NODE_ENV !== 'production'
+  && !process.env.NETLIFY
+  && !process.env.AWS_LAMBDA_FUNCTION_NAME
+  && ENV.ALLOW_DEV_AUTH_BYPASS;
+const voiceIntegrationConfigured = () => ENV.VOICE_AGENT_INTEGRATION_TOKEN.length >= 32;
 const secureCookies = () => ENV.NODE_ENV === 'production' || Boolean(process.env.NETLIFY || process.env.AWS_LAMBDA_FUNCTION_NAME);
 const sessionSecret = () => ENV.SESSION_SECRET || ENV.ADMIN_PASSWORD;
 const sign = (payload: string) => createHmac('sha256', sessionSecret()).update(payload).digest('base64url');
@@ -75,6 +81,12 @@ authRouter.get('/session', (req, res) => {
   res.json({ authenticated: isAuthenticated(req), configured: authConfigured() });
 });
 
+authRouter.post('/dev-unlock', (_req, res) => {
+  if (!devAuthBypassEnabled()) return res.status(404).json({ error: 'Route not found' });
+  issueSession(res);
+  res.json({ authenticated: true, mode: 'development-bypass' });
+});
+
 authRouter.post('/login', (req, res) => {
   if (!authConfigured()) return res.status(503).json({ error: 'Access is not configured' });
   const { key, recent } = recentFailures(req);
@@ -95,7 +107,17 @@ authRouter.post('/logout', (req, res) => {
 });
 
 export const requireAuth = (req: Request, res: Response, next: NextFunction) => {
-  if (!authConfigured()) return res.status(503).json({ error: 'Authentication is not configured' });
+  if (!authConfigured() && !devAuthBypassEnabled()) return res.status(503).json({ error: 'Authentication is not configured' });
   if (!isAuthenticated(req)) return res.status(401).json({ error: 'Authentication required' });
+  next();
+};
+
+export const requireVoiceAgentIntegration = (req: Request, res: Response, next: NextFunction) => {
+  if (!voiceIntegrationConfigured()) return res.status(503).json({ error: 'Voice Agent integration is not configured' });
+  const authorization = req.headers.authorization || '';
+  const match = /^Bearer ([^\s]+)$/.exec(authorization);
+  if (!match || !integrationTokenMatches(match[1])) {
+    return res.status(401).json({ error: 'Integration authentication required' });
+  }
   next();
 };

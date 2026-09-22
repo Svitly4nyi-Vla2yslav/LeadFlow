@@ -25,6 +25,7 @@ The current project review and completion plan are documented in [docs/PROJECT_S
 - Responsive UI built with `styled-components`
 - One shared CRM pipeline: `NEW`, `AUDITED`, `CONTACTED`, `REPLY`, `CALL`, `OFFER`, `FOLLOW-UP`, `WON`, `LOST`
 - Evidence validation before status changes, approved lost reasons, status history, CSV export and funnel dashboard
+- Authenticated Voice Agent contract v1 receiver with durable event idempotency and CRM-owned status decisions
 
 ## CRM standard
 
@@ -118,10 +119,34 @@ GOOGLE_API_KEY=your_google_api_key
 LEADFLOW_DATA_FILE=data/leadflow.json
 ADMIN_PASSWORD=replace-with-a-long-unique-password
 SESSION_SECRET=replace-with-at-least-32-random-characters
+ALLOW_DEV_AUTH_BYPASS=false
+VOICE_AGENT_INTEGRATION_TOKEN=replace-with-at-least-32-random-characters
 SESSION_HOURS=12
 ```
 
-`ADMIN_PASSWORD` must contain at least 12 characters or the private entrance remains disabled. `SESSION_SECRET` signs portable sessions across serverless instances and should be a separate random secret in production. `PORT` and `ALLOWED_ORIGIN` have local defaults. `GOOGLE_API_KEY` is only needed for Google Places. `LEADFLOW_DATA_FILE` controls the local Express JSON store; Netlify production hydrates and persists the CRM document through Netlify Blobs instead, so the local file path is not the durable production datastore. Never commit real passwords or API keys.
+`ADMIN_PASSWORD` must contain at least 12 characters or the private entrance remains disabled. `SESSION_SECRET` signs portable sessions across serverless instances and should be a separate random secret in production. `ALLOW_DEV_AUTH_BYPASS` is parsed by the server and defaults to `false`. `VOICE_AGENT_INTEGRATION_TOKEN` is a separate server-only bearer token of at least 32 characters; never expose it to the frontend or reuse the admin password/session secret. `PORT` and `ALLOWED_ORIGIN` have local defaults. `GOOGLE_API_KEY` is only needed for Google Places. `LEADFLOW_DATA_FILE` controls the local Express JSON store; Netlify production hydrates and persists the CRM document through Netlify Blobs instead, so the local file path is not the durable production datastore. Never commit real passwords or API keys.
+
+### Passwordless local owner access
+
+For local development only, set the following server environment value:
+
+```env
+ALLOW_DEV_AUTH_BYPASS=true
+```
+
+Start LeadFlow, then click or tap the hidden screw five times within four seconds. The backend issues the same signed HttpOnly owner-session cookie used by normal login and the CRM opens immediately without showing the password dialog. If the bypass is disabled or unavailable, the existing password dialog remains the fallback.
+
+Never enable `ALLOW_DEV_AUTH_BYPASS` in production. The server rejects `/api/auth/dev-unlock` whenever `NODE_ENV=production`, even if the flag is accidentally set to `true`; production continues to use `ADMIN_PASSWORD` and signed sessions.
+
+## Voice Agent integration
+
+The VS AI Voice Agent reports confirmed interaction facts to `POST /api/integrations/voice-agent/interactions`. It authenticates with `Authorization: Bearer <VOICE_AGENT_INTEGRATION_TOKEN>` and does not need or use the human browser session cookie. The two projects do not share database access: LeadFlow is the authoritative CRM receiver and is solely responsible for deciding whether evidence permits a status transition.
+
+Contract `VoiceAgentInteractionV1` uses `contractVersion: "1.0"`, source `vs-ai-voice-agent`, the canonical `Client.id` in `leadRef.leadId`, an RFC3339 `occurredAt`, and a structured outbound phone interaction. Optional next-action, follow-up, calendar, and approved lost-reason facts are strictly validated; unknown fields and malformed dates are rejected. The receiver never fuzzy-matches or creates leads, and it never accepts a requested CRM status.
+
+`eventId` is the durable UUID idempotency key. Replaying equivalent normalized content returns `duplicate: true` without creating another interaction, message, history item, or follow-up update. Reusing the ID with different content returns `409 event_conflict`. Accepted events create one structured `VoiceInteraction` and one existing contact-journal `Message`; no audio, full transcript, prompts, credentials, or tool internals are stored.
+
+In Netlify production, `voiceInteractions` is included alongside clients and messages in the strongly read, ETag/`onlyIfMatch`-protected Blobs snapshot. Configure a unique `VOICE_AGENT_INTEGRATION_TOKEN` in the Netlify server environment before enabling the sender.
 
 ### Start frontend and backend together
 
@@ -160,7 +185,7 @@ npm run build:server
 
 Netlify serves the Vite application and routes `/api/*` to the bundled Express function. The function keeps the CRM document in the site-wide `leadflow-crm` Netlify Blobs store and uses strong API reads plus ETag-protected writes, so production no longer depends on a visitor's `localhost:3001` and concurrent updates cannot silently overwrite each other.
 
-Configure `ADMIN_PASSWORD`, `SESSION_SECRET`, `SESSION_HOURS` and `ALLOWED_ORIGIN` in Netlify environment variables before deployment. Production sessions are signed HttpOnly cookies and remain valid across function instances.
+Configure `ADMIN_PASSWORD`, `SESSION_SECRET`, `VOICE_AGENT_INTEGRATION_TOKEN`, `SESSION_HOURS` and `ALLOWED_ORIGIN` in Netlify environment variables before deployment. Production sessions are signed HttpOnly cookies and remain valid across function instances.
 
 ## Verification workflow
 

@@ -7,7 +7,8 @@ import places from './routes/places';
 import placesImport from './routes/placesImport';
 import exportCsv from './routes/export';
 import dashboard from './routes/dashboard';
-import { authRouter, requireAuth } from './auth';
+import voiceAgent from './routes/voiceAgent';
+import { authRouter, requireAuth, requireVoiceAgentIntegration } from './auth';
 
 const app = express();
 app.disable('x-powered-by');
@@ -16,6 +17,7 @@ app.use(express.json({ limit: '1mb' }));
 
 app.get('/api/health', (_req, res) => res.json({ ok: true, storage: 'persistent-json' }));
 app.use('/api/auth', authRouter);
+app.use('/api/integrations/voice-agent', requireVoiceAgentIntegration, voiceAgent);
 app.use('/api', requireAuth);
 app.use('/api/clients', clients);
 app.use('/api/messages', messages);
