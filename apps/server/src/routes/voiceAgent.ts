@@ -1,8 +1,35 @@
 import { Router } from 'express';
 import { addMessage, addVoiceInteraction, db, persistDb, updateClient } from '../db/memory';
 import { applyVoiceInteractionToLead, VoiceAgentInteractionV1Schema, voicePayloadHash } from '../voiceAgent';
+import { verifyVoiceAgentHandoff } from '../voiceAgentHandoff';
 
 const router = Router();
+
+router.post('/resolve-handoff', (req, res) => {
+  const body = req.body;
+  if (!body || typeof body !== 'object' || Array.isArray(body)
+    || Object.keys(body).length !== 1 || typeof body.handoffToken !== 'string' || !body.handoffToken) {
+    return res.status(400).json({ error: 'invalid_handoff' });
+  }
+
+  const handoff = verifyVoiceAgentHandoff(body.handoffToken);
+  if (!handoff) return res.status(401).json({ error: 'invalid_or_expired_handoff' });
+
+  const lead = db.clients.find(client => client.id === handoff.leadId);
+  if (!lead) return res.status(404).json({ error: 'lead_not_found' });
+
+  return res.json({
+    ok: true,
+    lead: {
+      id: lead.id,
+      company: lead.company,
+      contactPerson: lead.contactPerson,
+      phone: lead.phone,
+      email: lead.email,
+      crmStatus: lead.crmStatus
+    }
+  });
+});
 
 router.post('/interactions', (req, res) => {
   const parsed = VoiceAgentInteractionV1Schema.safeParse(req.body);

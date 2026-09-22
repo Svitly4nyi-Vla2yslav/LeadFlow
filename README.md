@@ -26,6 +26,7 @@ The current project review and completion plan are documented in [docs/PROJECT_S
 - One shared CRM pipeline: `NEW`, `AUDITED`, `CONTACTED`, `REPLY`, `CALL`, `OFFER`, `FOLLOW-UP`, `WON`, `LOST`
 - Evidence validation before status changes, approved lost reasons, status history, CSV export and funnel dashboard
 - Authenticated Voice Agent contract v1 receiver with durable event idempotency and CRM-owned status decisions
+- Secure client-to-Voice-Agent handoff using exact canonical lead IDs and short-lived signed tokens
 
 ## CRM standard
 
@@ -121,10 +122,11 @@ ADMIN_PASSWORD=replace-with-a-long-unique-password
 SESSION_SECRET=replace-with-at-least-32-random-characters
 ALLOW_DEV_AUTH_BYPASS=false
 VOICE_AGENT_INTEGRATION_TOKEN=replace-with-at-least-32-random-characters
+VOICE_AGENT_APP_URL=http://localhost:3002
 SESSION_HOURS=12
 ```
 
-`ADMIN_PASSWORD` must contain at least 12 characters or the private entrance remains disabled. `SESSION_SECRET` signs portable sessions across serverless instances and should be a separate random secret in production. `ALLOW_DEV_AUTH_BYPASS` is parsed by the server and defaults to `false`. `VOICE_AGENT_INTEGRATION_TOKEN` is a separate server-only bearer token of at least 32 characters; never expose it to the frontend or reuse the admin password/session secret. `PORT` and `ALLOWED_ORIGIN` have local defaults. `GOOGLE_API_KEY` is only needed for Google Places. `LEADFLOW_DATA_FILE` controls the local Express JSON store; Netlify production hydrates and persists the CRM document through Netlify Blobs instead, so the local file path is not the durable production datastore. Never commit real passwords or API keys.
+`ADMIN_PASSWORD` must contain at least 12 characters or the private entrance remains disabled. `SESSION_SECRET` signs portable sessions and purpose-scoped Voice Agent handoffs across serverless instances and should be a separate random secret in production. `ALLOW_DEV_AUTH_BYPASS` is parsed by the server and defaults to `false`. `VOICE_AGENT_INTEGRATION_TOKEN` is a separate server-only bearer token of at least 32 characters; never expose it to the frontend or reuse the admin password/session secret. `VOICE_AGENT_APP_URL` is the non-secret Voice Agent application origin opened by the CRM; it defaults to `http://localhost:3002` for local development and must be set to the deployed HTTPS origin in production. `PORT` and `ALLOWED_ORIGIN` have local defaults. `GOOGLE_API_KEY` is only needed for Google Places. `LEADFLOW_DATA_FILE` controls the local Express JSON store; Netlify production hydrates and persists the CRM document through Netlify Blobs instead, so the local file path is not the durable production datastore. Never commit real passwords or API keys.
 
 ### Passwordless local owner access
 
@@ -159,6 +161,25 @@ npm --prefix apps/server run voice:integration-test -- --lead-id=<LEAD_ID> --con
 ```
 
 The command reads `VOICE_AGENT_INTEGRATION_TOKEN` from `apps/server/.env`, generates a fresh event UUID, submits one non-destructive `CALL_COMPLETED` fact with confirmed next-action evidence, verifies the identical retry, then verifies that changed content produces `409 event_conflict`. It never prints the token and performs no request unless both `--lead-id` and `--confirm-write` are supplied. The local API defaults to `http://localhost:3001`; use `--base-url=<URL>` only when intentionally testing another receiver.
+
+### Phase 5C lead handoff
+
+The client detail page now provides **Mit Emma anrufen**. The secure flow is:
+
+```text
+LeadFlow client
+  -> Call with Emma
+  -> signed, short-lived handoff
+  -> Voice Agent
+  -> server-to-server resolve
+  -> canonical LeadFlow Client.id
+```
+
+The authenticated browser sends only the currently selected `Client.id` to `POST /api/voice-agent/handoff`. LeadFlow verifies that exact ID, signs a five-minute token containing only its version, canonical lead ID, issue/expiry times and a random nonce, and returns the token with the non-secret `VOICE_AGENT_APP_URL`. The browser opens the Voice Agent with the token in the `handoff` query parameter; no customer name, phone, email, notes, or integration credential is placed in the URL.
+
+The Voice Agent backend must exchange the handoff through `POST /api/integrations/voice-agent/resolve-handoff` using `Authorization: Bearer <VOICE_AGENT_INTEGRATION_TOKEN>`. LeadFlow validates the bearer token, HMAC signature, lifetime, exact lead existence and then returns only `id`, `company`, `contactPerson`, `phone`, `email`, and `crmStatus`. It never returns notes, timelines, messages, VoiceInteractions, lost history, or credentials.
+
+LeadFlow creates and owns every lead ID. Emma never generates, guesses, fuzzy-matches, or substitutes a company, email, or phone number for an ID. Phase 5C-B in the Voice Agent repository must read the `handoff` query parameter, send it only from its backend to the resolve endpoint with the server-only integration bearer token, keep the token out of logs, handle invalid/expired/not-found responses, and bind the resolved exact ID to subsequent Phase 5A interaction events.
 
 ### Start frontend and backend together
 
@@ -197,7 +218,7 @@ npm run build:server
 
 Netlify serves the Vite application and routes `/api/*` to the bundled Express function. The function keeps the CRM document in the site-wide `leadflow-crm` Netlify Blobs store and uses strong API reads plus ETag-protected writes, so production no longer depends on a visitor's `localhost:3001` and concurrent updates cannot silently overwrite each other.
 
-Configure `ADMIN_PASSWORD`, `SESSION_SECRET`, `VOICE_AGENT_INTEGRATION_TOKEN`, `SESSION_HOURS` and `ALLOWED_ORIGIN` in Netlify environment variables before deployment. Production sessions are signed HttpOnly cookies and remain valid across function instances.
+Configure `ADMIN_PASSWORD`, `SESSION_SECRET`, `VOICE_AGENT_INTEGRATION_TOKEN`, `VOICE_AGENT_APP_URL`, `SESSION_HOURS` and `ALLOWED_ORIGIN` in Netlify environment variables before deployment. Production sessions are signed HttpOnly cookies and remain valid across function instances. `VOICE_AGENT_APP_URL` is safe to return to an authenticated browser; the integration token and signing secret remain server-only. No secret is stored in `netlify.toml`.
 
 ## Verification workflow
 

@@ -18,6 +18,8 @@ export default function ClientDetail() {
   const [message, setMessage] = useState(emptyMessage);
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
+  const [handoffState, setHandoffState] = useState<'ready' | 'opening' | 'error'>('ready');
+  const [handoffError, setHandoffError] = useState('');
 
   const load = useCallback(async () => {
     try {
@@ -50,6 +52,24 @@ export default function ClientDetail() {
     } catch (exception: any) { setError(exception.response?.data?.error || 'Kontaktprotokoll konnte nicht gespeichert werden.'); }
   };
 
+  const callWithEmma = async () => {
+    if (handoffState === 'opening') return;
+    setHandoffState('opening');
+    setHandoffError('');
+    try {
+      const response = await api.post('/api/voice-agent/handoff', { leadId: client?.id });
+      const destination = new URL(response.data.voiceAgentAppUrl);
+      destination.searchParams.set('handoff', response.data.handoffToken);
+      const opened = window.open(destination.toString(), '_blank');
+      if (!opened) throw new Error('Der Browser hat das neue Emma-Fenster blockiert. Bitte Pop-ups erlauben.');
+      opened.opener = null;
+      setHandoffState('ready');
+    } catch (exception: any) {
+      setHandoffState('error');
+      setHandoffError(exception.response?.data?.error || exception.message || 'Emma konnte nicht geöffnet werden.');
+    }
+  };
+
   const timeline = useMemo(() => {
     if (!client) return [];
     return [
@@ -63,8 +83,16 @@ export default function ClientDetail() {
 
   return (
     <div style={{ display: 'grid', gap: 16 }}>
-      <div><Link to="/leads">← Leads</Link><h2>{client.company}</h2><p style={{ opacity: .68 }}>Lead ID: {client.id}</p></div>
-      {(error || notice) && <Card><p role="status" style={{ margin: 0, color: error ? '#fca5a5' : '#86efac' }}>{error || notice}</p></Card>}
+      <div>
+        <Link to="/leads">← Leads</Link>
+        <div className="toolbar" style={{ alignItems: 'center', justifyContent: 'space-between' }}>
+          <div><h2>{client.company}</h2><p style={{ opacity: .68 }}>Lead ID: {client.id}</p></div>
+          <Button type="button" onClick={callWithEmma} disabled={handoffState === 'opening'} aria-busy={handoffState === 'opening'}>
+            {handoffState === 'opening' ? 'Emma wird geöffnet…' : handoffState === 'error' ? 'Fehler – erneut versuchen' : 'Mit Emma anrufen'}
+          </Button>
+        </div>
+      </div>
+      {(error || notice || handoffError) && <Card><p role="status" style={{ margin: 0, color: error || handoffError ? '#fca5a5' : '#86efac' }}>{error || handoffError || notice}</p></Card>}
       <form onSubmit={save} className="detail-grid">
         <Card>
           <h3 style={{ marginTop: 0 }}>Wer ist der Lead?</h3>

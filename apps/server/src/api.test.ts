@@ -9,7 +9,9 @@ import type { Server } from 'node:http';
 const temporaryDirectory = mkdtempSync(join(tmpdir(), 'leadflow-api-'));
 process.env.LEADFLOW_DATA_FILE = join(temporaryDirectory, 'leadflow.json');
 process.env.ADMIN_PASSWORD = 'test-only-long-password';
+process.env.SESSION_SECRET = 'test-only-session-secret-with-32-characters';
 process.env.VOICE_AGENT_INTEGRATION_TOKEN = 'test-only-voice-token-with-32-characters';
+process.env.VOICE_AGENT_APP_URL = 'http://localhost:3002';
 
 let server: Server;
 let baseUrl = '';
@@ -51,6 +53,16 @@ const createLead = async (company: string, crmStatus = 'NEW', extra: Record<stri
 
 const sendVoiceInteraction = (payload: unknown) => fetch(`${baseUrl}/api/integrations/voice-agent/interactions`, {
   method: 'POST', headers: voiceHeaders(), body: JSON.stringify(payload)
+});
+
+const createHandoff = (body: unknown, authenticated = true) => fetch(`${baseUrl}/api/voice-agent/handoff`, {
+  method: 'POST',
+  headers: { 'content-type': 'application/json', ...(authenticated ? { cookie: sessionCookie } : {}) },
+  body: JSON.stringify(body)
+});
+
+const resolveHandoff = (handoffToken: string, token?: string) => fetch(`${baseUrl}/api/integrations/voice-agent/resolve-handoff`, {
+  method: 'POST', headers: voiceHeaders(token), body: JSON.stringify({ handoffToken })
 });
 
 const getLeadDetail = async (leadId: string) => {
@@ -140,6 +152,110 @@ test('canonical bulk import skips duplicates', async () => {
   assert.equal(response.status, 200);
   const result = await response.json() as { created: number; skipped: number };
   assert.deepEqual(result, { created: 1, skipped: 1, errors: [] });
+});
+
+test('handoff creation requires a logged-in owner session', async () => {
+  const lead = await createLead('Handoff Auth GmbH');
+  const response = await createHandoff({ leadId: lead.id }, false);
+  assert.equal(response.status, 401);
+});
+
+test('an existing canonical lead produces a short-lived handoff token', async () => {
+  const lead = await createLead('Handoff Token GmbH');
+  const response = await createHandoff({ leadId: lead.id });
+  assert.equal(response.status, 200);
+  const result = await response.json() as { handoffToken: string; voiceAgentAppUrl: string };
+  assert.match(result.handoffToken, /^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/);
+  assert.equal(result.voiceAgentAppUrl, 'http://localhost:3002/');
+  const payload = JSON.parse(Buffer.from(result.handoffToken.split('.')[0], 'base64url').toString('utf8')) as Record<string, unknown>;
+  assert.deepEqual(Object.keys(payload).sort(), ['expiresAt', 'issuedAt', 'leadId', 'nonce', 'version']);
+  assert.equal(payload.leadId, lead.id);
+  assert.equal((payload.expiresAt as number) - (payload.issuedAt as number), 300);
+});
+
+test('handoff creation rejects an unknown lead without creating one', async () => {
+  const { db } = await import('./db/memory');
+  const countBefore = db.clients.length;
+  const response = await createHandoff({ leadId: randomUUID() });
+  assert.equal(response.status, 404);
+  assert.equal(db.clients.length, countBefore);
+});
+
+test('handoff token and Voice Agent URL contain no customer PII in clear text', async () => {
+  const pii = ['Private Customer GmbH', 'secret.customer@example.test', '+49 511 123456'];
+  const lead = await createLead(pii[0], 'NEW', { email: pii[1], phone: pii[2], contactPerson: 'Private Person' });
+  const response = await createHandoff({ leadId: lead.id });
+  const result = await response.json() as { handoffToken: string; voiceAgentAppUrl: string };
+  const handoffUrl = new URL(result.voiceAgentAppUrl);
+  handoffUrl.searchParams.set('handoff', result.handoffToken);
+  for (const value of [...pii, 'Private Person']) {
+    assert.equal(result.handoffToken.includes(value), false);
+    assert.equal(handoffUrl.toString().includes(encodeURIComponent(value)), false);
+  }
+});
+
+test('resolve-handoff rejects a modified signed token', async () => {
+  const lead = await createLead('Tamper Test GmbH');
+  const created = await (await createHandoff({ leadId: lead.id })).json() as { handoffToken: string };
+  const [payload, signature] = created.handoffToken.split('.');
+  const modifiedSignature = `${signature[0] === 'A' ? 'B' : 'A'}${signature.slice(1)}`;
+  assert.equal((await resolveHandoff(`${payload}.${modifiedSignature}`)).status, 401);
+});
+
+test('resolve-handoff rejects an expired signed token', async () => {
+  const lead = await createLead('Expired Handoff GmbH');
+  const { issueVoiceAgentHandoff } = await import('./voiceAgentHandoff');
+  const expired = issueVoiceAgentHandoff(lead.id, { nowMs: Date.now() - 10 * 60 * 1000 });
+  assert.equal((await resolveHandoff(expired)).status, 401);
+});
+
+test('resolve-handoff requires the Voice Agent integration bearer token', async () => {
+  const response = await fetch(`${baseUrl}/api/integrations/voice-agent/resolve-handoff`, {
+    method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ handoffToken: 'not-a-token' })
+  });
+  assert.equal(response.status, 401);
+});
+
+test('a valid handoff resolves the exact lead with only sanitized operator context', async () => {
+  const lead = await createLead('Exact Resolve GmbH', 'NEW', {
+    contactPerson: 'Erika Mustermann', phone: '+49 511 987654', email: 'erika@example.test', notes: 'Private notes must stay in LeadFlow.'
+  });
+  const created = await (await createHandoff({ leadId: lead.id })).json() as { handoffToken: string };
+  const response = await resolveHandoff(created.handoffToken);
+  assert.equal(response.status, 200);
+  assert.deepEqual(await response.json(), {
+    ok: true,
+    lead: {
+      id: lead.id,
+      company: 'Exact Resolve GmbH',
+      contactPerson: 'Erika Mustermann',
+      phone: '+49 511 987654',
+      email: 'erika@example.test',
+      crmStatus: 'NEW'
+    }
+  });
+});
+
+test('resolve-handoff confirms that the exact lead still exists', async () => {
+  const lead = await createLead('Deleted Before Resolve GmbH');
+  const created = await (await createHandoff({ leadId: lead.id })).json() as { handoffToken: string };
+  const deleted = await fetch(`${baseUrl}/api/clients/${lead.id}?confirm=DELETE`, withSession({ method: 'DELETE' }));
+  assert.equal(deleted.status, 204);
+  assert.equal((await resolveHandoff(created.handoffToken)).status, 404);
+});
+
+test('resolve-handoff rejects the wrong integration bearer token', async () => {
+  const lead = await createLead('Wrong Bearer GmbH');
+  const created = await (await createHandoff({ leadId: lead.id })).json() as { handoffToken: string };
+  assert.equal((await resolveHandoff(created.handoffToken, 'wrong-token-with-at-least-32-characters')).status, 401);
+});
+
+test('handoff performs no fuzzy lookup or alternate-field lookup', async () => {
+  const lead = await createLead('No Fuzzy Lookup GmbH', 'NEW', { email: 'lookup@example.test', phone: '+49 511 111222' });
+  for (const leadId of ['No Fuzzy Lookup GmbH', 'no fuzzy lookup gmbh', 'lookup@example.test', '+49 511 111222', lead.id.slice(0, -1)]) {
+    assert.equal((await createHandoff({ leadId })).status, 404);
+  }
+  assert.equal((await createHandoff({ company: 'No Fuzzy Lookup GmbH' })).status, 400);
 });
 
 test('voice integration requires its bearer token, not a browser session', async () => {
