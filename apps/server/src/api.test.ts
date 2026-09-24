@@ -282,6 +282,40 @@ test('DRAFT transitions to READY after requirements are fixed without rewriting 
   assert.equal(storedLead?.phone, phone);
 });
 
+test('editable call task readiness stays synchronized with canonical lead phone changes', async () => {
+  const lead = await createLead('Readiness Sync GmbH', 'NEW', { phone: '+49 511 100 055' });
+  const task = await (await createCallTask({ leadId: lead.id, callObjective: 'Bedarf prüfen' })).json() as { id: string; status: string };
+  assert.equal(task.status, 'READY');
+
+  const removePhone = await fetch(`${baseUrl}/api/clients/${lead.id}`, withSession({
+    method: 'PATCH', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ phone: '' })
+  }));
+  assert.equal(removePhone.status, 200);
+  const draft = await (await fetch(`${baseUrl}/api/call-tasks/${task.id}`, withSession())).json() as { status: string; readinessIssues: string[] };
+  assert.equal(draft.status, 'DRAFT');
+  assert.deepEqual(draft.readinessIssues, ['missing_phone']);
+
+  const restorePhone = await fetch(`${baseUrl}/api/clients/${lead.id}`, withSession({
+    method: 'PATCH', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ phone: '+49 511 100 056' })
+  }));
+  assert.equal(restorePhone.status, 200);
+  const ready = await (await fetch(`${baseUrl}/api/call-tasks/${task.id}`, withSession())).json() as { status: string; readinessIssues: string[] };
+  assert.equal(ready.status, 'READY');
+  assert.deepEqual(ready.readinessIssues, []);
+});
+
+test('editing a READY task to remove its objective demotes it to DRAFT with an exact issue', async () => {
+  const lead = await createLead('Objective Sync GmbH', 'NEW', { phone: '+49 511 100 057' });
+  const task = await (await createCallTask({ leadId: lead.id, callObjective: 'Termin vereinbaren' })).json() as { id: string };
+  const response = await fetch(`${baseUrl}/api/call-tasks/${task.id}`, withSession({
+    method: 'PATCH', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ callObjective: '' })
+  }));
+  assert.equal(response.status, 200);
+  const result = await response.json() as { status: string; readinessIssues: string[] };
+  assert.equal(result.status, 'DRAFT');
+  assert.deepEqual(result.readinessIssues, ['missing_call_objective']);
+});
+
 test('call task status cannot be patched arbitrarily and READY can transition to CANCELLED once', async () => {
   const lead = await createLead('Cancel Call GmbH', 'NEW', { phone: '+49 511 100006' });
   const task = await (await createCallTask({ leadId: lead.id, callObjective: 'Anrufen' })).json() as { id: string };

@@ -11,6 +11,8 @@ import {
   updateClient
 } from '../db/memory';
 import { canonicalImportRow, sanitizeClient, validateClient } from '../crm';
+import { callTaskReadiness } from '../callTasks';
+import { updateCallTask } from '../db/memory';
 
 const router = Router();
 
@@ -90,7 +92,16 @@ router.patch('/:id', (req, res) => {
     });
   }
   const next: Client = { ...item, ...draft, statusHistory };
-  res.json(updateClient(item, next));
+  const saved = updateClient(item, next, false);
+  db.callTasks
+    .filter(task => task.leadId === saved.id && ['DRAFT', 'READY'].includes(task.status))
+    .forEach(task => {
+      const ready = callTaskReadiness(saved, task).length === 0;
+      const status = ready ? 'READY' : 'DRAFT';
+      if (task.status !== status) updateCallTask(task, { ...task, status }, false);
+    });
+  updateClient(item, saved);
+  res.json(saved);
 });
 
 router.delete('/:id', (req, res) => {

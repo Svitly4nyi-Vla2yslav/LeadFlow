@@ -94,11 +94,9 @@ router.patch('/:id', (req, res) => {
   const error = validateFields(fields);
   if (error) return res.status(400).json({ error });
   const readinessIssues = callTaskReadiness(lead, fields);
-  if (task.status === 'READY' && readinessIssues.length) {
-    return res.status(409).json({ error: 'Ready call task requirements cannot be removed', readinessIssues });
-  }
   let next: CallTask = { ...task, ...fields };
   if (task.status === 'DRAFT' && !readinessIssues.length) next = transitionCallTask(next, 'READY');
+  if (task.status === 'READY' && readinessIssues.length) next = { ...next, status: 'DRAFT' };
   return res.json(view(updateCallTask(task, next)));
 });
 

@@ -35,13 +35,20 @@ export default function Leads() {
       const { callObjective, ...leadDraft } = draft;
       let response = await api.post('/api/clients', { ...leadDraft, preferredLanguage: leadDraft.preferredLanguage || undefined, crmStatus: 'NEW' });
       const wasDuplicate = Boolean(response.data.duplicate);
-      if (wasDuplicate) response = await api.patch(`/api/clients/${response.data.id}`, { ...leadDraft, preferredLanguage: leadDraft.preferredLanguage || undefined });
+      if (wasDuplicate) {
+        const suppliedFields = Object.fromEntries(Object.entries(leadDraft).filter(([, value]) => value.trim()));
+        response = await api.patch(`/api/clients/${response.data.id}`, { ...suppliedFields, preferredLanguage: leadDraft.preferredLanguage || undefined });
+      }
       const leadId = response.data.id as string;
       if (action === 'prepare') {
-        await api.post('/api/call-tasks', { leadId, callObjective, offerFocus: leadDraft.offerFocus, operatorNote: leadDraft.emmaFocus });
+        const taskResponse = await api.get('/api/call-tasks', { params: { leadId } });
+        const editableTask = (taskResponse.data as CallTask[]).find(task => ['DRAFT', 'READY'].includes(task.status));
+        const callPayload = { callObjective, offerFocus: leadDraft.offerFocus || undefined };
+        if (editableTask) await api.patch(`/api/call-tasks/${editableTask.id}`, callPayload);
+        else await api.post('/api/call-tasks', { leadId, ...callPayload });
         navigate(`/clients/${leadId}#emma`);
       } else { setNotice(wasDuplicate ? t('lead.updatedExisting') : t('lead.saved')); setDraft(emptyDraft); await load(); }
-    } catch (exception: any) { setError(exception.response?.data?.error || t('errors.leadSave')); } finally { setSaving(false); }
+    } catch { setError(t('errors.leadSave')); } finally { setSaving(false); }
   };
 
   const callWithEmma = async (leadId: string) => {
@@ -72,7 +79,7 @@ export default function Leads() {
 
     <Card className="lead-list-card"><p className="muted list-count">{loading ? t('common.loading') : t('lead.count', { count: items.length })}</p>
       <table className="data-table desktop-only"><thead><tr><th>{t('lead.lead')}</th><th>{t('lead.industryLocation')}</th><th>{t('lead.contact')}</th><th>{t('lead.status')}</th><th>{t('lead.auditProblem')}</th><th>{t('lead.nextAction')}</th></tr></thead><tbody>{!loading && !items.length && <tr><td colSpan={6}>{t('lead.empty')}</td></tr>}{items.map(lead => <tr key={lead.id}><td><Link to={`/clients/${lead.id}`}><strong>{lead.company}</strong></Link><br/><small>{lead.website || t('common.notVerified')}</small></td><td>{lead.branche || '—'}<br/><small>{lead.ort || '—'}</small></td><td>{lead.contactPerson || '—'}<br/><small>{lead.email || lead.phone || '—'}</small></td><td><span className="status-pill" style={{color:statusColor[lead.crmStatus],borderColor:statusColor[lead.crmStatus]}}>{t(`status.${lead.crmStatus}`)}</span></td><td>{lead.auditProblem || '—'}</td><td>{lead.nextFollowUpDate && <><strong>{lead.nextFollowUpDate}</strong><br/></>}<small>{lead.notes || '—'}</small></td></tr>)}</tbody></table>
-      <div className="mobile-lead-list mobile-only">{!loading && !items.length && <p>{t('lead.empty')}</p>}{items.map(lead => { const task = taskByLead[lead.id]; return <article className="lead-card" key={lead.id}><div className="lead-card-head"><div><h3>{lead.company}</h3><p>{[lead.branche,lead.ort].filter(Boolean).join(' · ') || '—'}</p></div><span className="status-pill" style={{color:statusColor[lead.crmStatus],borderColor:statusColor[lead.crmStatus]}}>{t(`status.${lead.crmStatus}`)}</span></div>{lead.phone && <a className="phone-link" href={`tel:${lead.phone}`}>{lead.phone}</a>}{lead.nextFollowUpDate && <p><strong>{t('lead.followUp')}:</strong> {lead.nextFollowUpDate}</p>}{lead.auditProblem && <p className="line-clamp">{lead.auditProblem}</p>}<p><strong>{t('call.readiness')}:</strong> {task ? t(`callStatus.${task.status}`) : t('call.notPrepared')}</p><div className="card-actions"><Link className="action-link" to={`/clients/${lead.id}`}>{t('actions.open')}</Link>{task?.status === 'READY' ? <button className="action-link primary card-action-button" type="button" disabled={!!launchingLeadId} onClick={() => callWithEmma(lead.id)}>{launchingLeadId === lead.id ? t('call.opening') : t('call.callEmma')}</button> : <Link className="action-link primary" to={`/clients/${lead.id}#emma`}>{t('call.prepare')}</Link>}</div></article>; })}</div>
+      <div className="mobile-lead-list mobile-only">{!loading && !items.length && <p>{t('lead.empty')}</p>}{items.map(lead => { const task = taskByLead[lead.id]; const canCall = task?.status === 'READY' && !task.readinessIssues.length; return <article className="lead-card" key={lead.id}><div className="lead-card-head"><div><h3>{lead.company}</h3><p>{[lead.branche,lead.ort].filter(Boolean).join(' · ') || '—'}</p></div><span className="status-pill" style={{color:statusColor[lead.crmStatus],borderColor:statusColor[lead.crmStatus]}}>{t(`status.${lead.crmStatus}`)}</span></div>{lead.phone && <a className="phone-link" href={`tel:${lead.phone}`}>{lead.phone}</a>}{lead.nextFollowUpDate && <p><strong>{t('lead.followUp')}:</strong> {lead.nextFollowUpDate}</p>}{lead.auditProblem && <p className="line-clamp">{lead.auditProblem}</p>}<p><strong>{t('call.readiness')}:</strong> {task ? t(`callStatus.${task.status}`) : t('call.notPrepared')}</p><div className="card-actions"><Link className="action-link" to={`/clients/${lead.id}`}>{t('actions.open')}</Link>{canCall ? <button className="action-link primary card-action-button" type="button" disabled={!!launchingLeadId} onClick={() => callWithEmma(lead.id)}>{launchingLeadId === lead.id ? t('call.opening') : t('call.callEmma')}</button> : <Link className="action-link primary" to={`/clients/${lead.id}#emma`}>{t('call.prepare')}</Link>}</div></article>; })}</div>
     </Card>
   </div>;
 }

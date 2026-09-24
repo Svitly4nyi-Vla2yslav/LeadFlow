@@ -30,8 +30,9 @@ test('mobile lead cards, progressive creation, call preparation and import UI ar
   assert.match(leads, /lead\.stepBasic/);
   assert.match(leads, /actions\.savePrepare/);
   assert.match(leads, /\/api\/call-tasks/);
-  assert.match(leads, /\/api\/clients\/import/);
-  assert.match(leads, /accept="\.json,\.csv/);
+  const dataManagement = read('pages/DataManagement.tsx');
+  assert.match(dataManagement, /\/api\/clients\/import/);
+  assert.match(dataManagement, /accept="\.json,\.csv/);
   const detail = read('pages/ClientDetail.tsx');
   assert.match(detail, /sections\.lastFeedback/);
   assert.match(detail, /feedback-grid/);
