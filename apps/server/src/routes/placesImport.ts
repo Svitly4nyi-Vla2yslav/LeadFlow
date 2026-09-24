@@ -25,6 +25,7 @@ r.post('/import', async (req, res) => {
       company: p.name,
       website: p.website,
       phone: p.formatted_phone_number,
+      source: 'Google Places',
       notes: [p.formatted_address, Array.isArray(p.types) ? `Google types: ${p.types.join('|')}` : ''].filter(Boolean).join(' | '),
       crmStatus: 'NEW'
     });
@@ -47,6 +48,7 @@ r.post('/import-bulk', async (req, res) => {
           company: p.name,
           website: p.website,
           phone: p.formatted_phone_number,
+          source: 'Google Places',
           notes: [p.formatted_address, Array.isArray(p.types) ? `Google types: ${p.types.join('|')}` : ''].filter(Boolean).join(' | '),
           crmStatus: 'NEW'
         });

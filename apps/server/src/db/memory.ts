@@ -23,6 +23,7 @@ export const LOST_REASONS = [
 export type CrmStatus = typeof CRM_STATUSES[number];
 export type LostReason = typeof LOST_REASONS[number];
 export type ContactChannel = typeof CONTACT_CHANNELS[number];
+export type PreferredLanguage = 'de' | 'uk' | 'ru' | 'en';
 
 export type StatusEvent = {
   status: CrmStatus;
@@ -42,9 +43,17 @@ export type Client = {
   contactPerson?: string;
   phone?: string;
   email?: string;
+  source?: string;
+  preferredLanguage?: PreferredLanguage;
+  decisionMaker?: string;
+  currentSituation?: string;
+  painPoints?: string;
   crmStatus: CrmStatus;
   auditProblem?: string;
   proposedSolution?: string;
+  emmaFocus?: string;
+  offerFocus?: string;
+  doNotMention?: string;
   contactChannel?: ContactChannel;
   lastContactDate?: string;
   nextFollowUpDate?: string;
@@ -120,9 +129,21 @@ export type CallTask = {
   result?: {
     outcome?: string;
     summary?: string;
+    clientNeed?: string;
+    confirmedPainPoints?: string;
+    interestLevel?: 'LOW' | 'MEDIUM' | 'HIGH';
+    objections?: string[];
+    budgetSignal?: string;
+    decisionMakerStatus?: string;
+    requestedInformation?: string;
     nextAction?: string;
     interactionId?: string;
+    callbackAt?: string;
     calendarEventId?: string;
+    meetingStart?: string;
+    meetingEnd?: string;
+    lostReason?: string;
+    doNotContact?: boolean;
   };
 };
 

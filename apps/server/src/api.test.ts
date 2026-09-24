@@ -160,6 +160,41 @@ test('canonical bulk import skips duplicates', async () => {
   assert.deepEqual(result, { created: 1, skipped: 1, errors: [] });
 });
 
+test('new optional lead context fields create, update, persist, import and export', async () => {
+  const create = await fetch(`${baseUrl}/api/clients`, withSession({
+    method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({
+      company: 'UX Context GmbH', crmStatus: 'NEW', source: 'Referral', preferredLanguage: 'uk', decisionMaker: 'Iryna',
+      currentSituation: 'Existing brochure website', painPoints: 'No mobile booking', emmaFocus: 'Confirm booking workflow',
+      offerFocus: 'Responsive relaunch', doNotMention: 'Internal price floor'
+    })
+  }));
+  assert.equal(create.status, 201);
+  const lead = await create.json() as { id: string; source: string; preferredLanguage: string; currentSituation: string };
+  assert.equal(lead.source, 'Referral'); assert.equal(lead.preferredLanguage, 'uk'); assert.equal(lead.currentSituation, 'Existing brochure website');
+
+  const update = await fetch(`${baseUrl}/api/clients/${lead.id}`, withSession({
+    method: 'PATCH', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ painPoints: 'Confirmed mobile conversion issue', preferredLanguage: 'de' })
+  }));
+  assert.equal(update.status, 200);
+  const updated = await update.json() as { painPoints: string; preferredLanguage: string };
+  assert.equal(updated.painPoints, 'Confirmed mobile conversion issue'); assert.equal(updated.preferredLanguage, 'de');
+
+  const imported = await fetch(`${baseUrl}/api/clients/import`, withSession({
+    method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ leads: [{
+      Company: 'UX Imported GmbH', Source: 'CSV', 'Preferred Language': 'ru', 'Current Situation': 'Legacy site', 'Emma Focus': 'Ask about timing'
+    }] })
+  }));
+  assert.equal(imported.status, 200); assert.equal((await imported.json() as { created: number }).created, 1);
+
+  const csv = await fetch(`${baseUrl}/api/export/clients.csv`, withSession());
+  assert.equal(csv.status, 200); const csvText = await csv.text();
+  for (const header of ['Source', 'Preferred Language', 'Decision Maker', 'Current Situation', 'Pain Points', 'Emma Focus', 'Offer Focus', 'Do Not Mention']) assert.ok(csvText.includes(`"${header}"`));
+  assert.ok(csvText.includes('"Confirmed mobile conversion issue"'));
+
+  const persisted = JSON.parse(readFileSync(process.env.LEADFLOW_DATA_FILE!, 'utf8')) as { clients: Array<Record<string, unknown>> };
+  assert.equal(persisted.clients.find(item => item.id === lead.id)?.preferredLanguage, 'de');
+});
+
 test('call task endpoints require an owner session', async () => {
   const lead = await createLead('Call Task Auth GmbH', 'NEW', { phone: '+49 511 100001' });
   assert.equal((await createCallTask({ leadId: lead.id, callObjective: 'Termin vereinbaren' }, false)).status, 401);
@@ -207,7 +242,8 @@ test('Call Brief uses current lead facts and excludes unrelated private CRM data
   const lead = await createLead('Brief Context GmbH', 'NEW', {
     phone: '+49 511 100004', email: 'brief@example.test', website: 'https://brief.example.test', branche: 'Friseur', ort: 'Hannover',
     contactPerson: 'Mara Beispiel', auditProblem: 'Mobile Navigation ist schwer nutzbar.', proposedSolution: 'Responsive Relaunch.',
-    notes: 'Private CRM note', lostReason: undefined
+    currentSituation: 'Legacy website in use', painPoints: 'No mobile booking', emmaFocus: 'Confirm appointment workflow',
+    offerFocus: 'Lead-level offer', doNotMention: 'Internal pricing', notes: 'Private CRM note', lostReason: undefined
   });
   const created = await (await createCallTask({
     leadId: lead.id, callObjective: 'Beratung anbieten', offerFocus: 'Website-Relaunch', operatorNote: 'Nach Entscheiderin fragen'
@@ -217,6 +253,11 @@ test('Call Brief uses current lead facts and excludes unrelated private CRM data
   const brief = await response.json() as Record<string, unknown>;
   assert.equal(brief.company, 'Brief Context GmbH');
   assert.equal(brief.auditProblem, 'Mobile Navigation ist schwer nutzbar.');
+  assert.equal(brief.currentSituation, 'Legacy website in use');
+  assert.equal(brief.painPoints, 'No mobile booking');
+  assert.equal(brief.emmaFocus, 'Confirm appointment workflow');
+  assert.equal(brief.doNotMention, 'Internal pricing');
+  assert.equal(brief.offerFocus, 'Website-Relaunch');
   assert.equal(brief.callObjective, 'Beratung anbieten');
   for (const forbidden of ['notes', 'statusHistory', 'messages', 'crmStatus', 'createdAt', 'updatedAt', 'result', 'token', 'password']) {
     assert.equal(Object.prototype.hasOwnProperty.call(brief, forbidden), false);
@@ -275,6 +316,37 @@ test('call tasks persist locally and participate in Netlify hydrate, snapshot an
   assert.equal(isDatabaseMutation({ httpMethod: 'POST', path: '/api/call-tasks' }), true);
   assert.equal(isDatabaseMutation({ httpMethod: 'POST', path: `/api/call-tasks/${task.id}/cancel` }), true);
   assert.equal(isDatabaseMutation({ httpMethod: 'GET', path: '/api/call-tasks' }), false);
+});
+
+test('structured CallTask feedback remains optional and round-trips through persistence snapshots', async () => {
+  const lead = await createLead('Feedback Foundation GmbH', 'NEW', { phone: '+49 511 100008' });
+  const created = await (await createCallTask({ leadId: lead.id, callObjective: 'Bedarf klären' })).json() as { id: string };
+  const { db, persistDb, updateCallTask } = await import('./db/memory');
+  const task = db.callTasks.find(item => item.id === created.id)!;
+  updateCallTask(task, { ...task, result: {
+    outcome: 'CALL_COMPLETED', summary: 'Customer described the project.', clientNeed: 'Online booking',
+    confirmedPainPoints: 'Mobile conversion', interestLevel: 'HIGH', objections: ['Timing'], budgetSignal: 'Budget planned',
+    decisionMakerStatus: 'Owner confirmed', requestedInformation: 'Portfolio', nextAction: 'Send examples',
+    callbackAt: '2026-10-01T10:00:00.000Z', calendarEventId: 'event-ux-1', meetingStart: '2026-10-02T10:00:00.000Z',
+    meetingEnd: '2026-10-02T10:30:00.000Z', lostReason: undefined, doNotContact: false
+  } }, false);
+  persistDb();
+  const response = await fetch(`${baseUrl}/api/call-tasks/${created.id}`, withSession());
+  const returned = await response.json() as { result: { interestLevel: string; objections: string[]; doNotContact: boolean } };
+  assert.equal(returned.result.interestLevel, 'HIGH'); assert.deepEqual(returned.result.objections, ['Timing']); assert.equal(returned.result.doNotContact, false);
+  const { snapshotDatabase } = await import('./databaseSnapshot');
+  assert.equal(snapshotDatabase(db).callTasks?.find(item => item.id === created.id)?.result?.clientNeed, 'Online booking');
+});
+
+test('old database snapshots hydrate without new lead fields, CallTask results or callTasks', async () => {
+  const { hydrateDatabase } = await import('./databaseSnapshot');
+  const { db } = await import('./db/memory');
+  const isolated: typeof db = { clients: [], messages: [], voiceInteractions: [], callTasks: [] };
+  const legacyClient = { id: randomUUID(), company: 'Legacy Snapshot GmbH', crmStatus: 'NEW', statusHistory: [], createdAt: '2025-01-01T00:00:00.000Z', updatedAt: '2025-01-01T00:00:00.000Z' } as any;
+  hydrateDatabase({ clients: [legacyClient], messages: [] }, isolated);
+  assert.equal(isolated.clients[0].company, 'Legacy Snapshot GmbH');
+  assert.equal(isolated.clients[0].currentSituation, undefined);
+  assert.deepEqual(isolated.callTasks, []);
 });
 
 test('handoff creation requires a logged-in owner session', async () => {

@@ -2,11 +2,13 @@ import { useState } from 'react';
 import Card from './ui/Card';
 import Button from './ui/Button';
 import { api } from '../api/client';
+import { useTranslation } from 'react-i18next';
 
 type Place = { place_id: string; name: string; address: string };
 
 export default function MapSearchBox(){
-  const [q, setQ] = useState('Friseur Hildesheim');
+  const { t } = useTranslation();
+  const [q, setQ] = useState(() => t('maps.defaultQuery'));
   const [items, setItems] = useState<Place[]>([]);
   const [sel, setSel] = useState<Record<string, boolean>>({});
   const [loading, setLoading] = useState(false);
@@ -25,37 +27,37 @@ export default function MapSearchBox(){
 
   const importSelected = async () => {
     const ids = Object.keys(sel).filter(k => sel[k]);
-    if(!ids.length) return alert('Спочатку відміть записи');
+    if(!ids.length) return alert(t('maps.selectFirst'));
     setBulkLoading(true);
     try {
       const res = await api.post('/api/places/import-bulk', { place_ids: ids });
-      alert(`Імпортовано: ${res.data.imported.filter((x:any)=>x.ok).length}`);
+      alert(t('maps.imported', { count: res.data.imported.filter((x:any)=>x.ok).length }));
     } finally { setBulkLoading(false); }
   };
 
   return (
     <Card>
-      <h3>Пошук бізнесів</h3>
-      <div style={{display:'flex', gap:8, marginBottom:12}}>
-        <input value={q} onChange={e=>setQ(e.target.value)} placeholder="Physiotherapie Hildesheim" style={{flex:1}} />
-        <Button onClick={search} disabled={loading}>{loading?'...':'Шукати'}</Button>
-        <Button onClick={importSelected} disabled={bulkLoading}>{bulkLoading?'Імпорт...':'Імпортувати вибрані'}</Button>
+      <h1>{t('maps.title')}</h1>
+      <div className="responsive-form">
+        <input value={q} onChange={e=>setQ(e.target.value)} placeholder={t('maps.placeholder')} style={{flex:1}} />
+        <Button onClick={search} disabled={loading}>{loading?t('common.loading'):t('actions.search')}</Button>
+        <Button onClick={importSelected} disabled={bulkLoading}>{bulkLoading?t('common.importing'):t('maps.importSelected')}</Button>
       </div>
       <ul style={{listStyle:'none', padding:0, margin:0, display:'grid', gap:8}}>
         {items.map(p => (
-          <li key={p.place_id} style={{display:'grid', gridTemplateColumns:'auto 1fr auto', alignItems:'center', gap:12, border:'1px solid rgba(255,255,255,.12)', borderRadius:12, padding:'10px 12px'}}>
+          <li className="map-result" key={p.place_id}>
             <input
               type="checkbox"
               checked={!!sel[p.place_id]}
               onChange={()=>toggle(p.place_id)}
               aria-labelledby={`place-name-${p.place_id}`}
-              title={`Вибрати ${p.name}`}
+              title={t('maps.selectPlace', { name: p.name })}
             />
             <div><strong id={`place-name-${p.place_id}`}>{p.name}</strong><div style={{opacity:.7}}>{p.address}</div></div>
             <Button onClick={async()=>{
               await api.post('/api/places/import', { place_id: p.place_id });
-              alert('Створено клієнта');
-            }}>+ Клієнт</Button>
+              alert(t('maps.clientCreated'));
+            }}>{t('maps.addClient')}</Button>
           </li>
         ))}
       </ul>

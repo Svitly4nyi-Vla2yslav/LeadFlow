@@ -1,6 +1,7 @@
 import { FormEvent, ReactNode, useEffect, useMemo, useRef, useState } from 'react';
 import styled, { keyframes } from 'styled-components';
 import { api } from '../api/client';
+import { useTranslation } from 'react-i18next';
 
 const TARGET = import.meta.env.VITE_LAUNCH_AT || '2027-01-01T00:00:00+01:00';
 const REQUIRED_TAPS = 5;
@@ -108,6 +109,7 @@ const calculateCountdown = (): Countdown => {
 };
 
 export default function LaunchGate({ children }: { children: ReactNode }) {
+  const { t } = useTranslation();
   const [authState, setAuthState] = useState<'checking' | 'locked' | 'unlocked'>('checking');
   const [countdown, setCountdown] = useState(calculateCountdown);
   const [accessOpen, setAccessOpen] = useState(false);
@@ -140,8 +142,8 @@ export default function LaunchGate({ children }: { children: ReactNode }) {
   }, []);
 
   const units = useMemo(() => [
-    ['Tage', countdown.days], ['Stunden', countdown.hours], ['Minuten', countdown.minutes], ['Sekunden', countdown.seconds]
-  ], [countdown]);
+    [t('launch.days'), countdown.days], [t('launch.hours'), countdown.hours], [t('launch.minutes'), countdown.minutes], [t('launch.seconds'), countdown.seconds]
+  ], [countdown, t]);
 
   const tryDevUnlock = async () => {
     if (devUnlockPending.current) return;
@@ -156,7 +158,7 @@ export default function LaunchGate({ children }: { children: ReactNode }) {
       setAuthState('unlocked');
     } catch (exception: any) {
       const status = exception.response?.status;
-      if (status !== 403 && status !== 404) setError('Entwicklungszugang nicht verfÃ¼gbar. Bitte Passwort verwenden.');
+      if (status !== 403 && status !== 404) setError(t('auth.devUnavailable'));
       setAccessOpen(true);
     } finally {
       devUnlockPending.current = false;
@@ -176,30 +178,30 @@ export default function LaunchGate({ children }: { children: ReactNode }) {
       setPassword(''); setShowPassword(false); setAccessOpen(false); setAuthState('unlocked');
     } catch (exception: any) {
       const status = exception.response?.status;
-      setError(status === 429 ? 'Zu viele Versuche. Bitte später erneut versuchen.' : status === 503 ? 'Der interne Zugang ist noch nicht konfiguriert.' : 'Zugang verweigert.');
+      setError(status === 429 ? t('auth.tooMany') : status === 503 ? t('auth.notConfigured') : t('auth.denied'));
     } finally { setSubmitting(false); }
   };
 
-  if (authState === 'checking') return <Screen><LoadingMark>INITIALISIERUNG…</LoadingMark></Screen>;
+  if (authState === 'checking') return <Screen><LoadingMark>{t('auth.initializing')}</LoadingMark></Screen>;
   if (authState === 'unlocked') return <>{children}</>;
 
   return <Screen>
-    <Device aria-label={`Countdown bis zum Start von VS Web Studio: ${countdown.days} Tage, ${countdown.hours} Stunden, ${countdown.minutes} Minuten und ${countdown.seconds} Sekunden`}>
+    <Device aria-label={t('launch.countdownLabel', countdown)}>
       <Screw $position="left:17px;top:17px"/><Screw $position="right:17px;top:17px"/><Screw $position="left:17px;bottom:17px"/>
-      <SecretScrew type="button" onClick={revealAccess} aria-label="Interner Zugangspunkt" />
-      <Brand><Logo src="/logo-vs-studio.svg" alt="VS Web Studio"/><BrandName>WEB STUDIO</BrandName><Kicker>Hildesheim · System im Aufbau</Kicker></Brand>
+      <SecretScrew type="button" onClick={revealAccess} aria-label={t('auth.internalAccess')} />
+      <Brand><Logo src="/logo-vs-studio.svg" alt="VS Web Studio"/><BrandName>WEB STUDIO</BrandName><Kicker>{t('launch.kicker')}</Kicker></Brand>
       <TimerPlate>
-        <StatusLine><Led/>{countdown.reached ? 'Launch window reached' : 'Slow launch sequence'}</StatusLine>
+        <StatusLine><Led/>{countdown.reached ? t('launch.reached') : t('launch.sequence')}</StatusLine>
         <Digits>{units.map(([label, value]) => <Unit key={label}><Number>{value}</Number><Label>{label}</Label></Unit>)}</Digits>
-        <Footer><span>Geplanter Start · 01.01.2027</span><span>VS System · Standby</span></Footer>
+        <Footer><span>{t('launch.planned')}</span><span>{t('launch.standby')}</span></Footer>
       </TimerPlate>
     </Device>
     {accessOpen && <Overlay onMouseDown={event => { if (event.target === event.currentTarget) setAccessOpen(false); }}>
       <AccessPanel onSubmit={login}>
-        <h2>Interner Zugang</h2><p>Authentifizierung für das VS Web Studio CRM.</p>
-        <label>Passwort<PasswordField><input autoFocus type={showPassword ? 'text' : 'password'} autoComplete="current-password" value={password} onChange={event => setPassword(event.target.value)} required /><button type="button" aria-pressed={showPassword} onClick={() => setShowPassword(value => !value)}>{showPassword ? 'Verbergen' : 'Anzeigen'}</button></PasswordField></label>
+        <h2>{t('auth.internalAccess')}</h2><p>{t('auth.description')}</p>
+        <label>{t('auth.password')}<PasswordField><input autoFocus type={showPassword ? 'text' : 'password'} autoComplete="current-password" value={password} onChange={event => setPassword(event.target.value)} required /><button type="button" aria-pressed={showPassword} onClick={() => setShowPassword(value => !value)}>{showPassword ? t('actions.hide') : t('actions.show')}</button></PasswordField></label>
         <ErrorText role="alert">{error}</ErrorText>
-        <Actions><button type="button" onClick={() => setAccessOpen(false)}>Abbrechen</button><button type="submit" disabled={submitting}>{submitting ? 'Prüfung…' : 'System öffnen'}</button></Actions>
+        <Actions><button type="button" onClick={() => setAccessOpen(false)}>{t('actions.cancel')}</button><button type="submit" disabled={submitting}>{submitting ? t('auth.checking') : t('auth.openSystem')}</button></Actions>
       </AccessPanel>
     </Overlay>}
   </Screen>;

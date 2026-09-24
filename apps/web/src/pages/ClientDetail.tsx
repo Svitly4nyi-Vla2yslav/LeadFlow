@@ -1,5 +1,6 @@
-import { FormEvent, useCallback, useEffect, useMemo, useState } from 'react';
+import { FormEvent, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import { api } from '../api/client';
@@ -7,213 +8,78 @@ import { CallTask, Client, CONTACT_CHANNELS, CRM_STATUSES, ContactChannel, LOST_
 
 const emptyMessage = { channel: 'email' as ContactChannel, direction: 'out' as 'in' | 'out', body: '' };
 const emptyCallDraft = { callObjective: '', offerFocus: '', operatorNote: '', scheduledAt: '' };
-const readinessLabels: Record<string, string> = {
-  missing_phone: 'Telefonnummer fehlt',
-  unusable_phone: 'Telefonnummer ist nicht verwendbar',
-  missing_call_objective: 'Anrufziel fehlt'
-};
-const fields: Array<[keyof Client, string, string]> = [
-  ['company', 'Company *', 'text'], ['branche', 'Branche', 'text'], ['ort', 'Ort', 'text'], ['website', 'Website', 'url'],
-  ['contactPerson', 'Contact Person', 'text'], ['phone', 'Phone', 'tel'], ['email', 'Email', 'email']
+const contactChannelKeys: Record<ContactChannel, string> = { email:'contactChannel.email', 'contact form':'contactChannel.contactForm', LinkedIn:'contactChannel.linkedin', WhatsApp:'contactChannel.whatsapp', 'phone/cold call':'contactChannel.phone' };
+const lostReasonKeys = ['noNeed','noBudget','noReply','ownAgency','noAuthority','inactive','wrongTarget','other'] as const;
+const feedbackFields: Array<[keyof NonNullable<CallTask['result']>, string]> = [
+  ['outcome','feedback.outcome'], ['summary','feedback.summary'], ['clientNeed','feedback.clientNeed'], ['confirmedPainPoints','feedback.confirmedPainPoints'],
+  ['interestLevel','feedback.interestLevel'], ['budgetSignal','feedback.budgetSignal'], ['decisionMakerStatus','feedback.decisionMakerStatus'],
+  ['requestedInformation','feedback.requestedInformation'], ['nextAction','feedback.nextAction'], ['callbackAt','feedback.callbackAt'],
+  ['calendarEventId','feedback.calendarEventId'], ['meetingStart','feedback.meetingStart'], ['meetingEnd','feedback.meetingEnd'], ['lostReason','feedback.lostReason']
 ];
 
+function Section({ title, children, open = false, id }: { title: string; children: ReactNode; open?: boolean; id?: string }) {
+  return <Card as="details" open={open} id={id} className="detail-section"><summary><strong>{title}</strong></summary><div className="section-body">{children}</div></Card>;
+}
+
 export default function ClientDetail() {
-  const { id } = useParams();
-  const [client, setClient] = useState<Client | null>(null);
-  const [draft, setDraft] = useState<Partial<Client>>({});
-  const [message, setMessage] = useState(emptyMessage);
-  const [error, setError] = useState('');
-  const [notice, setNotice] = useState('');
-  const [handoffState, setHandoffState] = useState<'ready' | 'opening' | 'error'>('ready');
-  const [handoffError, setHandoffError] = useState('');
-  const [callTask, setCallTask] = useState<CallTask | null>(null);
-  const [callDraft, setCallDraft] = useState(emptyCallDraft);
-  const [callTaskBusy, setCallTaskBusy] = useState(false);
+  const { id } = useParams(); const { t, i18n } = useTranslation();
+  const [client, setClient] = useState<Client | null>(null); const [draft, setDraft] = useState<Partial<Client>>({});
+  const [message, setMessage] = useState(emptyMessage); const [error, setError] = useState(''); const [notice, setNotice] = useState('');
+  const [handoffState, setHandoffState] = useState<'ready'|'opening'|'error'>('ready'); const [handoffError, setHandoffError] = useState('');
+  const [callTask, setCallTask] = useState<CallTask | null>(null); const [lastFeedback, setLastFeedback] = useState<CallTask | null>(null);
+  const [callDraft, setCallDraft] = useState(emptyCallDraft); const [callTaskBusy, setCallTaskBusy] = useState(false);
 
   const load = useCallback(async () => {
     try {
-      const [clientResponse, tasksResponse] = await Promise.all([
-        api.get(`/api/clients/${id}`),
-        api.get('/api/call-tasks', { params: { leadId: id } })
-      ]);
-      setClient(clientResponse.data);
-      setDraft(clientResponse.data);
-      const active = (tasksResponse.data as CallTask[]).find(task => !['COMPLETED', 'FAILED', 'CANCELLED'].includes(task.status)) || null;
-      setCallTask(active);
-      setCallDraft(active ? {
-        callObjective: active.callObjective,
-        offerFocus: active.offerFocus || '',
-        operatorNote: active.operatorNote || '',
-        scheduledAt: active.scheduledAt ? active.scheduledAt.slice(0, 16) : ''
-      } : emptyCallDraft);
+      const [clientResponse, tasksResponse] = await Promise.all([api.get(`/api/clients/${id}`), api.get('/api/call-tasks', { params: { leadId: id } })]);
+      const tasks = tasksResponse.data as CallTask[]; const active = tasks.find(task => !['COMPLETED','FAILED','CANCELLED'].includes(task.status)) || null;
+      setClient(clientResponse.data); setDraft(clientResponse.data); setCallTask(active); setLastFeedback(tasks.find(task => task.result && Object.keys(task.result).length) || null);
+      setCallDraft(active ? { callObjective: active.callObjective, offerFocus: active.offerFocus || '', operatorNote: active.operatorNote || '', scheduledAt: active.scheduledAt ? active.scheduledAt.slice(0,16) : '' } : { ...emptyCallDraft, offerFocus: clientResponse.data.offerFocus || '', operatorNote: clientResponse.data.emmaFocus || '' });
       setError('');
-    } catch { setError('Lead nicht gefunden oder API nicht erreichbar.'); }
-  }, [id]);
+    } catch { setError(t('errors.leadLoad')); }
+  }, [id, t]);
   useEffect(() => { load(); }, [load]);
-
+  useEffect(() => { if (client && window.location.hash === '#emma') document.getElementById('emma')?.scrollIntoView({ behavior: 'smooth' }); }, [client]);
   const set = (key: keyof Client, value: unknown) => setDraft(current => ({ ...current, [key]: value }));
 
-  const save = async (event: FormEvent) => {
-    event.preventDefault(); setError(''); setNotice('');
-    try {
-      await api.patch(`/api/clients/${id}`, draft);
-      setNotice('Lead und CRM-Ereignis wurden gespeichert.');
-      load();
-    } catch (exception: any) { setError(exception.response?.data?.error || 'Änderungen konnten nicht gespeichert werden.'); }
-  };
-
-  const addMessage = async (event: FormEvent) => {
-    event.preventDefault(); setError('');
-    try {
-      await api.post('/api/messages', { clientId: id, ...message });
-      setMessage(emptyMessage);
-      setNotice('Kontaktprotokoll gespeichert. CRM-Status nur ändern, wenn die Statusbedingungen erfüllt sind.');
-      load();
-    } catch (exception: any) { setError(exception.response?.data?.error || 'Kontaktprotokoll konnte nicht gespeichert werden.'); }
-  };
-
+  const save = async (event: FormEvent) => { event.preventDefault(); setError(''); setNotice(''); try { await api.patch(`/api/clients/${id}`, draft); setNotice(t('lead.changesSaved')); await load(); } catch (exception: any) { setError(exception.response?.data?.error || t('errors.changesSave')); } };
+  const addMessage = async (event: FormEvent) => { event.preventDefault(); setError(''); try { await api.post('/api/messages', { clientId: id, ...message }); setMessage(emptyMessage); setNotice(t('messages.saved')); await load(); } catch (exception: any) { setError(exception.response?.data?.error || t('errors.messageSave')); } };
   const callWithEmma = async () => {
-    if (handoffState === 'opening') return;
-    setHandoffState('opening');
-    setHandoffError('');
-    try {
-      const response = await api.post('/api/voice-agent/handoff', { leadId: client?.id });
-      const destination = new URL(response.data.voiceAgentAppUrl);
-      destination.searchParams.set('handoff', response.data.handoffToken);
-      const opened = window.open(destination.toString(), '_blank');
-      if (!opened) throw new Error('Der Browser hat das neue Emma-Fenster blockiert. Bitte Pop-ups erlauben.');
-      opened.opener = null;
-      setHandoffState('ready');
-    } catch (exception: any) {
-      setHandoffState('error');
-      setHandoffError(exception.response?.data?.error || exception.message || 'Emma konnte nicht geöffnet werden.');
-    }
+    if (handoffState === 'opening') return; setHandoffState('opening'); setHandoffError('');
+    try { const response = await api.post('/api/voice-agent/handoff', { leadId: client?.id }); const destination = new URL(response.data.voiceAgentAppUrl); destination.searchParams.set('handoff', response.data.handoffToken); const opened = window.open(destination.toString(), '_blank'); if (!opened) throw new Error(t('errors.popupBlocked')); opened.opener = null; setHandoffState('ready'); }
+    catch (exception: any) { setHandoffState('error'); setHandoffError(exception.response?.data?.error || exception.message || t('errors.emmaOpen')); }
   };
-
   const prepareCall = async (event: FormEvent) => {
-    event.preventDefault();
-    if (callTaskBusy || !client) return;
-    setCallTaskBusy(true); setError(''); setNotice('');
-    try {
-      const payload = {
-        ...callDraft,
-        scheduledAt: callDraft.scheduledAt ? new Date(callDraft.scheduledAt).toISOString() : undefined
-      };
-      const response = callTask
-        ? await api.patch(`/api/call-tasks/${callTask.id}`, payload)
-        : await api.post('/api/call-tasks', { leadId: client.id, ...payload });
-      setCallTask(response.data);
-      setNotice(response.data.status === 'READY'
-        ? 'Anruf ist vorbereitet. Emma kann mit diesem Lead-Kontext geöffnet werden.'
-        : 'Entwurf gespeichert. Bitte die fehlenden Angaben ergänzen.');
-    } catch (exception: any) {
-      setError(exception.response?.data?.error || 'Anruf konnte nicht vorbereitet werden.');
-    } finally { setCallTaskBusy(false); }
+    event.preventDefault(); if (callTaskBusy || !client) return; setCallTaskBusy(true); setError(''); setNotice('');
+    try { const payload = { ...callDraft, scheduledAt: callDraft.scheduledAt ? new Date(callDraft.scheduledAt).toISOString() : undefined }; const response = callTask ? await api.patch(`/api/call-tasks/${callTask.id}`, payload) : await api.post('/api/call-tasks', { leadId: client.id, ...payload }); setCallTask(response.data); setNotice(response.data.status === 'READY' ? t('call.preparedReady') : t('call.savedDraft', { issues: response.data.readinessIssues.map((issue: string) => t(`readiness.${issue}`)).join(', ') })); }
+    catch (exception: any) { setError(exception.response?.data?.error || t('errors.callPrepare')); } finally { setCallTaskBusy(false); }
   };
 
-  const timeline = useMemo(() => {
-    if (!client) return [];
-    return [
-      ...(client.statusHistory || []).map(event => ({ key: `s-${event.occurredAt}-${event.status}`, date: event.occurredAt, title: `Status: ${event.status}`, detail: event.summary || event.lostReason || '' })),
-      ...(client.messages || []).map((item: Message) => ({ key: `m-${item.id}`, date: item.createdAt, title: `${item.direction === 'out' ? 'Outbound' : 'Inbound'} · ${item.channel}`, detail: item.body }))
-    ].sort((a, b) => b.date.localeCompare(a.date));
-  }, [client]);
+  const timeline = useMemo(() => !client ? [] : [...(client.statusHistory || []).map(event => ({ key:`s-${event.occurredAt}-${event.status}`, date:event.occurredAt, title:`${t('lead.status')}: ${t(`status.${event.status}`)}`, detail:event.summary || (event.lostReason ? t(`lostReason.${lostReasonKeys[LOST_REASONS.indexOf(event.lostReason)]}`) : '') })), ...(client.messages || []).map((item:Message) => ({ key:`m-${item.id}`, date:item.createdAt, title:`${t(`direction.${item.direction}`)} · ${t(contactChannelKeys[item.channel])}`, detail:item.body }))].sort((a,b) => b.date.localeCompare(a.date)), [client,t]);
+  if (!client && !error) return <Card>{t('common.loading')}</Card>;
+  if (!client) return <Card><p role="alert">{error}</p><Link to="/leads">{t('actions.backToLeads')}</Link></Card>;
+  const result = lastFeedback?.result;
 
-  if (!client && !error) return <Card>Lead wird geladen…</Card>;
-  if (!client) return <Card><p role="alert">{error}</p><Link to="/leads">Zurück zu Leads</Link></Card>;
+  return <div className="page-stack client-detail">
+    <header className="detail-header"><div><Link to="/leads">← {t('nav.leads')}</Link><h1>{client.company}</h1><details className="technical-id"><summary>{t('common.technicalDetails')}</summary><code>{client.id}</code></details></div>{callTask?.status === 'READY' && <Button type="button" onClick={callWithEmma} disabled={handoffState === 'opening'}>{handoffState === 'opening' ? t('call.opening') : t('call.callEmma')}</Button>}</header>
+    {(error || notice || handoffError) && <Card><p role={error || handoffError ? 'alert' : 'status'} className={error || handoffError ? 'error-text' : 'success-text'}>{error || handoffError || notice}</p></Card>}
 
-  return (
-    <div style={{ display: 'grid', gap: 16 }}>
-      <div>
-        <Link to="/leads">← Leads</Link>
-        <div className="toolbar" style={{ alignItems: 'center', justifyContent: 'space-between' }}>
-          <div><h2>{client.company}</h2><p style={{ opacity: .68 }}>Lead ID: {client.id}</p></div>
-          {callTask?.status === 'READY' && <Button type="button" onClick={callWithEmma} disabled={handoffState === 'opening'} aria-busy={handoffState === 'opening'}>
-            {handoffState === 'opening' ? 'Emma wird geöffnet…' : handoffState === 'error' ? 'Fehler – erneut versuchen' : 'Mit Emma anrufen'}
-          </Button>}
-        </div>
-      </div>
-      {(error || notice || handoffError) && <Card><p role="status" style={{ margin: 0, color: error || handoffError ? '#fca5a5' : '#86efac' }}>{error || handoffError || notice}</p></Card>}
-      <form onSubmit={save} className="detail-grid">
-        <Card>
-          <h3 style={{ marginTop: 0 }}>Wer ist der Lead?</h3>
-          <div className="field-grid">
-            {fields.map(([key, label, type]) => <label key={key}>{label}<input type={type} value={String(draft[key] || '')} onChange={event => set(key, event.target.value)} required={key === 'company'} /></label>)}
-          </div>
-        </Card>
-        <Card>
-          <h3 style={{ marginTop: 0 }}>Was wurde getan?</h3>
-          <div className="field-grid">
-            <label>CRM Status<select value={draft.crmStatus} onChange={event => set('crmStatus', event.target.value)}>{CRM_STATUSES.map(status => <option key={status}>{status}</option>)}</select></label>
-            <label>Contact Channel<select value={draft.contactChannel || ''} onChange={event => set('contactChannel', event.target.value)}><option value="">nicht verifiziert</option>{CONTACT_CHANNELS.map(channel => <option key={channel}>{channel}</option>)}</select></label>
-            <label>Last Contact Date<input type="date" value={draft.lastContactDate || ''} onChange={event => set('lastContactDate', event.target.value)} /></label>
-            <label>Offer Amount, EUR<input type="number" min="0" step="0.01" value={draft.offerAmount ?? ''} onChange={event => set('offerAmount', event.target.value)} /></label>
-            <label className="span-2">Audit Problem<textarea value={draft.auditProblem || ''} onChange={event => set('auditProblem', event.target.value)} placeholder="Nur konkret bestätigter Punkt, keine Vermutung" /></label>
-            <label className="span-2">Proposed Solution<textarea value={draft.proposedSolution || ''} onChange={event => set('proposedSolution', event.target.value)} /></label>
-          </div>
-        </Card>
-        <Card>
-          <h3 style={{ marginTop: 0 }}>Was ist als Nächstes zu tun?</h3>
-          <div className="field-grid">
-            <label>Next Follow-up Date<input type="date" value={draft.nextFollowUpDate || ''} onChange={event => set('nextFollowUpDate', event.target.value)} /></label>
-            <label>Lost Reason<select value={draft.lostReason || ''} onChange={event => set('lostReason', event.target.value)}><option value="">—</option>{LOST_REASONS.map(reason => <option key={reason}>{reason}</option>)}</select></label>
-            <label className="span-2">Notes / result / client need / next action<textarea rows={5} value={draft.notes || ''} onChange={event => set('notes', event.target.value)} /></label>
-          </div>
-          <p style={{ opacity: .65, fontSize: 13 }}>AUDITED: bestätigtes Problem. CONTACTED: Kanal + Datum + Inhalt. CALL: Ergebnis + Bedarf + nächste Aktion. OFFER/WON: Betrag + Details. FOLLOW-UP: beide Datumsfelder + Grund.</p>
-          <Button type="submit">Änderungen speichern</Button>
-        </Card>
-      </form>
+    <form onSubmit={save} className="page-stack">
+      <Section title={t('sections.overview')} open><div className="field-grid"><label>{t('lead.company')} *<input value={String(draft.company || '')} onChange={e=>set('company',e.target.value)} required /></label><label>{t('lead.status')}<select value={draft.crmStatus} onChange={e=>set('crmStatus',e.target.value)}>{CRM_STATUSES.map(value=><option key={value} value={value}>{t(`status.${value}`)}</option>)}</select></label><label>{t('lead.source')}<input value={draft.source || ''} onChange={e=>set('source',e.target.value)} /></label><label>{t('lead.preferredLanguage')}<select value={draft.preferredLanguage || ''} onChange={e=>set('preferredLanguage',e.target.value)}><option value="">—</option>{['de','uk','ru','en'].map(value=><option key={value} value={value}>{t(`language.${value}`)}</option>)}</select></label></div></Section>
+      <Section title={t('sections.contact')} open><div className="field-grid"><label>{t('lead.contactPerson')}<input value={draft.contactPerson || ''} onChange={e=>set('contactPerson',e.target.value)} /></label><label>{t('lead.decisionMaker')}<input value={draft.decisionMaker || ''} onChange={e=>set('decisionMaker',e.target.value)} /></label><label>{t('lead.phone')}<input type="tel" value={draft.phone || ''} onChange={e=>set('phone',e.target.value)} /></label><label>{t('lead.email')}<input type="email" value={draft.email || ''} onChange={e=>set('email',e.target.value)} /></label><label>{t('lead.website')}<input type="url" value={draft.website || ''} onChange={e=>set('website',e.target.value)} /></label><label>{t('lead.location')}<input value={draft.ort || ''} onChange={e=>set('ort',e.target.value)} /></label></div></Section>
+      <Section title={t('sections.businessContext')}><div className="field-grid"><label>{t('lead.industry')}<input value={draft.branche || ''} onChange={e=>set('branche',e.target.value)} /></label><label className="span-2">{t('lead.currentSituation')}<textarea value={draft.currentSituation || ''} onChange={e=>set('currentSituation',e.target.value)} /></label><label>{t('lead.painPoints')}<textarea value={draft.painPoints || ''} onChange={e=>set('painPoints',e.target.value)} /></label><label>{t('lead.auditProblem')}<textarea value={draft.auditProblem || ''} onChange={e=>set('auditProblem',e.target.value)} /></label><label>{t('lead.proposedSolution')}<textarea value={draft.proposedSolution || ''} onChange={e=>set('proposedSolution',e.target.value)} /></label><label>{t('lead.notes')}<textarea value={draft.notes || ''} onChange={e=>set('notes',e.target.value)} /></label></div></Section>
+      <Section title={t('sections.emmaPreparation')}><div className="field-grid"><label>{t('lead.emmaFocus')}<textarea value={draft.emmaFocus || ''} onChange={e=>set('emmaFocus',e.target.value)} /></label><label>{t('lead.offerFocus')}<textarea value={draft.offerFocus || ''} onChange={e=>set('offerFocus',e.target.value)} /></label><label className="span-2">{t('lead.doNotMention')}<textarea value={draft.doNotMention || ''} onChange={e=>set('doNotMention',e.target.value)} /></label></div></Section>
+      <Section title={t('sections.nextAction')}><div className="field-grid"><label>{t('lead.contactChannel')}<select value={draft.contactChannel || ''} onChange={e=>set('contactChannel',e.target.value)}><option value="">{t('common.notVerified')}</option>{CONTACT_CHANNELS.map(value=><option key={value} value={value}>{t(contactChannelKeys[value])}</option>)}</select></label><label>{t('lead.lastContactDate')}<input type="date" value={draft.lastContactDate || ''} onChange={e=>set('lastContactDate',e.target.value)} /></label><label>{t('lead.nextFollowUpDate')}<input type="date" value={draft.nextFollowUpDate || ''} onChange={e=>set('nextFollowUpDate',e.target.value)} /></label><label>{t('lead.offerAmount')}<input type="number" min="0" step="0.01" value={draft.offerAmount ?? ''} onChange={e=>set('offerAmount',e.target.value)} /></label><label>{t('lead.lostReason')}<select value={draft.lostReason || ''} onChange={e=>set('lostReason',e.target.value)}><option value="">—</option>{LOST_REASONS.map((value,index)=><option key={value} value={value}>{t(`lostReason.${lostReasonKeys[index]}`)}</option>)}</select></label></div></Section>
+      <div className="sticky-actions"><Button type="submit">{t('actions.save')}</Button></div>
+    </form>
 
-      <Card>
-        <div className="toolbar" style={{ alignItems: 'center', justifyContent: 'space-between' }}>
-          <div><h3 style={{ margin: 0 }}>Emma Anruf</h3><p style={{ marginBottom: 0, opacity: .68 }}>CallTask: {callTask?.status || 'noch nicht angelegt'}</p></div>
-          {callTask?.status === 'READY' && <span className="status-pill" style={{ color: '#86efac' }}>READY</span>}
-        </div>
-        <form onSubmit={prepareCall} className="field-grid" style={{ marginTop: 16 }}>
-          <label>Telefon<input type="tel" value={client.phone || ''} readOnly aria-describedby="call-phone-help" /></label>
-          <label>Geplanter Zeitpunkt<input type="datetime-local" value={callDraft.scheduledAt} onChange={event => setCallDraft({ ...callDraft, scheduledAt: event.target.value })} /></label>
-          <label className="span-2">Anrufziel<textarea value={callDraft.callObjective} onChange={event => setCallDraft({ ...callDraft, callObjective: event.target.value })} placeholder="Was soll Emma in diesem Gespräch erreichen?" /></label>
-          <label>Angebot / Fokus<textarea value={callDraft.offerFocus} onChange={event => setCallDraft({ ...callDraft, offerFocus: event.target.value })} /></label>
-          <label>Interne Notiz<textarea value={callDraft.operatorNote} onChange={event => setCallDraft({ ...callDraft, operatorNote: event.target.value })} /></label>
-          <div className="span-2" id="call-phone-help">
-            {callTask?.readinessIssues?.length ? <p role="status" style={{ color: '#fca5a5' }}>Noch nicht bereit: {callTask.readinessIssues.map(issue => readinessLabels[issue] || issue).join(', ')}.</p> : null}
-            {!client.phone && !callTask && <p role="status" style={{ color: '#fca5a5' }}>Noch nicht bereit: Telefonnummer fehlt. Lead zuerst oben aktualisieren.</p>}
-            <Button type="submit" disabled={callTaskBusy}>{callTaskBusy ? 'Wird gespeichert…' : 'Anruf vorbereiten'}</Button>
-          </div>
-        </form>
-        <div className="call-brief" aria-label="Call Brief">
-          <h4>Call Brief</h4>
-          <dl>
-            <dt>Unternehmen</dt><dd>{client.company}</dd>
-            <dt>Telefon</dt><dd>{client.phone || '—'}</dd>
-            {client.contactPerson && <><dt>Kontaktperson</dt><dd>{client.contactPerson}</dd></>}
-            <dt>Ziel</dt><dd>{callDraft.callObjective || '—'}</dd>
-            {client.auditProblem && <><dt>Bekanntes Problem</dt><dd>{client.auditProblem}</dd></>}
-            {client.proposedSolution && <><dt>Mögliche Lösung</dt><dd>{client.proposedSolution}</dd></>}
-            {callDraft.offerFocus && <><dt>Angebot / Fokus</dt><dd>{callDraft.offerFocus}</dd></>}
-          </dl>
-        </div>
-        {callTask?.status === 'READY' && <div style={{ marginTop: 14 }}><Button type="button" onClick={callWithEmma} disabled={handoffState === 'opening'}>
-          {handoffState === 'opening' ? 'Emma wird geöffnet…' : 'Mit Emma anrufen'}
-        </Button></div>}
-      </Card>
+    <Section title={t('sections.callTask')} open id="emma"><div className="section-heading"><span>{t('call.status')}: <strong>{callTask ? t(`callStatus.${callTask.status}`) : t('call.notPrepared')}</strong></span></div><form onSubmit={prepareCall} className="field-grid"><label>{t('lead.phone')}<input value={client.phone || ''} readOnly /></label><label>{t('call.scheduledAt')}<input type="datetime-local" value={callDraft.scheduledAt} onChange={e=>setCallDraft({...callDraft,scheduledAt:e.target.value})}/></label><label className="span-2">{t('call.objective')}<textarea value={callDraft.callObjective} onChange={e=>setCallDraft({...callDraft,callObjective:e.target.value})}/></label><label>{t('call.offerFocus')}<textarea value={callDraft.offerFocus} onChange={e=>setCallDraft({...callDraft,offerFocus:e.target.value})}/></label><label>{t('call.emmaFocus')}<textarea value={client.emmaFocus || ''} readOnly /></label><label className="span-2">{t('call.operatorNote')}<textarea value={callDraft.operatorNote} onChange={e=>setCallDraft({...callDraft,operatorNote:e.target.value})}/></label>{callTask?.readinessIssues?.length ? <p className="span-2 error-text" role="status">{t('call.notReady')}: {callTask.readinessIssues.map(issue=>t(`readiness.${issue}`)).join(', ')}</p> : null}<div className="span-2 form-actions"><Button type="submit" disabled={callTaskBusy}>{callTaskBusy?t('common.saving'):t('call.prepare')}</Button>{callTask?.status==='READY'&&<Button type="button" onClick={callWithEmma}>{t('call.callEmma')}</Button>}</div></form>
+      <div className="call-brief"><h4>{t('call.brief')}</h4><dl><dt>{t('lead.company')}</dt><dd>{client.company}</dd><dt>{t('lead.phone')}</dt><dd>{client.phone||'—'}</dd>{client.currentSituation&&<><dt>{t('lead.currentSituation')}</dt><dd>{client.currentSituation}</dd></>}{client.painPoints&&<><dt>{t('lead.painPoints')}</dt><dd>{client.painPoints}</dd></>}<dt>{t('call.objective')}</dt><dd>{callDraft.callObjective||'—'}</dd>{client.auditProblem&&<><dt>{t('lead.auditProblem')}</dt><dd>{client.auditProblem}</dd></>}{client.proposedSolution&&<><dt>{t('lead.proposedSolution')}</dt><dd>{client.proposedSolution}</dd></>}{client.emmaFocus&&<><dt>{t('lead.emmaFocus')}</dt><dd>{client.emmaFocus}</dd></>}{callDraft.offerFocus&&<><dt>{t('lead.offerFocus')}</dt><dd>{callDraft.offerFocus}</dd></>}{client.doNotMention&&<><dt>{t('lead.doNotMention')}</dt><dd>{client.doNotMention}</dd></>}</dl></div>
+    </Section>
 
-      <div className="detail-grid">
-        <Card>
-          <h3 style={{ marginTop: 0 }}>Kontakt protokollieren</h3>
-          <form onSubmit={addMessage} className="field-grid">
-            <label>Kanal<select value={message.channel} onChange={event => setMessage({ ...message, channel: event.target.value as ContactChannel })}>{CONTACT_CHANNELS.map(channel => <option key={channel}>{channel}</option>)}</select></label>
-            <label>Richtung<select value={message.direction} onChange={event => setMessage({ ...message, direction: event.target.value as 'in' | 'out' })}><option value="out">Outbound</option><option value="in">Inbound</option></select></label>
-            <label className="span-2">Was wurde gesendet / gesagt?<textarea required value={message.body} onChange={event => setMessage({ ...message, body: event.target.value })} /></label>
-            <Button type="submit">Protokoll speichern</Button>
-          </form>
-        </Card>
-        <Card>
-          <h3 style={{ marginTop: 0 }}>Timeline</h3>
-          {!timeline.length && <p>Keine Ereignisse.</p>}
-          <div className="timeline">{timeline.map(item => <div key={item.key}><strong>{item.title}</strong><small>{new Date(item.date).toLocaleString('de-DE')}</small>{item.detail && <p>{item.detail}</p>}</div>)}</div>
-        </Card>
-      </div>
-    </div>
-  );
+    <Section title={t('sections.lastFeedback')} open={!!result}>{!result ? <p className="muted">{t('feedback.empty')}</p> : <dl className="feedback-grid">{feedbackFields.map(([key,label])=>{const value=result[key];if(value===undefined||value===''||(Array.isArray(value)&&!value.length))return null;return <div key={key}><dt>{t(label)}</dt><dd>{Array.isArray(value)?value.join(', '):typeof value==='string'&&(/At$|Start$|End$/.test(key))?new Date(value).toLocaleString(i18n.language):String(value)}</dd></div>})}{result.objections?.length?<div><dt>{t('feedback.objections')}</dt><dd>{result.objections.join(' · ')}</dd></div>:null}{result.doNotContact!==undefined?<div><dt>{t('feedback.doNotContact')}</dt><dd>{result.doNotContact?t('common.yes'):t('common.no')}</dd></div>:null}</dl>}</Section>
+
+    <Section title={t('messages.logContact')}><form onSubmit={addMessage} className="field-grid"><label>{t('messages.channel')}<select value={message.channel} onChange={e=>setMessage({...message,channel:e.target.value as ContactChannel})}>{CONTACT_CHANNELS.map(value=><option key={value} value={value}>{t(contactChannelKeys[value])}</option>)}</select></label><label>{t('messages.direction')}<select value={message.direction} onChange={e=>setMessage({...message,direction:e.target.value as 'in'|'out'})}><option value="out">{t('direction.out')}</option><option value="in">{t('direction.in')}</option></select></label><label className="span-2">{t('messages.summary')}<textarea required value={message.body} onChange={e=>setMessage({...message,body:e.target.value})}/></label><Button type="submit">{t('messages.save')}</Button></form></Section>
+    <Section title={t('sections.timeline')} open>{!timeline.length&&<p>{t('timeline.empty')}</p>}<div className="timeline">{timeline.map(item=><div key={item.key}><strong>{item.title}</strong><small>{new Date(item.date).toLocaleString(i18n.language)}</small>{item.detail&&<p>{item.detail}</p>}</div>)}</div></Section>
+  </div>;
 }

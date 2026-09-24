@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "build": "tsc -b",
-    "test": "tsx --test src/api.test.ts src/auth-dev.test.ts src/crm.test.ts src/voiceAgent.test.ts",
+    "test": "tsx --test src/api.test.ts src/auth-dev.test.ts src/crm.test.ts src/voiceAgent.test.ts src/ux.test.ts",
     "voice:integration-test": "tsx src/scripts/test-voice-integration.ts"
   },
   "dependencies": {

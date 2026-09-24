@@ -23,9 +23,17 @@ export type Client = {
   contactPerson?: string;
   phone?: string;
   email?: string;
+  source?: string;
+  preferredLanguage?: 'de' | 'uk' | 'ru' | 'en';
+  decisionMaker?: string;
+  currentSituation?: string;
+  painPoints?: string;
   crmStatus: CrmStatus;
   auditProblem?: string;
   proposedSolution?: string;
+  emmaFocus?: string;
+  offerFocus?: string;
+  doNotMention?: string;
   contactChannel?: ContactChannel;
   lastContactDate?: string;
   nextFollowUpDate?: string;
@@ -55,7 +63,13 @@ export type CallTask = {
   completedAt?: string;
   attemptCount: number;
   lastFailureReason?: string;
-  result?: { outcome?: string; summary?: string; nextAction?: string; interactionId?: string; calendarEventId?: string };
+  result?: {
+    outcome?: string; summary?: string; clientNeed?: string; confirmedPainPoints?: string;
+    interestLevel?: 'LOW' | 'MEDIUM' | 'HIGH'; objections?: string[]; budgetSignal?: string;
+    decisionMakerStatus?: string; requestedInformation?: string; nextAction?: string;
+    interactionId?: string; callbackAt?: string; calendarEventId?: string; meetingStart?: string;
+    meetingEnd?: string; lostReason?: string; doNotContact?: boolean;
+  };
   readinessIssues: Array<'missing_phone' | 'unusable_phone' | 'missing_call_objective' | 'lead_not_found'>;
 };
 
@@ -68,8 +82,14 @@ export type CallBrief = {
   website?: string;
   branche?: string;
   ort?: string;
+  preferredLanguage?: 'de' | 'uk' | 'ru' | 'en';
+  decisionMaker?: string;
+  currentSituation?: string;
+  painPoints?: string;
   auditProblem?: string;
   proposedSolution?: string;
+  emmaFocus?: string;
+  doNotMention?: string;
   callObjective: string;
   offerFocus?: string;
   operatorNote?: string;

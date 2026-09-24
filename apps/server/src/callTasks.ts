@@ -51,9 +51,15 @@ export const buildCallBrief = (lead: Client, callTask: CallTask) => ({
   ...(lead.website ? { website: lead.website } : {}),
   ...(lead.branche ? { branche: lead.branche } : {}),
   ...(lead.ort ? { ort: lead.ort } : {}),
+  ...(lead.preferredLanguage ? { preferredLanguage: lead.preferredLanguage } : {}),
+  ...(lead.decisionMaker ? { decisionMaker: lead.decisionMaker } : {}),
+  ...(lead.currentSituation ? { currentSituation: lead.currentSituation } : {}),
+  ...(lead.painPoints ? { painPoints: lead.painPoints } : {}),
   ...(lead.auditProblem ? { auditProblem: lead.auditProblem } : {}),
   ...(lead.proposedSolution ? { proposedSolution: lead.proposedSolution } : {}),
+  ...(lead.emmaFocus ? { emmaFocus: lead.emmaFocus } : {}),
+  ...(lead.doNotMention ? { doNotMention: lead.doNotMention } : {}),
   callObjective: callTask.callObjective,
-  ...(callTask.offerFocus ? { offerFocus: callTask.offerFocus } : {}),
+  ...(callTask.offerFocus || lead.offerFocus ? { offerFocus: callTask.offerFocus || lead.offerFocus } : {}),
   ...(callTask.operatorNote ? { operatorNote: callTask.operatorNote } : {})
 });

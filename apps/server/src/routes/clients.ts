@@ -25,7 +25,8 @@ router.get('/', (req, res) => {
     if (status && client.crmStatus !== status) return false;
     if (followUp === 'overdue' && (!client.nextFollowUpDate || client.nextFollowUpDate >= today || ['WON', 'LOST'].includes(client.crmStatus))) return false;
     if (!query) return true;
-    return [client.company, client.branche, client.ort, client.website, client.contactPerson, client.email, client.phone]
+    return [client.company, client.branche, client.ort, client.website, client.contactPerson, client.email, client.phone,
+      client.source, client.decisionMaker, client.currentSituation, client.painPoints, client.emmaFocus, client.offerFocus]
       .some(value => value?.toLocaleLowerCase('de-DE').includes(query));
   }).sort((a, b) => {
     const aDate = a.nextFollowUpDate || '9999-12-31';

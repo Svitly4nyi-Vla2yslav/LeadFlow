@@ -27,9 +27,17 @@ export const sanitizeClient = (input: Record<string, unknown>, current?: Client)
     contactPerson: optionalText(source.contactPerson),
     phone: optionalText(source.phone),
     email: optionalText(source.email),
+    source: optionalText(source.source),
+    preferredLanguage: optionalText(source.preferredLanguage) as ClientDraft['preferredLanguage'],
+    decisionMaker: optionalText(source.decisionMaker),
+    currentSituation: optionalText(source.currentSituation),
+    painPoints: optionalText(source.painPoints),
     crmStatus: (source.crmStatus || 'NEW') as CrmStatus,
     auditProblem: optionalText(source.auditProblem),
     proposedSolution: optionalText(source.proposedSolution),
+    emmaFocus: optionalText(source.emmaFocus),
+    offerFocus: optionalText(source.offerFocus),
+    doNotMention: optionalText(source.doNotMention),
     contactChannel: optionalText(source.contactChannel) as ContactChannel | undefined,
     lastContactDate: optionalText(source.lastContactDate),
     nextFollowUpDate: optionalText(source.nextFollowUpDate),
@@ -47,6 +55,7 @@ export const validateClient = (lead: ClientDraft): string | null => {
   if (!isDate(lead.lastContactDate)) return 'Last Contact Date must use YYYY-MM-DD';
   if (!isDate(lead.nextFollowUpDate)) return 'Next Follow-up Date must use YYYY-MM-DD';
   if (lead.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(lead.email)) return 'Email is invalid';
+  if (lead.preferredLanguage && !['de', 'uk', 'ru', 'en'].includes(lead.preferredLanguage)) return 'Invalid Preferred Language';
   if (lead.offerAmount !== undefined && (!Number.isFinite(lead.offerAmount) || lead.offerAmount < 0)) return 'Offer Amount must be a non-negative number';
 
   switch (lead.crmStatus) {
@@ -79,16 +88,24 @@ export const validateClient = (lead: ClientDraft): string | null => {
 };
 
 export const canonicalImportRow = (row: Record<string, unknown>) => ({
-  company: row.company ?? row.Company,
-  branche: row.branche ?? row.Branche,
-  ort: row.ort ?? row.Ort,
-  website: row.website ?? row.Website,
-  contactPerson: row.contactPerson ?? row['Contact Person'],
-  phone: row.phone ?? row.Phone,
-  email: row.email ?? row.Email,
+  company: row.company ?? row.Company ?? row.Firma ?? row.Unternehmen,
+  branche: row.branche ?? row.Branche ?? row.Industry,
+  ort: row.ort ?? row.Ort ?? row.City ?? row.Stadt,
+  website: row.website ?? row.Website ?? row.URL,
+  contactPerson: row.contactPerson ?? row['Contact Person'] ?? row.Kontaktperson,
+  phone: row.phone ?? row.Phone ?? row.Telefon ?? row.Telephone,
+  email: row.email ?? row.Email ?? row['E-Mail'],
+  source: row.source ?? row.Source ?? row.Quelle,
+  preferredLanguage: row.preferredLanguage ?? row['Preferred Language'] ?? row.Language ?? row.Sprache,
+  decisionMaker: row.decisionMaker ?? row['Decision Maker'] ?? row.Entscheidungsperson,
+  currentSituation: row.currentSituation ?? row['Current Situation'] ?? row['Aktuelle Situation'],
+  painPoints: row.painPoints ?? row['Pain Points'] ?? row.Probleme,
   crmStatus: row.crmStatus ?? row['CRM Status'] ?? 'NEW',
   auditProblem: row.auditProblem ?? row['Audit Problem'],
   proposedSolution: row.proposedSolution ?? row['Proposed Solution'],
+  emmaFocus: row.emmaFocus ?? row['Emma Focus'] ?? row['Emma Fokus'],
+  offerFocus: row.offerFocus ?? row['Offer Focus'] ?? row.Angebotsfokus,
+  doNotMention: row.doNotMention ?? row['Do Not Mention'] ?? row['Nicht erwähnen'],
   contactChannel: row.contactChannel ?? row['Contact Channel'],
   lastContactDate: row.lastContactDate ?? row['Last Contact Date'],
   nextFollowUpDate: row.nextFollowUpDate ?? row['Next Follow-up Date'],

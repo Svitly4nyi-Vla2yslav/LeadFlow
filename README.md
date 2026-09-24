@@ -203,6 +203,18 @@ Authenticated owner endpoints are available at `POST/GET /api/call-tasks`, `GET/
 
 The client detail page provides an **Emma Anruf** preparation form and Call Brief preview. Once a task is ready, **Mit Emma anrufen** continues to use the existing Phase 5C browser handoff. Phase 5D-A deliberately does not add `callTaskId` to that token and does not implement Twilio, SIP, dialing or any other real telephone operation. Emma does not choose who to call; LeadFlow binds the canonical lead and owns the call lifecycle.
 
+### Phase 5D-UX — Mobile control plane
+
+LeadFlow is mobile-first from approximately 360 px while retaining its desktop sidebar and tables. Phones use a safe-area-aware bottom navigation for Dashboard, Leads, Calls, Messages and Settings. The Leads page renders touch-friendly cards on mobile, keeps the desktop table at larger widths, and provides progressive Basic, Context and Emma lead-creation sections.
+
+Lead intake now supports the structured optional fields `source`, `preferredLanguage`, `decisionMaker`, `currentSituation`, `painPoints`, `emmaFocus`, `offerFocus` and `doNotMention`. **Save lead** performs a normal canonical create/update. **Save & prepare Emma call** first persists the lead, uses the returned canonical UUID, then creates a CallTask; missing phone or objective produces a durable DRAFT with explicit readiness issues rather than inventing data or launching Emma.
+
+The Lead management area accepts JSON arrays (or `{ "leads": [...] }`) and CSV files in the browser, displays detected columns and a preview, and submits normalized rows to the existing `/api/clients/import` endpoint. Duplicate protection and the 1,000-row server limit remain authoritative. CSV export includes the new context fields while preserving existing columns.
+
+All main application views, navigation, form labels, state labels, errors and empty states use complete DE/UK/RU i18next resources; Ukrainian remains the default and the selected language is stored locally. Canonical CRM, CallTask, channel and lost-reason values remain unchanged in storage and are translated only for display.
+
+CallTask results now have backward-compatible optional fields for client need, confirmed pain points, interest, objections, budget, decision-maker status, requested information, callback, meeting details, lost reason and do-not-contact. Client detail renders the latest available result as a localized scan-friendly feedback card. This phase does not populate feedback automatically or send the added LeadFlow context externally.
+
 ### Start frontend and backend together
 
 ```bash

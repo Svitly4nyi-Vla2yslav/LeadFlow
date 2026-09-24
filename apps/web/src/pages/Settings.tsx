@@ -1,1 +1,1 @@
-import Card from '../components/ui/Card'; export default function Settings(){ return <Card>Налаштування акаунта (WIP)</Card>; }
+import { useTranslation } from 'react-i18next'; import Card from '../components/ui/Card'; import LanguageSwitcher from '../components/LanguageSwitcher'; export default function Settings(){const{t}=useTranslation();return <Card><h1>{t('settings.title')}</h1><p className="muted">{t('settings.subtitle')}</p><label>{t('language.select')}<LanguageSwitcher/></label></Card>}
