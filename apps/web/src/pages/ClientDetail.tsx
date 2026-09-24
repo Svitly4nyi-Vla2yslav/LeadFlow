@@ -73,8 +73,8 @@ export default function ClientDetail() {
   };
   const addMessage = async (event: FormEvent) => { event.preventDefault(); setError(''); try { await api.post('/api/messages', { clientId: id, ...message }); setMessage(emptyMessage); setNotice(t('messages.saved')); await load(); } catch (exception: any) { setError(exception.response?.data?.error || t('errors.messageSave')); } };
   const callWithEmma = async () => {
-    if (handoffState === 'opening') return; setHandoffState('opening'); setHandoffError('');
-    try { const response = await api.post('/api/voice-agent/handoff', { leadId: client?.id }); const destination = new URL(response.data.voiceAgentAppUrl); destination.searchParams.set('handoff', response.data.handoffToken); const opened = window.open(destination.toString(), '_blank'); if (!opened) throw new Error(t('errors.popupBlocked')); opened.opener = null; setHandoffState('ready'); }
+    if (handoffState === 'opening' || !client || !callTask || callTask.status !== 'READY' || callTask.readinessIssues.length) return; setHandoffState('opening'); setHandoffError('');
+    try { const response = await api.post('/api/voice-agent/handoff', { leadId: client.id, callTaskId: callTask.id }); const destination = new URL(response.data.voiceAgentAppUrl); destination.searchParams.set('handoff', response.data.handoffToken); const opened = window.open(destination.toString(), '_blank'); if (!opened) throw new Error(t('errors.popupBlocked')); opened.opener = null; setHandoffState('ready'); }
     catch (exception: any) { setHandoffState('error'); setHandoffError(exception.response?.data?.error || exception.message || t('errors.emmaOpen')); }
   };
   const prepareCall = async (event: FormEvent) => {

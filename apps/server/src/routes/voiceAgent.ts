@@ -1,7 +1,8 @@
 import { Router } from 'express';
 import { addMessage, addVoiceInteraction, db, persistDb, updateClient } from '../db/memory';
 import { applyVoiceInteractionToLead, VoiceAgentInteractionV1Schema, voicePayloadHash } from '../voiceAgent';
-import { verifyVoiceAgentHandoff } from '../voiceAgentHandoff';
+import { buildCallBrief, callTaskReadiness } from '../callTasks';
+import { verifyVoiceAgentHandoffResult } from '../voiceAgentHandoff';
 
 const router = Router();
 
@@ -12,12 +13,40 @@ router.post('/resolve-handoff', (req, res) => {
     return res.status(400).json({ error: 'invalid_handoff' });
   }
 
-  const handoff = verifyVoiceAgentHandoff(body.handoffToken);
-  if (!handoff) return res.status(401).json({ error: 'invalid_or_expired_handoff' });
+  const verification = verifyVoiceAgentHandoffResult(body.handoffToken);
+  if (!verification.handoff) return res.status(401).json({ error: verification.error });
+  const handoff = verification.handoff;
 
   const lead = db.clients.find(client => client.id === handoff.leadId);
   if (!lead) return res.status(404).json({ error: 'lead_not_found' });
 
+  if (handoff.version === '2') {
+    const task = db.callTasks.find(item => item.id === handoff.callTaskId);
+    if (!task) return res.status(404).json({ error: 'call_task_not_found' });
+    if (task.leadId !== lead.id) return res.status(409).json({ error: 'call_task_mismatch' });
+    if (task.status !== 'READY' || callTaskReadiness(lead, task).length) {
+      return res.status(409).json({ error: 'call_task_not_ready' });
+    }
+    return res.json({
+      ok: true,
+      lead: {
+        id: lead.id,
+        company: lead.company,
+        contactPerson: lead.contactPerson ?? null,
+        phone: lead.phone ?? null,
+        email: lead.email ?? null,
+        crmStatus: lead.crmStatus
+      },
+      callTask: {
+        id: task.id,
+        status: task.status,
+        scheduledAt: task.scheduledAt ?? null
+      },
+      callBrief: buildCallBrief(lead, task)
+    });
+  }
+
+  // Legacy v1 stays lead-only and never selects or attaches a CallTask.
   return res.json({
     ok: true,
     lead: {

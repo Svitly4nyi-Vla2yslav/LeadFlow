@@ -402,6 +402,139 @@ test('an existing canonical lead produces a short-lived handoff token', async ()
   assert.equal((payload.expiresAt as number) - (payload.issuedAt as number), 300);
 });
 
+test('a READY CallTask creates a minimal task-aware v2 handoff with no PII', async () => {
+  const pii = ['Task Aware Private GmbH', 'task.private@example.test', '+49 511 222333', 'Private Person'];
+  const lead = await createLead(pii[0], 'NEW', { phone: pii[2], email: pii[1], contactPerson: pii[3] });
+  const task = await (await createCallTask({ leadId: lead.id, callObjective: 'Beratungstermin vereinbaren' })).json() as { id: string };
+  const response = await createHandoff({ leadId: lead.id, callTaskId: task.id });
+  assert.equal(response.status, 200);
+  const result = await response.json() as { handoffToken: string; voiceAgentAppUrl: string };
+  const payload = JSON.parse(Buffer.from(result.handoffToken.split('.')[0], 'base64url').toString('utf8')) as Record<string, unknown>;
+  assert.deepEqual(Object.keys(payload).sort(), ['callTaskId', 'expiresAt', 'issuedAt', 'leadId', 'nonce', 'version']);
+  assert.equal(payload.version, '2');
+  assert.equal(payload.leadId, lead.id);
+  assert.equal(payload.callTaskId, task.id);
+  assert.equal((payload.expiresAt as number) - (payload.issuedAt as number), 300);
+  for (const value of [...pii, 'Beratungstermin vereinbaren']) assert.equal(result.handoffToken.includes(value), false);
+});
+
+test('task-aware handoff rejects unknown, mismatched and non-READY CallTasks', async () => {
+  const firstLead = await createLead('Task Validation One GmbH', 'NEW', { phone: '+49 511 300001' });
+  const secondLead = await createLead('Task Validation Two GmbH', 'NEW', { phone: '+49 511 300002' });
+  const readyTask = await (await createCallTask({ leadId: firstLead.id, callObjective: 'Bedarf prüfen' })).json() as { id: string };
+  const draftTask = await (await createCallTask({ leadId: secondLead.id, callObjective: '' })).json() as { id: string };
+
+  const unknownLead = await createHandoff({ leadId: randomUUID(), callTaskId: readyTask.id });
+  assert.equal(unknownLead.status, 404);
+  assert.equal((await unknownLead.json() as { error: string }).error, 'lead_not_found');
+  const unknownTask = await createHandoff({ leadId: firstLead.id, callTaskId: randomUUID() });
+  assert.equal(unknownTask.status, 404);
+  assert.equal((await unknownTask.json() as { error: string }).error, 'call_task_not_found');
+  const mismatch = await createHandoff({ leadId: secondLead.id, callTaskId: readyTask.id });
+  assert.equal(mismatch.status, 409);
+  assert.equal((await mismatch.json() as { error: string }).error, 'call_task_mismatch');
+  const { issueTaskAwareVoiceAgentHandoff } = await import('./voiceAgentHandoff');
+  const mismatchedToken = issueTaskAwareVoiceAgentHandoff(secondLead.id, readyTask.id);
+  const mismatchedResolve = await resolveHandoff(mismatchedToken);
+  assert.equal(mismatchedResolve.status, 409);
+  assert.equal((await mismatchedResolve.json() as { error: string }).error, 'call_task_mismatch');
+  const draft = await createHandoff({ leadId: secondLead.id, callTaskId: draftTask.id });
+  assert.equal(draft.status, 409);
+  assert.equal((await draft.json() as { error: string }).error, 'call_task_not_ready');
+
+  const cancelled = await fetch(`${baseUrl}/api/call-tasks/${readyTask.id}/cancel`, withSession({ method: 'POST' }));
+  assert.equal(cancelled.status, 200);
+  const cancelledHandoff = await createHandoff({ leadId: firstLead.id, callTaskId: readyTask.id });
+  assert.equal(cancelledHandoff.status, 409);
+  assert.equal((await cancelledHandoff.json() as { error: string }).error, 'call_task_not_ready');
+
+  const failedLead = await createLead('Task Failed GmbH', 'NEW', { phone: '+49 511 300007' });
+  const completedLead = await createLead('Task Completed GmbH', 'NEW', { phone: '+49 511 300008' });
+  const failedTask = await (await createCallTask({ leadId: failedLead.id, callObjective: 'Anrufen' })).json() as { id: string };
+  const completedTask = await (await createCallTask({ leadId: completedLead.id, callObjective: 'Anrufen' })).json() as { id: string };
+  const { db, updateCallTask } = await import('./db/memory');
+  const storedFailed = db.callTasks.find(item => item.id === failedTask.id)!;
+  const storedCompleted = db.callTasks.find(item => item.id === completedTask.id)!;
+  updateCallTask(storedFailed, { ...storedFailed, status: 'FAILED' }, false);
+  updateCallTask(storedCompleted, { ...storedCompleted, status: 'COMPLETED' }, false);
+  assert.equal((await createHandoff({ leadId: failedLead.id, callTaskId: failedTask.id })).status, 409);
+  assert.equal((await createHandoff({ leadId: completedLead.id, callTaskId: completedTask.id })).status, 409);
+});
+
+test('task-aware handoff creation rechecks current phone and objective readiness', async () => {
+  const phoneLead = await createLead('Task Phone Race GmbH', 'NEW', { phone: '+49 511 300003' });
+  const phoneTask = await (await createCallTask({ leadId: phoneLead.id, callObjective: 'Anrufen' })).json() as { id: string };
+  assert.equal((await fetch(`${baseUrl}/api/clients/${phoneLead.id}`, withSession({
+    method: 'PATCH', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ phone: '' })
+  }))).status, 200);
+  assert.equal((await createHandoff({ leadId: phoneLead.id, callTaskId: phoneTask.id })).status, 409);
+
+  const objectiveLead = await createLead('Task Objective Race GmbH', 'NEW', { phone: '+49 511 300004' });
+  const objectiveTask = await (await createCallTask({ leadId: objectiveLead.id, callObjective: 'Anrufen' })).json() as { id: string };
+  assert.equal((await fetch(`${baseUrl}/api/call-tasks/${objectiveTask.id}`, withSession({
+    method: 'PATCH', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ callObjective: '' })
+  }))).status, 200);
+  assert.equal((await createHandoff({ leadId: objectiveLead.id, callTaskId: objectiveTask.id })).status, 409);
+});
+
+test('v2 resolve returns the exact lead, exact task and current canonical Call Brief only', async () => {
+  const lead = await createLead('Task Resolve GmbH', 'NEW', {
+    phone: '+49 511 300005', email: 'resolve@example.test', contactPerson: 'Mara Beispiel', website: 'https://resolve.example.test',
+    branche: 'Beratung', ort: 'Hildesheim', preferredLanguage: 'de', decisionMaker: 'Mara Beispiel',
+    currentSituation: 'Current situation before token', painPoints: 'No online booking', auditProblem: 'CTA below fold',
+    proposedSolution: 'Responsive relaunch', emmaFocus: 'Confirm process', offerFocus: 'Lead offer',
+    doNotMention: 'Internal floor', notes: 'Private CRM note must not leave LeadFlow'
+  });
+  const task = await (await createCallTask({
+    leadId: lead.id, callObjective: 'Bedarf qualifizieren', offerFocus: 'Task offer', operatorNote: 'Ask for timing', scheduledAt: '2026-10-03T10:00:00.000Z'
+  })).json() as { id: string };
+  const token = (await (await createHandoff({ leadId: lead.id, callTaskId: task.id })).json() as { handoffToken: string }).handoffToken;
+
+  const changed = await fetch(`${baseUrl}/api/clients/${lead.id}`, withSession({
+    method: 'PATCH', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ currentSituation: 'Current situation changed after token' })
+  }));
+  assert.equal(changed.status, 200);
+  const response = await resolveHandoff(token);
+  assert.equal(response.status, 200);
+  const result = await response.json() as any;
+  assert.deepEqual(result.lead, {
+    id: lead.id, company: 'Task Resolve GmbH', contactPerson: 'Mara Beispiel', phone: '+49 511 300005', email: 'resolve@example.test', crmStatus: 'NEW'
+  });
+  assert.deepEqual(result.callTask, { id: task.id, status: 'READY', scheduledAt: '2026-10-03T10:00:00.000Z' });
+  assert.equal(result.callBrief.leadId, lead.id);
+  assert.equal(result.callBrief.currentSituation, 'Current situation changed after token');
+  assert.equal(result.callBrief.callObjective, 'Bedarf qualifizieren');
+  assert.equal(result.callBrief.offerFocus, 'Task offer');
+  assert.equal(result.callBrief.operatorNote, 'Ask for timing');
+  for (const forbidden of ['notes', 'messages', 'timeline', 'statusHistory', 'voiceInteractions', 'handoffToken', 'callTaskId', 'credentials']) {
+    assert.equal(JSON.stringify(result).includes(`"${forbidden}"`), false);
+  }
+});
+
+test('v2 resolve rejects modified, expired and no-longer-ready task handoffs', async () => {
+  const lead = await createLead('Task Resolve Guard GmbH', 'NEW', { phone: '+49 511 300006' });
+  const task = await (await createCallTask({ leadId: lead.id, callObjective: 'Anrufen' })).json() as { id: string };
+  const valid = (await (await createHandoff({ leadId: lead.id, callTaskId: task.id })).json() as { handoffToken: string }).handoffToken;
+  const [payload, signature] = valid.split('.');
+  const modified = `${payload}.${signature[0] === 'A' ? 'B' : 'A'}${signature.slice(1)}`;
+  const modifiedResponse = await resolveHandoff(modified);
+  assert.equal(modifiedResponse.status, 401);
+  assert.equal((await modifiedResponse.json() as { error: string }).error, 'handoff_invalid');
+
+  const { issueTaskAwareVoiceAgentHandoff } = await import('./voiceAgentHandoff');
+  const expired = issueTaskAwareVoiceAgentHandoff(lead.id, task.id, { nowMs: Date.now() - 10 * 60 * 1000 });
+  const expiredResponse = await resolveHandoff(expired);
+  assert.equal(expiredResponse.status, 401);
+  assert.equal((await expiredResponse.json() as { error: string }).error, 'handoff_expired');
+
+  assert.equal((await fetch(`${baseUrl}/api/clients/${lead.id}`, withSession({
+    method: 'PATCH', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ phone: '' })
+  }))).status, 200);
+  const staleResponse = await resolveHandoff(valid);
+  assert.equal(staleResponse.status, 409);
+  assert.equal((await staleResponse.json() as { error: string }).error, 'call_task_not_ready');
+});
+
 test('handoff creation rejects an unknown lead without creating one', async () => {
   const { db } = await import('./db/memory');
   const countBefore = db.clients.length;
@@ -443,6 +576,7 @@ test('resolve-handoff requires the Voice Agent integration bearer token', async 
     method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ handoffToken: 'not-a-token' })
   });
   assert.equal(response.status, 401);
+  assert.equal((await response.json() as { error: string }).error, 'integration_authentication_required');
 });
 
 test('a valid handoff resolves the exact lead with only sanitized operator context', async () => {

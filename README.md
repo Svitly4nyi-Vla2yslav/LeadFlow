@@ -176,7 +176,7 @@ LeadFlow client
   -> canonical LeadFlow Client.id
 ```
 
-The authenticated browser sends only the currently selected `Client.id` to `POST /api/voice-agent/handoff`. LeadFlow verifies that exact ID, signs a five-minute token containing only its version, canonical lead ID, issue/expiry times and a random nonce, and returns the token with the non-secret `VOICE_AGENT_APP_URL`. The browser opens the Voice Agent with the token in the `handoff` query parameter; no customer name, phone, email, notes, or integration credential is placed in the URL.
+The legacy Phase 5C flow sends only the selected `Client.id` to `POST /api/voice-agent/handoff`. LeadFlow verifies that exact ID, signs a five-minute v1 token containing only its version, canonical lead ID, issue/expiry times and a random nonce, and returns the token with the non-secret `VOICE_AGENT_APP_URL`. This lead-only contract remains temporarily available for compatibility and resolves only the lead; it never selects, guesses or attaches a CallTask. Normal LeadFlow UI launches use the task-aware v2 flow documented below.
 
 The Voice Agent backend must exchange the handoff through `POST /api/integrations/voice-agent/resolve-handoff` using `Authorization: Bearer <VOICE_AGENT_INTEGRATION_TOKEN>`. LeadFlow validates the bearer token, HMAC signature, lifetime, exact lead existence and then returns only `id`, `company`, `contactPerson`, `phone`, `email`, and `crmStatus`. It never returns notes, timelines, messages, VoiceInteractions, lost history, or credentials.
 
@@ -201,7 +201,27 @@ Tasks are created as `READY` only when the canonical lead exists, the stored pho
 
 Authenticated owner endpoints are available at `POST/GET /api/call-tasks`, `GET/PATCH /api/call-tasks/:id`, `POST /api/call-tasks/:id/cancel`, and `GET /api/call-tasks/:id/brief`. The brief is generated server-side from the current lead plus task-specific fields and excludes CRM notes, timelines, messages and hidden metadata. CallTasks are included in both local atomic JSON persistence and Netlify Blob hydrate/snapshot writes.
 
-The client detail page provides an **Emma Anruf** preparation form and Call Brief preview. Once a task is ready, **Mit Emma anrufen** continues to use the existing Phase 5C browser handoff. Phase 5D-A deliberately does not add `callTaskId` to that token and does not implement Twilio, SIP, dialing or any other real telephone operation. Emma does not choose who to call; LeadFlow binds the canonical lead and owns the call lifecycle.
+The client detail page provides an **Emma Anruf** preparation form and Call Brief preview. Phase 5D-B1 now binds READY-task launches to both the canonical lead and exact CallTask. It does not implement Twilio, SIP, dialing or any other real telephone operation.
+
+### Phase 5D-B1 — Task-aware Emma handoff
+
+Normal Emma launches now follow this authoritative flow:
+
+```text
+LeadFlow
+  -> canonical Lead
+  -> canonical READY CallTask
+  -> signed short-lived v2 handoff
+  -> server-to-server resolution
+  -> current server-generated Call Brief
+  -> Voice Agent
+```
+
+The authenticated browser must send both `{ leadId, callTaskId }` to `POST /api/voice-agent/handoff`. LeadFlow performs exact lookups, verifies that the task belongs to that lead, requires `READY`, and recalculates phone/objective readiness against current data. It never substitutes a different task or chooses the newest task. The v2 token contains only `version`, `leadId`, `callTaskId`, `issuedAt`, `expiresAt`, and `nonce`, protected by a version-specific HMAC signing context. Customer data, call objectives and Call Brief content never enter the URL token.
+
+The Voice Agent backend resolves the token through authenticated `POST /api/integrations/voice-agent/resolve-handoff`. LeadFlow repeats the exact ownership, READY and readiness checks, then generates the Call Brief at resolution time through the canonical `buildCallBrief` helper. The response contains the sanitized lead identity/contact view, exact READY task identity/schedule, and current approved call context. CRM notes, messages, timeline, status history, previous interactions, credentials, tokens and storage metadata are excluded.
+
+LeadFlow chooses the lead, CallTask and objective. Emma never guesses, fuzzy-matches or substitutes either ID. Phase 5D-B1 establishes identity and context only: it does not move the task to `DIALING`, `IN_PROGRESS` or a terminal status. The legacy v1 verifier remains temporarily supported for Phase 5C tooling, but v1 stays strictly lead-only.
 
 ### Phase 5D-UX — Mobile control plane
 

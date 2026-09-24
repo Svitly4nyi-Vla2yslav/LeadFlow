@@ -48,3 +48,11 @@ test('mobile shell uses dedicated bottom navigation and responsive safe-area sty
   assert.match(styles, /env\(safe-area-inset-bottom\)/);
   assert.match(styles, /\.desktop-only\{display:none/);
 });
+
+test('every normal Emma launch sends an exact CallTask ID', () => {
+  for (const page of ['pages/Leads.tsx', 'pages/Calls.tsx', 'pages/ClientDetail.tsx']) {
+    const source = read(page);
+    assert.match(source, /callTaskId/);
+    assert.match(source, /voice-agent\/handoff/);
+  }
+});

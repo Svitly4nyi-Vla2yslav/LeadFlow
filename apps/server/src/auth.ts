@@ -117,7 +117,7 @@ export const requireVoiceAgentIntegration = (req: Request, res: Response, next: 
   const authorization = req.headers.authorization || '';
   const match = /^Bearer ([^\s]+)$/.exec(authorization);
   if (!match || !integrationTokenMatches(match[1])) {
-    return res.status(401).json({ error: 'Integration authentication required' });
+    return res.status(401).json({ error: 'integration_authentication_required' });
   }
   next();
 };
