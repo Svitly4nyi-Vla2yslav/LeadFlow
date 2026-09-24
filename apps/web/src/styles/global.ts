@@ -21,6 +21,7 @@ export const GlobalStyle = createGlobalStyle`
   .detail-grid{display:grid;gap:16px;grid-template-columns:repeat(2,minmax(0,1fr))}.detail-grid> :last-child:nth-child(odd){grid-column:1/-1}
   .field-grid{display:grid;gap:12px;grid-template-columns:repeat(2,minmax(0,1fr))}.span-2{grid-column:1/-1}
   .timeline{display:grid;gap:0}.timeline>div{border-left:2px solid rgba(99,102,241,.55);padding:0 0 18px 14px}.timeline small{display:block;opacity:.6;margin-top:3px}.timeline p{margin:7px 0 0;white-space:pre-wrap}
+  .call-brief{margin-top:18px;padding:16px;border:1px solid rgba(255,255,255,.12);border-radius:12px;background:rgba(255,255,255,.035)}.call-brief h4{margin:0 0 12px}.call-brief dl{display:grid;grid-template-columns:minmax(120px,.35fr) 1fr;gap:8px 16px;margin:0}.call-brief dt{font-size:12px;text-transform:uppercase;letter-spacing:.04em;opacity:.6}.call-brief dd{margin:0;white-space:pre-wrap}
   .metric-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}.metric-row span{display:grid;gap:5px;padding:12px;border-radius:10px;background:rgba(255,255,255,.04)}.metric-row strong{font-size:23px}
-  @media(max-width:760px){.detail-grid,.field-grid{grid-template-columns:1fr}.detail-grid>*,.span-2{grid-column:auto}.data-table th,.data-table td{padding:10px 7px}}
+  @media(max-width:760px){.detail-grid,.field-grid{grid-template-columns:1fr}.detail-grid>*,.span-2{grid-column:auto}.data-table th,.data-table td{padding:10px 7px}.call-brief dl{grid-template-columns:1fr}.call-brief dd{margin-bottom:5px}}
 `;

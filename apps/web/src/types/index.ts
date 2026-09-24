@@ -39,3 +39,38 @@ export type Client = {
 };
 
 export type Message = { id: string; clientId: string; channel: ContactChannel; direction: 'in' | 'out'; body: string; createdAt: string };
+
+export type CallTaskStatus = 'DRAFT' | 'READY' | 'DIALING' | 'IN_PROGRESS' | 'COMPLETED' | 'FAILED' | 'CANCELLED';
+export type CallTask = {
+  id: string;
+  leadId: string;
+  status: CallTaskStatus;
+  callObjective: string;
+  offerFocus?: string;
+  operatorNote?: string;
+  scheduledAt?: string;
+  createdAt: string;
+  updatedAt: string;
+  startedAt?: string;
+  completedAt?: string;
+  attemptCount: number;
+  lastFailureReason?: string;
+  result?: { outcome?: string; summary?: string; nextAction?: string; interactionId?: string; calendarEventId?: string };
+  readinessIssues: Array<'missing_phone' | 'unusable_phone' | 'missing_call_objective' | 'lead_not_found'>;
+};
+
+export type CallBrief = {
+  leadId: string;
+  company: string;
+  contactPerson?: string;
+  phone?: string;
+  email?: string;
+  website?: string;
+  branche?: string;
+  ort?: string;
+  auditProblem?: string;
+  proposedSolution?: string;
+  callObjective: string;
+  offerFocus?: string;
+  operatorNote?: string;
+};

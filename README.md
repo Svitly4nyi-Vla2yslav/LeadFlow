@@ -27,6 +27,7 @@ The current project review and completion plan are documented in [docs/PROJECT_S
 - Evidence validation before status changes, approved lost reasons, status history, CSV export and funnel dashboard
 - Authenticated Voice Agent contract v1 receiver with durable event idempotency and CRM-owned status decisions
 - Secure client-to-Voice-Agent handoff using exact canonical lead IDs and short-lived signed tokens
+- Persistent outbound CallTasks with readiness validation, guarded lifecycle transitions and sanitized Call Briefs
 
 ## CRM standard
 
@@ -180,6 +181,27 @@ The authenticated browser sends only the currently selected `Client.id` to `POST
 The Voice Agent backend must exchange the handoff through `POST /api/integrations/voice-agent/resolve-handoff` using `Authorization: Bearer <VOICE_AGENT_INTEGRATION_TOKEN>`. LeadFlow validates the bearer token, HMAC signature, lifetime, exact lead existence and then returns only `id`, `company`, `contactPerson`, `phone`, `email`, and `crmStatus`. It never returns notes, timelines, messages, VoiceInteractions, lost history, or credentials.
 
 LeadFlow creates and owns every lead ID. Emma never generates, guesses, fuzzy-matches, or substitutes a company, email, or phone number for an ID. Phase 5C-B in the Voice Agent repository must read the `handoff` query parameter, send it only from its backend to the resolve endpoint with the server-only integration bearer token, keep the token out of logs, handle invalid/expired/not-found responses, and bind the resolved exact ID to subsequent Phase 5A interaction events.
+
+### Phase 5D-A — Call Orchestration Foundation
+
+LeadFlow is now the control plane and source of truth for outbound call preparation:
+
+```text
+LeadFlow
+  -> canonical Client
+  -> persistent CallTask
+  -> sanitized Call Brief
+  -> existing Emma handoff
+  -> future telephony and post-call writeback
+```
+
+A `CallTask` references exactly one existing `Client.id`; it does not duplicate the lead record. The current lead supplies the phone and business context, while the task stores the call objective, optional offer focus/operator note, schedule and independent call lifecycle. CRM pipeline status and CallTask status are separate domains.
+
+Tasks are created as `READY` only when the canonical lead exists, the stored phone is potentially usable and a call objective is present. Otherwise they remain `DRAFT` with explicit readiness issues. Phone values are retained exactly as entered; Phase 5D-A performs no country inference or E.164 rewriting. The state machine permits only `DRAFT -> READY`, `READY -> CANCELLED|FAILED|DIALING`, `DIALING -> IN_PROGRESS|FAILED`, and `IN_PROGRESS -> COMPLETED|FAILED`. Provider-only transitions are prepared in the domain layer but are not exposed to the owner UI in this phase.
+
+Authenticated owner endpoints are available at `POST/GET /api/call-tasks`, `GET/PATCH /api/call-tasks/:id`, `POST /api/call-tasks/:id/cancel`, and `GET /api/call-tasks/:id/brief`. The brief is generated server-side from the current lead plus task-specific fields and excludes CRM notes, timelines, messages and hidden metadata. CallTasks are included in both local atomic JSON persistence and Netlify Blob hydrate/snapshot writes.
+
+The client detail page provides an **Emma Anruf** preparation form and Call Brief preview. Once a task is ready, **Mit Emma anrufen** continues to use the existing Phase 5C browser handoff. Phase 5D-A deliberately does not add `callTaskId` to that token and does not implement Twilio, SIP, dialing or any other real telephone operation. Emma does not choose who to call; LeadFlow binds the canonical lead and owns the call lifecycle.
 
 ### Start frontend and backend together
 

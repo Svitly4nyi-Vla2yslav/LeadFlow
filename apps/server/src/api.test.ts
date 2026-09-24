@@ -1,6 +1,6 @@
 import test, { after, before } from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtempSync, rmSync } from 'node:fs';
+import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { randomUUID } from 'node:crypto';
@@ -56,6 +56,12 @@ const sendVoiceInteraction = (payload: unknown) => fetch(`${baseUrl}/api/integra
 });
 
 const createHandoff = (body: unknown, authenticated = true) => fetch(`${baseUrl}/api/voice-agent/handoff`, {
+  method: 'POST',
+  headers: { 'content-type': 'application/json', ...(authenticated ? { cookie: sessionCookie } : {}) },
+  body: JSON.stringify(body)
+});
+
+const createCallTask = (body: Record<string, unknown>, authenticated = true) => fetch(`${baseUrl}/api/call-tasks`, {
   method: 'POST',
   headers: { 'content-type': 'application/json', ...(authenticated ? { cookie: sessionCookie } : {}) },
   body: JSON.stringify(body)
@@ -152,6 +158,123 @@ test('canonical bulk import skips duplicates', async () => {
   assert.equal(response.status, 200);
   const result = await response.json() as { created: number; skipped: number };
   assert.deepEqual(result, { created: 1, skipped: 1, errors: [] });
+});
+
+test('call task endpoints require an owner session', async () => {
+  const lead = await createLead('Call Task Auth GmbH', 'NEW', { phone: '+49 511 100001' });
+  assert.equal((await createCallTask({ leadId: lead.id, callObjective: 'Termin vereinbaren' }, false)).status, 401);
+  assert.equal((await fetch(`${baseUrl}/api/call-tasks?leadId=${lead.id}`)).status, 401);
+});
+
+test('call tasks remain DRAFT with explicit missing phone or objective issues', async () => {
+  const withoutPhone = await createLead('Call Draft No Phone GmbH');
+  const phoneResponse = await createCallTask({ leadId: withoutPhone.id, callObjective: 'Bedarf prüfen' });
+  assert.equal(phoneResponse.status, 201);
+  const phoneTask = await phoneResponse.json() as { status: string; readinessIssues: string[] };
+  assert.equal(phoneTask.status, 'DRAFT');
+  assert.deepEqual(phoneTask.readinessIssues, ['missing_phone']);
+
+  const withoutObjective = await createLead('Call Draft No Objective GmbH', 'NEW', { phone: '+49 511 100002' });
+  const objectiveResponse = await createCallTask({ leadId: withoutObjective.id, callObjective: '' });
+  const objectiveTask = await objectiveResponse.json() as { status: string; readinessIssues: string[] };
+  assert.equal(objectiveTask.status, 'DRAFT');
+  assert.deepEqual(objectiveTask.readinessIssues, ['missing_call_objective']);
+
+  const unusablePhone = await createLead('Call Draft Bad Phone GmbH', 'NEW', { phone: 'call the office' });
+  const unusableResponse = await createCallTask({ leadId: unusablePhone.id, callObjective: 'Bedarf prüfen' });
+  const unusableTask = await unusableResponse.json() as { status: string; readinessIssues: string[] };
+  assert.equal(unusableTask.status, 'DRAFT');
+  assert.deepEqual(unusableTask.readinessIssues, ['unusable_phone']);
+});
+
+test('a call task becomes READY only for an exact canonical lead with usable facts', async () => {
+  const lead = await createLead('Ready Call GmbH', 'NEW', { phone: '+49 (511) 100-003' });
+  const response = await createCallTask({ leadId: lead.id, callObjective: 'Webseitenbedarf qualifizieren' });
+  assert.equal(response.status, 201);
+  const task = await response.json() as { id: string; leadId: string; status: string; readinessIssues: string[]; attemptCount: number };
+  assert.equal(task.leadId, lead.id);
+  assert.equal(task.status, 'READY');
+  assert.deepEqual(task.readinessIssues, []);
+  assert.equal(task.attemptCount, 0);
+
+  const unknown = await createCallTask({ leadId: randomUUID(), callObjective: 'Nicht anlegen' });
+  assert.equal(unknown.status, 404);
+  const fuzzy = await createCallTask({ leadId: 'Ready Call GmbH', callObjective: 'Nicht fuzzy suchen' });
+  assert.equal(fuzzy.status, 404);
+});
+
+test('Call Brief uses current lead facts and excludes unrelated private CRM data', async () => {
+  const lead = await createLead('Brief Context GmbH', 'NEW', {
+    phone: '+49 511 100004', email: 'brief@example.test', website: 'https://brief.example.test', branche: 'Friseur', ort: 'Hannover',
+    contactPerson: 'Mara Beispiel', auditProblem: 'Mobile Navigation ist schwer nutzbar.', proposedSolution: 'Responsive Relaunch.',
+    notes: 'Private CRM note', lostReason: undefined
+  });
+  const created = await (await createCallTask({
+    leadId: lead.id, callObjective: 'Beratung anbieten', offerFocus: 'Website-Relaunch', operatorNote: 'Nach Entscheiderin fragen'
+  })).json() as { id: string };
+  const response = await fetch(`${baseUrl}/api/call-tasks/${created.id}/brief`, withSession());
+  assert.equal(response.status, 200);
+  const brief = await response.json() as Record<string, unknown>;
+  assert.equal(brief.company, 'Brief Context GmbH');
+  assert.equal(brief.auditProblem, 'Mobile Navigation ist schwer nutzbar.');
+  assert.equal(brief.callObjective, 'Beratung anbieten');
+  for (const forbidden of ['notes', 'statusHistory', 'messages', 'crmStatus', 'createdAt', 'updatedAt', 'result', 'token', 'password']) {
+    assert.equal(Object.prototype.hasOwnProperty.call(brief, forbidden), false);
+  }
+});
+
+test('DRAFT transitions to READY after requirements are fixed without rewriting the phone', async () => {
+  const phone = '+49 511 / 100 005';
+  const lead = await createLead('Draft Promotion GmbH');
+  const task = await (await createCallTask({ leadId: lead.id, callObjective: 'Erstgespräch führen' })).json() as { id: string; status: string };
+  assert.equal(task.status, 'DRAFT');
+  const leadUpdate = await fetch(`${baseUrl}/api/clients/${lead.id}`, withSession({
+    method: 'PATCH', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ phone })
+  }));
+  assert.equal(leadUpdate.status, 200);
+  const promoted = await fetch(`${baseUrl}/api/call-tasks/${task.id}`, withSession({
+    method: 'PATCH', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ operatorNote: 'Telefon ergänzt' })
+  }));
+  assert.equal(promoted.status, 200);
+  assert.equal((await promoted.json() as { status: string }).status, 'READY');
+  const storedLead = (await import('./db/memory')).db.clients.find(item => item.id === lead.id);
+  assert.equal(storedLead?.phone, phone);
+});
+
+test('call task status cannot be patched arbitrarily and READY can transition to CANCELLED once', async () => {
+  const lead = await createLead('Cancel Call GmbH', 'NEW', { phone: '+49 511 100006' });
+  const task = await (await createCallTask({ leadId: lead.id, callObjective: 'Anrufen' })).json() as { id: string };
+  const invalid = await fetch(`${baseUrl}/api/call-tasks/${task.id}`, withSession({
+    method: 'PATCH', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ status: 'COMPLETED' })
+  }));
+  assert.equal(invalid.status, 400);
+
+  const cancelled = await fetch(`${baseUrl}/api/call-tasks/${task.id}/cancel`, withSession({ method: 'POST' }));
+  assert.equal(cancelled.status, 200);
+  assert.equal((await cancelled.json() as { status: string }).status, 'CANCELLED');
+  const reopen = await fetch(`${baseUrl}/api/call-tasks/${task.id}`, withSession({
+    method: 'PATCH', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ callObjective: 'Wieder öffnen' })
+  }));
+  assert.equal(reopen.status, 409);
+  assert.equal((await fetch(`${baseUrl}/api/call-tasks/${task.id}/cancel`, withSession({ method: 'POST' }))).status, 409);
+});
+
+test('call tasks persist locally and participate in Netlify hydrate, snapshot and mutation detection', async () => {
+  const lead = await createLead('Persistence Call GmbH', 'NEW', { phone: '+49 511 100007' });
+  const task = await (await createCallTask({ leadId: lead.id, callObjective: 'Persistenz prüfen' })).json() as { id: string };
+  const stored = JSON.parse(readFileSync(process.env.LEADFLOW_DATA_FILE!, 'utf8')) as { callTasks?: Array<{ id: string }> };
+  assert.equal(stored.callTasks?.some(item => item.id === task.id), true);
+
+  const { hydrateDatabase, isDatabaseMutation, snapshotDatabase } = await import('./databaseSnapshot');
+  const { db } = await import('./db/memory');
+  const snapshot = snapshotDatabase(db);
+  assert.equal(snapshot.callTasks?.some(item => item.id === task.id), true);
+  const isolated: typeof db = { clients: [], messages: [], voiceInteractions: [], callTasks: [] };
+  hydrateDatabase(snapshot, isolated);
+  assert.equal(isolated.callTasks.some(item => item.id === task.id), true);
+  assert.equal(isDatabaseMutation({ httpMethod: 'POST', path: '/api/call-tasks' }), true);
+  assert.equal(isDatabaseMutation({ httpMethod: 'POST', path: `/api/call-tasks/${task.id}/cancel` }), true);
+  assert.equal(isDatabaseMutation({ httpMethod: 'GET', path: '/api/call-tasks' }), false);
 });
 
 test('handoff creation requires a logged-in owner session', async () => {

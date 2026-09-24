@@ -9,6 +9,7 @@ import exportCsv from './routes/export';
 import dashboard from './routes/dashboard';
 import voiceAgent from './routes/voiceAgent';
 import voiceAgentHandoff from './routes/voiceAgentHandoff';
+import callTasks from './routes/callTasks';
 import { authRouter, requireAuth, requireVoiceAgentIntegration } from './auth';
 
 const app = express();
@@ -21,6 +22,7 @@ app.use('/api/auth', authRouter);
 app.use('/api/integrations/voice-agent', requireVoiceAgentIntegration, voiceAgent);
 app.use('/api', requireAuth);
 app.use('/api/voice-agent', voiceAgentHandoff);
+app.use('/api/call-tasks', callTasks);
 app.use('/api/clients', clients);
 app.use('/api/messages', messages);
 app.use('/api/places', places);

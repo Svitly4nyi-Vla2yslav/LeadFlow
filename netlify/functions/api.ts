@@ -1,27 +1,19 @@
 import { connectLambda, getStore, setEnvironmentContext } from '@netlify/blobs';
 import serverless from 'serverless-http';
 import app from '../../apps/server/src/app';
-import { db, type Client, type Message, type VoiceInteraction } from '../../apps/server/src/db/memory';
+import { db } from '../../apps/server/src/db/memory';
+import { hydrateDatabase, isDatabaseMutation, snapshotDatabase, type StoredDatabase } from '../../apps/server/src/databaseSnapshot';
 
-export type StoredDatabase = { clients: Client[]; messages: Message[]; voiceInteractions?: VoiceInteraction[] };
+export type { StoredDatabase } from '../../apps/server/src/databaseSnapshot';
 type FunctionEvent = { blobs?: string; headers?: Record<string, string>; httpMethod?: string; path?: string; rawUrl?: string };
 type FunctionResponse = { statusCode: number; headers?: Record<string, string | number | boolean>; body?: string };
 
 const DATABASE_KEY = 'database';
 const expressHandler = serverless(app);
 
-export const hydrateDatabase = (stored: StoredDatabase | null) => {
-  db.clients.splice(0, db.clients.length, ...(Array.isArray(stored?.clients) ? stored.clients : []));
-  db.messages.splice(0, db.messages.length, ...(Array.isArray(stored?.messages) ? stored.messages : []));
-  db.voiceInteractions.splice(0, db.voiceInteractions.length, ...(Array.isArray(stored?.voiceInteractions) ? stored.voiceInteractions : []));
-};
+export { hydrateDatabase } from '../../apps/server/src/databaseSnapshot';
 
-export const isDatabaseMutation = (event: FunctionEvent) => {
-  const method = (event.httpMethod || 'GET').toUpperCase();
-  const path = event.path || (event.rawUrl ? new URL(event.rawUrl).pathname : '');
-  return !['GET', 'HEAD', 'OPTIONS'].includes(method)
-    && /\/api\/(clients|messages|integrations\/voice-agent\/interactions)(\/|$)/.test(path);
-};
+export { isDatabaseMutation } from '../../apps/server/src/databaseSnapshot';
 
 const connectStrongBlobContext = (event: FunctionEvent) => {
   connectLambda(event as never);
@@ -40,7 +32,7 @@ export const handler = async (event: FunctionEvent, context: unknown): Promise<F
   const response = await expressHandler(event as never, context as never) as FunctionResponse;
   if (!isDatabaseMutation(event) || response.statusCode >= 500) return response;
 
-  const snapshot: StoredDatabase = { clients: db.clients, messages: db.messages, voiceInteractions: db.voiceInteractions };
+  const snapshot: StoredDatabase = snapshotDatabase(db);
   const saved = entry
     ? await store.setJSON(DATABASE_KEY, snapshot, { onlyIfMatch: entry.etag })
     : await store.setJSON(DATABASE_KEY, snapshot, { onlyIfNew: true });

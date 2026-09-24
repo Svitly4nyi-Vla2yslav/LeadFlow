@@ -78,9 +78,10 @@ test('strict contract rejects nested extras, malformed dates and incomplete conf
 
 test('Netlify persistence recognizes integration writes and includes voiceInteractions', () => {
   const source = readFileSync(new URL('../../../netlify/functions/api.ts', import.meta.url), 'utf8');
-  assert.match(source, /integrations\\\/voice-agent\\\/interactions/);
-  assert.match(source, /db\.voiceInteractions\.splice/);
-  assert.match(source, /voiceInteractions: db\.voiceInteractions/);
+  const snapshotSource = readFileSync(new URL('./databaseSnapshot.ts', import.meta.url), 'utf8');
+  assert.match(snapshotSource, /integrations\\\/voice-agent\\\/interactions/);
+  assert.match(snapshotSource, /target\.voiceInteractions\.splice/);
+  assert.match(snapshotSource, /voiceInteractions: source\.voiceInteractions/);
   assert.match(source, /if \(!isDatabaseMutation\(event\) \|\| response\.statusCode >= 500\) return response/);
   assert.match(source, /store\.setJSON\(DATABASE_KEY, snapshot/);
   assert.match(source, /onlyIfMatch: entry\.etag/);

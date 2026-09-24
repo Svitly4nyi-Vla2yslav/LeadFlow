@@ -97,10 +97,39 @@ export type VoiceInteraction = {
   createdAt: string;
 };
 
-export type Database = { clients: Client[]; messages: Message[]; voiceInteractions: VoiceInteraction[] };
+export const CALL_TASK_STATUSES = [
+  'DRAFT', 'READY', 'DIALING', 'IN_PROGRESS', 'COMPLETED', 'FAILED', 'CANCELLED'
+] as const;
+
+export type CallTaskStatus = typeof CALL_TASK_STATUSES[number];
+
+export type CallTask = {
+  id: string;
+  leadId: string;
+  status: CallTaskStatus;
+  callObjective: string;
+  offerFocus?: string;
+  operatorNote?: string;
+  scheduledAt?: string;
+  createdAt: string;
+  updatedAt: string;
+  startedAt?: string;
+  completedAt?: string;
+  attemptCount: number;
+  lastFailureReason?: string;
+  result?: {
+    outcome?: string;
+    summary?: string;
+    nextAction?: string;
+    interactionId?: string;
+    calendarEventId?: string;
+  };
+};
+
+export type Database = { clients: Client[]; messages: Message[]; voiceInteractions: VoiceInteraction[]; callTasks: CallTask[] };
 
 const dataFile = resolve(process.env.LEADFLOW_DATA_FILE || 'data/leadflow.json');
-const emptyDatabase = (): Database => ({ clients: [], messages: [], voiceInteractions: [] });
+const emptyDatabase = (): Database => ({ clients: [], messages: [], voiceInteractions: [], callTasks: [] });
 
 const loadDatabase = (): Database => {
   if (!existsSync(dataFile)) return emptyDatabase();
@@ -115,7 +144,8 @@ const loadDatabase = (): Database => {
         updatedAt: client.updatedAt || client.createdAt || now
       })) as Client[] : [],
       messages: Array.isArray(parsed.messages) ? parsed.messages : [],
-      voiceInteractions: Array.isArray(parsed.voiceInteractions) ? parsed.voiceInteractions : []
+      voiceInteractions: Array.isArray(parsed.voiceInteractions) ? parsed.voiceInteractions : [],
+      callTasks: Array.isArray(parsed.callTasks) ? parsed.callTasks : []
     };
   } catch (error) {
     console.error(`Could not read LeadFlow data file ${dataFile}:`, error);
@@ -181,12 +211,27 @@ export const addVoiceInteraction = (data: Omit<VoiceInteraction, 'id' | 'created
   return item;
 };
 
+export const addCallTask = (data: Omit<CallTask, 'id' | 'createdAt' | 'updatedAt'>, persist = true) => {
+  const now = new Date().toISOString();
+  const item: CallTask = { id: randomUUID(), createdAt: now, updatedAt: now, ...data };
+  db.callTasks.push(item);
+  if (persist) persistDb();
+  return item;
+};
+
+export const updateCallTask = (item: CallTask, next: CallTask, persist = true) => {
+  Object.assign(item, next, { updatedAt: new Date().toISOString() });
+  if (persist) persistDb();
+  return item;
+};
+
 export const removeClient = (id: string) => {
   const index = db.clients.findIndex(client => client.id === id);
   if (index < 0) return false;
   db.clients.splice(index, 1);
   db.messages = db.messages.filter(message => message.clientId !== id);
   db.voiceInteractions = db.voiceInteractions.filter(interaction => interaction.leadId !== id);
+  db.callTasks = db.callTasks.filter(task => task.leadId !== id);
   persistDb();
   return true;
 };
