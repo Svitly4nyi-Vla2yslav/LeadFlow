@@ -20,6 +20,7 @@ export default function Sidebar(){
         <NavLink to="/clients">{t('nav.clients')}</NavLink>
         <NavLink to="/leads">{t('nav.leads')}</NavLink>
         <NavLink to="/calls">{t('nav.calls')}</NavLink>
+        <NavLink to="/data">{t('nav.data')}</NavLink>
         <NavLink to="/maps">{t('nav.maps')}</NavLink>
         <NavLink to="/email">{t('nav.email')}</NavLink>
         <NavLink to="/messages">{t('nav.messages')}</NavLink>

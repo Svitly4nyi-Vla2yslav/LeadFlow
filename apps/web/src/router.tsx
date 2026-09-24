@@ -7,6 +7,7 @@ import Maps from './pages/Maps';
 import Settings from './pages/Settings';
 import Leads from './pages/Leads';
 import Calls from './pages/Calls';
+import DataManagement from './pages/DataManagement';
 
 export const routes = [
   { path: '/', element: <Dashboard/> },
@@ -14,6 +15,7 @@ export const routes = [
   { path: '/clients/:id', element: <ClientDetail/> },
   { path: '/leads', element: <Leads/> },
   { path: '/calls', element: <Calls/> },
+  { path: '/data', element: <DataManagement/> },
   { path: '/messages', element: <Messages/> },
   { path: '/email', element: <Email/> },
   { path: '/maps', element: <Maps/> },

@@ -9,33 +9,14 @@ import { CallTask, Client, CRM_STATUSES, CrmStatus } from '../types';
 const statusColor: Record<CrmStatus, string> = {
   NEW: '#94a3b8', AUDITED: '#38bdf8', CONTACTED: '#818cf8', REPLY: '#a78bfa', CALL: '#f59e0b', OFFER: '#fb923c', 'FOLLOW-UP': '#facc15', WON: '#22c55e', LOST: '#ef4444'
 };
-const apiUrl = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? '' : 'http://localhost:3001');
 const emptyDraft = { company: '', phone: '', contactPerson: '', website: '', branche: '', ort: '', email: '', source: '', preferredLanguage: '', decisionMaker: '', currentSituation: '', painPoints: '', auditProblem: '', proposedSolution: '', emmaFocus: '', offerFocus: '', doNotMention: '', notes: '', callObjective: '' };
-
-const parseCsv = (text: string) => {
-  const rows: string[][] = []; let row: string[] = [], cell = '', quoted = false;
-  for (let index = 0; index < text.length; index++) {
-    const char = text[index];
-    if (char === '"' && quoted && text[index + 1] === '"') { cell += '"'; index++; }
-    else if (char === '"') quoted = !quoted;
-    else if (char === ',' && !quoted) { row.push(cell.trim()); cell = ''; }
-    else if ((char === '\n' || char === '\r') && !quoted) { if (char === '\r' && text[index + 1] === '\n') index++; row.push(cell.trim()); cell = ''; if (row.some(Boolean)) rows.push(row); row = []; }
-    else cell += char;
-  }
-  if (quoted) throw new Error('invalid_csv');
-  row.push(cell.trim()); if (row.some(Boolean)) rows.push(row);
-  const [headers = [], ...values] = rows;
-  if (!headers.length || headers.some(header => !header) || values.some(columns => columns.length !== headers.length)) throw new Error('invalid_csv');
-  return values.map(columns => Object.fromEntries(headers.map((header, index) => [header, columns[index] || ''])));
-};
 
 export default function Leads() {
   const { t } = useTranslation(); const navigate = useNavigate();
   const [items, setItems] = useState<Client[]>([]); const [tasks, setTasks] = useState<CallTask[]>([]); const [draft, setDraft] = useState(emptyDraft);
   const [query, setQuery] = useState(''); const [status, setStatus] = useState(''); const [overdueOnly, setOverdueOnly] = useState(false);
   const [error, setError] = useState(''); const [notice, setNotice] = useState(''); const [loading, setLoading] = useState(true); const [saving, setSaving] = useState(false);
-  const [importRows, setImportRows] = useState<Record<string, unknown>[]>([]); const [importColumns, setImportColumns] = useState<string[]>([]);
-  const [importResult, setImportResult] = useState<{ created: number; skipped: number; errors: Array<{ row: number; error: string }> } | null>(null);
+  const [launchingLeadId, setLaunchingLeadId] = useState('');
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -63,30 +44,35 @@ export default function Leads() {
     } catch (exception: any) { setError(exception.response?.data?.error || t('errors.leadSave')); } finally { setSaving(false); }
   };
 
-  const chooseImportFile = async (file?: File) => {
-    if (!file) return;
-    try { const text = await file.text(); let rows: Record<string, unknown>[]; if (file.name.toLowerCase().endsWith('.json')) { const parsed = JSON.parse(text); rows = Array.isArray(parsed) ? parsed : parsed.leads; if (!Array.isArray(rows)) throw new Error(t('import.invalidJson')); } else rows = parseCsv(text); setImportRows(rows); setImportColumns([...new Set(rows.flatMap(row => Object.keys(row)))]); setImportResult(null); setError(''); }
-    catch (exception: any) { setError(exception.message === 'invalid_csv' ? t('import.invalidCsv') : exception.message || t('import.readError')); setImportRows([]); }
+  const callWithEmma = async (leadId: string) => {
+    if (launchingLeadId) return;
+    setLaunchingLeadId(leadId); setError('');
+    try {
+      const response = await api.post('/api/voice-agent/handoff', { leadId });
+      const destination = new URL(response.data.voiceAgentAppUrl);
+      destination.searchParams.set('handoff', response.data.handoffToken);
+      const opened = window.open(destination.toString(), '_blank');
+      if (!opened) throw new Error('popup_blocked');
+      opened.opener = null;
+    } catch (exception: any) { setError(exception.message === 'popup_blocked' ? t('errors.popupBlocked') : t('errors.emmaOpen')); }
+    finally { setLaunchingLeadId(''); }
   };
-  const runImport = async () => { try { const response = await api.post('/api/clients/import', { leads: importRows }); setImportResult(response.data); await load(); } catch (exception: any) { setError(exception.response?.data?.error || t('import.failed')); } };
 
   return <div className="page-stack">
     <Card id="create-lead"><h1>{t('lead.title')}</h1><p className="muted">{t('lead.subtitle')}</p><form onSubmit={add} className="progressive-form">
       <details open><summary>{t('lead.stepBasic')}</summary><div className="field-grid section-body"><label>{t('lead.company')} *<input value={draft.company} onChange={e => set('company', e.target.value)} required /></label><label>{t('lead.phone')}<input type="tel" value={draft.phone} onChange={e => set('phone', e.target.value)} /></label><label>{t('lead.contactPerson')}<input value={draft.contactPerson} onChange={e => set('contactPerson', e.target.value)} /></label><label>{t('lead.website')}<input type="url" value={draft.website} onChange={e => set('website', e.target.value)} /></label></div></details>
-      <details><summary>{t('lead.stepContext')}</summary><div className="field-grid section-body"><label>{t('lead.industry')}<input value={draft.branche} onChange={e => set('branche', e.target.value)} /></label><label>{t('lead.location')}<input value={draft.ort} onChange={e => set('ort', e.target.value)} /></label><label>{t('lead.email')}<input type="email" value={draft.email} onChange={e => set('email', e.target.value)} /></label><label>{t('lead.source')}<input value={draft.source} onChange={e => set('source', e.target.value)} /></label><label>{t('lead.preferredLanguage')}<select value={draft.preferredLanguage} onChange={e => set('preferredLanguage', e.target.value)}><option value="">—</option>{['de','uk','ru','en'].map(value => <option key={value} value={value}>{t(`language.${value}`)}</option>)}</select></label><label>{t('lead.decisionMaker')}<input value={draft.decisionMaker} onChange={e => set('decisionMaker', e.target.value)} /></label></div></details>
-      <details><summary>{t('lead.stepEmma')}</summary><div className="field-grid section-body"><label className="span-2">{t('lead.currentSituation')}<textarea value={draft.currentSituation} onChange={e => set('currentSituation', e.target.value)} /></label><label>{t('lead.painPoints')}<textarea value={draft.painPoints} onChange={e => set('painPoints', e.target.value)} /></label><label>{t('lead.auditProblem')}<textarea value={draft.auditProblem} onChange={e => set('auditProblem', e.target.value)} /></label><label>{t('lead.proposedSolution')}<textarea value={draft.proposedSolution} onChange={e => set('proposedSolution', e.target.value)} /></label><label>{t('lead.offerFocus')}<textarea value={draft.offerFocus} onChange={e => set('offerFocus', e.target.value)} /></label><label>{t('lead.emmaFocus')}<textarea value={draft.emmaFocus} onChange={e => set('emmaFocus', e.target.value)} /></label><label>{t('lead.doNotMention')}<textarea value={draft.doNotMention} onChange={e => set('doNotMention', e.target.value)} /></label><label>{t('call.objective')}<textarea value={draft.callObjective} onChange={e => set('callObjective', e.target.value)} /></label><label className="span-2">{t('lead.notes')}<textarea value={draft.notes} onChange={e => set('notes', e.target.value)} /></label></div></details>
+      <details><summary>{t('lead.stepContext')}</summary><div className="field-grid section-body"><label>{t('lead.industry')}<input value={draft.branche} onChange={e => set('branche', e.target.value)} /></label><label>{t('lead.location')}<input value={draft.ort} onChange={e => set('ort', e.target.value)} /></label><label>{t('lead.email')}<input type="email" value={draft.email} onChange={e => set('email', e.target.value)} /></label><label>{t('lead.source')}<input value={draft.source} onChange={e => set('source', e.target.value)} /></label><label>{t('lead.preferredLanguage')}<select value={draft.preferredLanguage} onChange={e => set('preferredLanguage', e.target.value)}><option value="">—</option>{['de','uk','ru','en'].map(value => <option key={value} value={value}>{t(`language.${value}`)}</option>)}</select></label><label>{t('lead.decisionMaker')}<input value={draft.decisionMaker} onChange={e => set('decisionMaker', e.target.value)} /></label><label className="span-2">{t('lead.currentSituation')}<textarea value={draft.currentSituation} onChange={e => set('currentSituation', e.target.value)} /></label><label>{t('lead.painPoints')}<textarea value={draft.painPoints} onChange={e => set('painPoints', e.target.value)} /></label><label>{t('lead.auditProblem')}<textarea value={draft.auditProblem} onChange={e => set('auditProblem', e.target.value)} /></label><label>{t('lead.proposedSolution')}<textarea value={draft.proposedSolution} onChange={e => set('proposedSolution', e.target.value)} /></label></div></details>
+      <details><summary>{t('lead.stepEmma')}</summary><div className="field-grid section-body"><label>{t('lead.offerFocus')}<textarea value={draft.offerFocus} onChange={e => set('offerFocus', e.target.value)} /></label><label>{t('lead.emmaFocus')}<textarea value={draft.emmaFocus} onChange={e => set('emmaFocus', e.target.value)} /></label><label>{t('lead.doNotMention')}<textarea value={draft.doNotMention} onChange={e => set('doNotMention', e.target.value)} /></label><label>{t('call.objective')}<textarea value={draft.callObjective} placeholder={t('call.objectivePlaceholder')} onChange={e => set('callObjective', e.target.value)} /></label><label className="span-2">{t('lead.notes')}<textarea value={draft.notes} onChange={e => set('notes', e.target.value)} /></label></div></details>
       <div className="form-actions"><Button name="action" value="save" disabled={saving}>{t('actions.saveLead')}</Button><Button name="action" value="prepare" disabled={saving}>{t('actions.savePrepare')}</Button></div>
     </form>{(error || notice) && <p role={error ? 'alert' : 'status'} className={error ? 'error-text' : 'success-text'}>{error || notice}</p>}</Card>
 
-    <Card className="data-shortcut"><a className="action-link" href="#create-lead">{t('data.addLead')}</a></Card>
-
-    <Card><details><summary><strong>{t('data.title')}</strong></summary><div className="section-body"><p className="muted">{t('import.instructions')}</p><label>{t('import.file')}<input type="file" accept=".json,.csv,application/json,text/csv" onChange={event => chooseImportFile(event.target.files?.[0])} /></label>{!!importColumns.length && <><p><strong>{t('import.detectedColumns')}:</strong> {importColumns.join(', ')}</p><div className="import-preview">{importRows.slice(0, 5).map((row, index) => <pre key={index}>{JSON.stringify(row, null, 2)}</pre>)}</div><Button type="button" onClick={runImport}>{t('import.confirm', { count: importRows.length })}</Button></>}{importResult && <p role="status">{t('import.result', { created: importResult.created, skipped: importResult.skipped, errors: importResult.errors.length })}</p>}<Button type="button" className="secondary-button" onClick={() => { window.location.href = `${apiUrl}/api/export/clients.csv`; }}>{t('data.exportCsv')}</Button></div></details></Card>
+    <Card className="data-shortcut"><Link className="action-link" to="/data">{t('data.open')}</Link></Card>
 
     <Card><div className="toolbar"><input value={query} onChange={e => setQuery(e.target.value)} placeholder={t('lead.searchPlaceholder')} aria-label={t('lead.search')} /><select value={status} onChange={e => setStatus(e.target.value)} aria-label={t('lead.filterStatus')}><option value="">{t('status.all')}</option>{CRM_STATUSES.map(value => <option key={value} value={value}>{t(`status.${value}`)}</option>)}</select><label className="checkbox"><input type="checkbox" checked={overdueOnly} onChange={e => setOverdueOnly(e.target.checked)} /> {t('lead.overdueOnly')}</label></div></Card>
 
     <Card className="lead-list-card"><p className="muted list-count">{loading ? t('common.loading') : t('lead.count', { count: items.length })}</p>
       <table className="data-table desktop-only"><thead><tr><th>{t('lead.lead')}</th><th>{t('lead.industryLocation')}</th><th>{t('lead.contact')}</th><th>{t('lead.status')}</th><th>{t('lead.auditProblem')}</th><th>{t('lead.nextAction')}</th></tr></thead><tbody>{!loading && !items.length && <tr><td colSpan={6}>{t('lead.empty')}</td></tr>}{items.map(lead => <tr key={lead.id}><td><Link to={`/clients/${lead.id}`}><strong>{lead.company}</strong></Link><br/><small>{lead.website || t('common.notVerified')}</small></td><td>{lead.branche || '—'}<br/><small>{lead.ort || '—'}</small></td><td>{lead.contactPerson || '—'}<br/><small>{lead.email || lead.phone || '—'}</small></td><td><span className="status-pill" style={{color:statusColor[lead.crmStatus],borderColor:statusColor[lead.crmStatus]}}>{t(`status.${lead.crmStatus}`)}</span></td><td>{lead.auditProblem || '—'}</td><td>{lead.nextFollowUpDate && <><strong>{lead.nextFollowUpDate}</strong><br/></>}<small>{lead.notes || '—'}</small></td></tr>)}</tbody></table>
-      <div className="mobile-lead-list mobile-only">{!loading && !items.length && <p>{t('lead.empty')}</p>}{items.map(lead => { const task = taskByLead[lead.id]; return <article className="lead-card" key={lead.id}><div className="lead-card-head"><div><h3>{lead.company}</h3><p>{[lead.branche,lead.ort].filter(Boolean).join(' · ') || '—'}</p></div><span className="status-pill" style={{color:statusColor[lead.crmStatus],borderColor:statusColor[lead.crmStatus]}}>{t(`status.${lead.crmStatus}`)}</span></div>{lead.phone && <a className="phone-link" href={`tel:${lead.phone}`}>{lead.phone}</a>}{lead.nextFollowUpDate && <p><strong>{t('lead.followUp')}:</strong> {lead.nextFollowUpDate}</p>}{lead.auditProblem && <p className="line-clamp">{lead.auditProblem}</p>}<p><strong>{t('call.readiness')}:</strong> {task ? t(`callStatus.${task.status}`) : t('call.notPrepared')}</p><div className="card-actions"><Link className="action-link" to={`/clients/${lead.id}`}>{t('actions.open')}</Link><Link className="action-link primary" to={`/clients/${lead.id}#emma`}>{task?.status === 'READY' ? t('call.callEmma') : t('call.prepare')}</Link></div></article>; })}</div>
+      <div className="mobile-lead-list mobile-only">{!loading && !items.length && <p>{t('lead.empty')}</p>}{items.map(lead => { const task = taskByLead[lead.id]; return <article className="lead-card" key={lead.id}><div className="lead-card-head"><div><h3>{lead.company}</h3><p>{[lead.branche,lead.ort].filter(Boolean).join(' · ') || '—'}</p></div><span className="status-pill" style={{color:statusColor[lead.crmStatus],borderColor:statusColor[lead.crmStatus]}}>{t(`status.${lead.crmStatus}`)}</span></div>{lead.phone && <a className="phone-link" href={`tel:${lead.phone}`}>{lead.phone}</a>}{lead.nextFollowUpDate && <p><strong>{t('lead.followUp')}:</strong> {lead.nextFollowUpDate}</p>}{lead.auditProblem && <p className="line-clamp">{lead.auditProblem}</p>}<p><strong>{t('call.readiness')}:</strong> {task ? t(`callStatus.${task.status}`) : t('call.notPrepared')}</p><div className="card-actions"><Link className="action-link" to={`/clients/${lead.id}`}>{t('actions.open')}</Link>{task?.status === 'READY' ? <button className="action-link primary card-action-button" type="button" disabled={!!launchingLeadId} onClick={() => callWithEmma(lead.id)}>{launchingLeadId === lead.id ? t('call.opening') : t('call.callEmma')}</button> : <Link className="action-link primary" to={`/clients/${lead.id}#emma`}>{t('call.prepare')}</Link>}</div></article>; })}</div>
     </Card>
   </div>;
 }

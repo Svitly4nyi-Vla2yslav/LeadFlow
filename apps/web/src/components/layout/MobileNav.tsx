@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 const Nav = styled.nav`
   display:none;
   @media(max-width:900px){
-    position:sticky;z-index:30;left:0;right:0;bottom:0;display:grid;grid-template-columns:repeat(5,1fr);
+    position:fixed;z-index:30;left:0;right:0;bottom:0;display:grid;grid-template-columns:repeat(5,1fr);
     padding:7px 6px calc(7px + env(safe-area-inset-bottom));background:rgba(8,10,14,.96);
     border-top:1px solid ${({ theme }) => theme.colors.border};backdrop-filter:blur(18px);
     a{min-width:0;min-height:48px;display:grid;place-items:center;padding:6px 2px;border-radius:10px;color:rgba(255,255,255,.68);font-size:11px;text-align:center}
