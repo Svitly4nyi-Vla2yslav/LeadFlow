@@ -127,7 +127,7 @@ VOICE_AGENT_APP_URL=http://localhost:3002
 SESSION_HOURS=12
 ```
 
-`ADMIN_PASSWORD` must contain at least 12 characters or the private entrance remains disabled. `SESSION_SECRET` signs portable sessions and purpose-scoped Voice Agent handoffs across serverless instances and should be a separate random secret in production. `ALLOW_DEV_AUTH_BYPASS` is parsed by the server and defaults to `false`. `VOICE_AGENT_INTEGRATION_TOKEN` is a separate server-only bearer token of at least 32 characters; never expose it to the frontend or reuse the admin password/session secret. `VOICE_AGENT_APP_URL` is the non-secret Voice Agent application origin opened by the CRM; it defaults to `http://localhost:3002` for local development and must be set to the deployed HTTPS origin in production. `PORT` and `ALLOWED_ORIGIN` have local defaults. `GOOGLE_API_KEY` is only needed for Google Places. `LEADFLOW_DATA_FILE` controls the local Express JSON store; Netlify production hydrates and persists the CRM document through Netlify Blobs instead, so the local file path is not the durable production datastore. Never commit real passwords or API keys.
+`ADMIN_PASSWORD` must contain at least 12 characters or the private entrance remains disabled. `SESSION_SECRET` signs portable sessions and purpose-scoped Voice Agent handoffs across serverless instances and should be a separate random secret in production. `ALLOW_DEV_AUTH_BYPASS` is parsed by the server and defaults to `false`. `VOICE_AGENT_INTEGRATION_TOKEN` is a separate server-only bearer token of at least 32 characters; never expose it to the frontend or reuse the admin password/session secret. `VOICE_AGENT_APP_URL` is the non-secret, public Voice Agent application origin opened by the CRM; it defaults to `http://localhost:3002` only in local development and must be set to the deployed HTTPS origin in production. The public application URL and server-only integration token are different values and must never be confused. `PORT` and `ALLOWED_ORIGIN` have local defaults. `GOOGLE_API_KEY` is only needed for Google Places. `LEADFLOW_DATA_FILE` controls the local Express JSON store; Netlify production hydrates and persists the CRM document through Netlify Blobs instead, so the local file path is not the durable production datastore. Never commit real passwords or API keys.
 
 ### Passwordless local owner access
 
@@ -223,6 +223,14 @@ The Voice Agent backend resolves the token through authenticated `POST /api/inte
 
 LeadFlow chooses the lead, CallTask and objective. Emma never guesses, fuzzy-matches or substitutes either ID. Phase 5D-B1 establishes identity and context only: it does not move the task to `DIALING`, `IN_PROGRESS` or a terminal status. The legacy v1 verifier remains temporarily supported for Phase 5C tooling, but v1 stays strictly lead-only.
 
+### Phase 5D-B3 — Production Voice Agent launch hardening
+
+Local development continues to use LeadFlow at `http://localhost:5173` and may launch the Voice Agent at `http://localhost:3002` without configuring a public URL. Other explicit HTTP or HTTPS origins may also be used outside production.
+
+Production and Netlify/serverless runtimes fail closed. `VOICE_AGENT_APP_URL` must be an absolute, origin-only public `https:` URL with no path, query, fragment, username or password. Localhost names, IPv4 loopback addresses (the complete `127.0.0.0/8` range) and IPv6 loopback are rejected. Missing or invalid configuration is never replaced with localhost: `POST /api/voice-agent/handoff` returns `503` with `{ "error": "voice_agent_app_not_configured" }` and issues no handoff token or browser destination.
+
+Authenticated operators can inspect `GET /api/voice-agent/status`. It returns only `configured`, `environment`, an optional safe validated public `origin`, and an optional non-sensitive `reason`; it never returns credentials, signing material, customer data or the full environment.
+
 ### Phase 5D-UX — Mobile control plane
 
 LeadFlow is mobile-first from approximately 360 px while retaining its desktop sidebar and tables. Phones use a safe-area-aware bottom navigation for Dashboard, Leads, Calls, Messages and Settings. The Leads page renders touch-friendly cards on mobile, keeps the desktop table at larger widths, and provides progressive Basic, Context and Emma lead-creation sections.
@@ -272,7 +280,41 @@ npm run build:server
 
 Netlify serves the Vite application and routes `/api/*` to the bundled Express function. The function keeps the CRM document in the site-wide `leadflow-crm` Netlify Blobs store and uses strong API reads plus ETag-protected writes, so production no longer depends on a visitor's `localhost:3001` and concurrent updates cannot silently overwrite each other.
 
-Configure `ADMIN_PASSWORD`, `SESSION_SECRET`, `VOICE_AGENT_INTEGRATION_TOKEN`, `VOICE_AGENT_APP_URL`, `SESSION_HOURS` and `ALLOWED_ORIGIN` in Netlify environment variables before deployment. Production sessions are signed HttpOnly cookies and remain valid across function instances. `VOICE_AGENT_APP_URL` is safe to return to an authenticated browser; the integration token and signing secret remain server-only. No secret is stored in `netlify.toml`.
+Configure `ADMIN_PASSWORD`, `SESSION_SECRET`, `VOICE_AGENT_INTEGRATION_TOKEN`, `VOICE_AGENT_APP_URL`, `SESSION_HOURS` and `ALLOWED_ORIGIN` in Netlify environment variables before deployment. Production sessions are signed HttpOnly cookies and remain valid across function instances. No secret is stored in `netlify.toml`.
+
+LeadFlow Netlify requires these Voice Agent launch values:
+
+```env
+VOICE_AGENT_APP_URL=https://YOUR-VOICE-AGENT.netlify.app
+VOICE_AGENT_INTEGRATION_TOKEN=<shared-secret>
+SESSION_SECRET=<strong-secret>
+```
+
+`VOICE_AGENT_APP_URL` is the public browser origin and is safe to return after validation. `VOICE_AGENT_INTEGRATION_TOKEN` is the server-only shared bearer secret used for backend integration calls. `SESSION_SECRET` signs LeadFlow sessions and handoffs. Use separate strong values for the integration and session secrets, and never expose either one in frontend variables or source control.
+
+The separately deployed Voice Agent Netlify site must contain:
+
+```env
+LEADFLOW_BASE_URL=https://YOUR-LEADFLOW.netlify.app
+LEADFLOW_INTEGRATION_TOKEN=<same-shared-integration-secret>
+# plus the Voice Agent's existing OPENAI... and GOOGLE... variables
+```
+
+`LEADFLOW_INTEGRATION_TOKEN` must exactly match LeadFlow's `VOICE_AGENT_INTEGRATION_TOKEN`. Do not add actual secrets to Git.
+
+### Production deployment checklist
+
+1. Deploy LeadFlow.
+2. Deploy the Voice Agent.
+3. Copy the public HTTPS Voice Agent origin.
+4. Set LeadFlow `VOICE_AGENT_APP_URL` to that origin.
+5. Set Voice Agent `LEADFLOW_BASE_URL` to the public HTTPS LeadFlow origin.
+6. Ensure `VOICE_AGENT_INTEGRATION_TOKEN` and `LEADFLOW_INTEGRATION_TOKEN` match.
+7. Redeploy both sites after changing their environments.
+8. Create a READY CallTask in LeadFlow.
+9. Press **Emma anrufen**.
+10. Verify the browser opens the HTTPS Voice Agent origin and never localhost.
+11. Verify the Voice Agent resolves the exact task-aware lead and CallTask context.
 
 ## Verification workflow
 

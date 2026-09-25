@@ -3,6 +3,33 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import type { Client, CrmStatus, LostReason } from './db/memory';
 import { applyVoiceInteractionToLead, VoiceAgentInteractionV1Schema, type VoiceAgentInteractionV1 } from './voiceAgent';
+import { validateVoiceAgentAppUrl } from './voiceAgentHandoff';
+
+test('Voice Agent app URL policy allows development localhost and production public HTTPS', () => {
+  assert.deepEqual(validateVoiceAgentAppUrl('http://localhost:3002', false), {
+    configured: true, environment: 'development', origin: 'http://localhost:3002/'
+  });
+  assert.deepEqual(validateVoiceAgentAppUrl('https://voice-agent.example.com', true), {
+    configured: true, environment: 'production', origin: 'https://voice-agent.example.com/'
+  });
+});
+
+test('Voice Agent app URL policy fails closed for unsafe production destinations', () => {
+  for (const value of [
+    'http://localhost:3002',
+    'https://localhost:3002',
+    'https://service.localhost.',
+    'http://127.0.0.1:3002',
+    'https://127.25.1.9',
+    'https://[::1]:3002',
+    'http://voice-agent.example.com',
+    'https://user:password@voice-agent.example.com',
+    'https://voice-agent.example.com/application'
+  ]) assert.equal(validateVoiceAgentAppUrl(value, true).configured, false, value);
+  assert.deepEqual(validateVoiceAgentAppUrl('', true), {
+    configured: false, environment: 'production', reason: 'app_url_missing'
+  });
+});
 
 const lead = (crmStatus: CrmStatus, extra: Partial<Client> = {}): Client => ({
   id: `lead-${crmStatus}`,

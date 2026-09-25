@@ -56,3 +56,13 @@ test('every normal Emma launch sends an exact CallTask ID', () => {
     assert.match(source, /voice-agent\/handoff/);
   }
 });
+
+test('Emma launch configuration failures use localized operator messages', () => {
+  const launchHelper = read('voiceAgentLaunch.ts');
+  assert.match(launchHelper, /voice_agent_app_not_configured/);
+  assert.match(launchHelper, /voiceAgent\.productionNotConfigured/);
+  assert.match(launchHelper, /voiceAgent\.unavailable/);
+  for (const page of ['pages/Leads.tsx', 'pages/Calls.tsx', 'pages/ClientDetail.tsx']) {
+    assert.match(read(page), /voiceAgentLaunchError/);
+  }
+});

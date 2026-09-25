@@ -1,4 +1,5 @@
 {
+  "voiceAgent.productionNotConfigured":"Der Voice Agent ist für die Produktionsumgebung nicht konfiguriert.","voiceAgent.unavailable":"Der Voice Agent ist derzeit nicht verfügbar.","voiceAgent.openingEmma":"Emma wird geöffnet…","voiceAgent.retry":"Erneut versuchen",
   "nav.dashboard":"Übersicht","nav.clients":"Kunden","nav.leads":"Leads","nav.calls":"Anrufe","nav.data":"Daten","nav.maps":"Maps","nav.email":"E-Mail","nav.messages":"Nachrichten","nav.settings":"Einstellungen","nav.mobile":"Mobile Hauptnavigation","nav.mobileDashboard":"Start","nav.mobileLeads":"Leads","nav.mobileCalls":"Anrufe","nav.mobileMessages":"Kontakte","nav.mobileSettings":"Mehr",
   "language.select":"Sprache auswählen","language.de":"Deutsch","language.uk":"Ukrainisch","language.ru":"Russisch","language.en":"Englisch",
   "common.loading":"Wird geladen…","common.saving":"Wird gespeichert…","common.importing":"Import läuft…","common.notVerified":"nicht verifiziert","common.technicalDetails":"Technische Details","common.yes":"Ja","common.no":"Nein",

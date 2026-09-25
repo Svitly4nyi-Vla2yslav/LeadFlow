@@ -5,6 +5,7 @@ import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import { api } from '../api/client';
 import { CallTask, Client, CRM_STATUSES, CrmStatus } from '../types';
+import { voiceAgentLaunchError } from '../voiceAgentLaunch';
 
 const statusColor: Record<CrmStatus, string> = {
   NEW: '#94a3b8', AUDITED: '#38bdf8', CONTACTED: '#818cf8', REPLY: '#a78bfa', CALL: '#f59e0b', OFFER: '#fb923c', 'FOLLOW-UP': '#facc15', WON: '#22c55e', LOST: '#ef4444'
@@ -61,7 +62,7 @@ export default function Leads() {
       const opened = window.open(destination.toString(), '_blank');
       if (!opened) throw new Error('popup_blocked');
       opened.opener = null;
-    } catch (exception: any) { setError(exception.message === 'popup_blocked' ? t('errors.popupBlocked') : t('errors.emmaOpen')); }
+    } catch (exception: any) { setError(voiceAgentLaunchError(exception, t)); }
     finally { setLaunchingLeadId(''); }
   };
 
@@ -79,7 +80,7 @@ export default function Leads() {
 
     <Card className="lead-list-card"><p className="muted list-count">{loading ? t('common.loading') : t('lead.count', { count: items.length })}</p>
       <table className="data-table desktop-only"><thead><tr><th>{t('lead.lead')}</th><th>{t('lead.industryLocation')}</th><th>{t('lead.contact')}</th><th>{t('lead.status')}</th><th>{t('lead.auditProblem')}</th><th>{t('lead.nextAction')}</th></tr></thead><tbody>{!loading && !items.length && <tr><td colSpan={6}>{t('lead.empty')}</td></tr>}{items.map(lead => <tr key={lead.id}><td><Link to={`/clients/${lead.id}`}><strong>{lead.company}</strong></Link><br/><small>{lead.website || t('common.notVerified')}</small></td><td>{lead.branche || '—'}<br/><small>{lead.ort || '—'}</small></td><td>{lead.contactPerson || '—'}<br/><small>{lead.email || lead.phone || '—'}</small></td><td><span className="status-pill" style={{color:statusColor[lead.crmStatus],borderColor:statusColor[lead.crmStatus]}}>{t(`status.${lead.crmStatus}`)}</span></td><td>{lead.auditProblem || '—'}</td><td>{lead.nextFollowUpDate && <><strong>{lead.nextFollowUpDate}</strong><br/></>}<small>{lead.notes || '—'}</small></td></tr>)}</tbody></table>
-      <div className="mobile-lead-list mobile-only">{!loading && !items.length && <p>{t('lead.empty')}</p>}{items.map(lead => { const task = taskByLead[lead.id]; const canCall = task?.status === 'READY' && !task.readinessIssues.length; return <article className="lead-card" key={lead.id}><div className="lead-card-head"><div><h3>{lead.company}</h3><p>{[lead.branche,lead.ort].filter(Boolean).join(' · ') || '—'}</p></div><span className="status-pill" style={{color:statusColor[lead.crmStatus],borderColor:statusColor[lead.crmStatus]}}>{t(`status.${lead.crmStatus}`)}</span></div>{lead.phone && <a className="phone-link" href={`tel:${lead.phone}`}>{lead.phone}</a>}{lead.nextFollowUpDate && <p><strong>{t('lead.followUp')}:</strong> {lead.nextFollowUpDate}</p>}{lead.auditProblem && <p className="line-clamp">{lead.auditProblem}</p>}<p><strong>{t('call.readiness')}:</strong> {task ? t(`callStatus.${task.status}`) : t('call.notPrepared')}</p><div className="card-actions"><Link className="action-link" to={`/clients/${lead.id}`}>{t('actions.open')}</Link>{canCall ? <button className="action-link primary card-action-button" type="button" disabled={!!launchingLeadId} onClick={() => callWithEmma(task)}>{launchingLeadId === lead.id ? t('call.opening') : t('call.callEmma')}</button> : <Link className="action-link primary" to={`/clients/${lead.id}#emma`}>{t('call.prepare')}</Link>}</div></article>; })}</div>
+      <div className="mobile-lead-list mobile-only">{!loading && !items.length && <p>{t('lead.empty')}</p>}{items.map(lead => { const task = taskByLead[lead.id]; const canCall = task?.status === 'READY' && !task.readinessIssues.length; return <article className="lead-card" key={lead.id}><div className="lead-card-head"><div><h3>{lead.company}</h3><p>{[lead.branche,lead.ort].filter(Boolean).join(' · ') || '—'}</p></div><span className="status-pill" style={{color:statusColor[lead.crmStatus],borderColor:statusColor[lead.crmStatus]}}>{t(`status.${lead.crmStatus}`)}</span></div>{lead.phone && <a className="phone-link" href={`tel:${lead.phone}`}>{lead.phone}</a>}{lead.nextFollowUpDate && <p><strong>{t('lead.followUp')}:</strong> {lead.nextFollowUpDate}</p>}{lead.auditProblem && <p className="line-clamp">{lead.auditProblem}</p>}<p><strong>{t('call.readiness')}:</strong> {task ? t(`callStatus.${task.status}`) : t('call.notPrepared')}</p><div className="card-actions"><Link className="action-link" to={`/clients/${lead.id}`}>{t('actions.open')}</Link>{canCall ? <button className="action-link primary card-action-button" type="button" disabled={!!launchingLeadId} onClick={() => callWithEmma(task)}>{launchingLeadId === lead.id ? t('voiceAgent.openingEmma') : t('call.callEmma')}</button> : <Link className="action-link primary" to={`/clients/${lead.id}#emma`}>{t('call.prepare')}</Link>}</div></article>; })}</div>
     </Card>
   </div>;
 }

@@ -5,6 +5,7 @@ import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import { api } from '../api/client';
 import { CallBrief, CallTask, Client, CONTACT_CHANNELS, CRM_STATUSES, ContactChannel, LOST_REASONS, Message } from '../types';
+import { voiceAgentLaunchError } from '../voiceAgentLaunch';
 
 const emptyMessage = { channel: 'email' as ContactChannel, direction: 'out' as 'in' | 'out', body: '' };
 const emptyCallDraft = { callObjective: '', offerFocus: '', operatorNote: '', scheduledAt: '' };
@@ -75,7 +76,7 @@ export default function ClientDetail() {
   const callWithEmma = async () => {
     if (handoffState === 'opening' || !client || !callTask || callTask.status !== 'READY' || callTask.readinessIssues.length) return; setHandoffState('opening'); setHandoffError('');
     try { const response = await api.post('/api/voice-agent/handoff', { leadId: client.id, callTaskId: callTask.id }); const destination = new URL(response.data.voiceAgentAppUrl); destination.searchParams.set('handoff', response.data.handoffToken); const opened = window.open(destination.toString(), '_blank'); if (!opened) throw new Error(t('errors.popupBlocked')); opened.opener = null; setHandoffState('ready'); }
-    catch (exception: any) { setHandoffState('error'); setHandoffError(exception.response?.data?.error || exception.message || t('errors.emmaOpen')); }
+    catch (exception: any) { setHandoffState('error'); setHandoffError(voiceAgentLaunchError(exception, t)); }
   };
   const prepareCall = async (event: FormEvent) => {
     event.preventDefault(); if (callTaskBusy || !client) return; setCallTaskBusy(true); setError(''); setNotice('');
@@ -90,7 +91,7 @@ export default function ClientDetail() {
   const canCall = callTask?.status === 'READY' && !callTask.readinessIssues.length;
 
   return <div className="page-stack client-detail">
-    <header className="detail-header"><div><Link to="/leads">← {t('nav.leads')}</Link><h1>{client.company}</h1><details className="technical-id"><summary>{t('common.technicalDetails')}</summary><code>{client.id}</code></details></div>{canCall && <Button type="button" onClick={callWithEmma} disabled={handoffState === 'opening'}>{handoffState === 'opening' ? t('call.opening') : t('call.callEmma')}</Button>}</header>
+    <header className="detail-header"><div><Link to="/leads">← {t('nav.leads')}</Link><h1>{client.company}</h1><details className="technical-id"><summary>{t('common.technicalDetails')}</summary><code>{client.id}</code></details></div>{canCall && <Button type="button" onClick={callWithEmma} disabled={handoffState === 'opening'}>{handoffState === 'opening' ? t('voiceAgent.openingEmma') : handoffState === 'error' ? t('voiceAgent.retry') : t('call.callEmma')}</Button>}</header>
     {(error || notice || handoffError) && <Card><p role={error || handoffError ? 'alert' : 'status'} className={error || handoffError ? 'error-text' : 'success-text'}>{error || handoffError || notice}</p></Card>}
 
     <form onSubmit={save} className="page-stack">

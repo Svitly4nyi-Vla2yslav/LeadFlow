@@ -389,6 +389,45 @@ test('handoff creation requires a logged-in owner session', async () => {
   assert.equal(response.status, 401);
 });
 
+test('Voice Agent status is authenticated and returns only safe configuration state', async () => {
+  assert.equal((await fetch(`${baseUrl}/api/voice-agent/status`)).status, 401);
+  const response = await fetch(`${baseUrl}/api/voice-agent/status`, withSession());
+  assert.equal(response.status, 200);
+  assert.deepEqual(await response.json(), {
+    configured: true,
+    environment: 'development',
+    origin: 'http://localhost:3002/'
+  });
+});
+
+test('invalid production Voice Agent URL returns a controlled secret-free 503', async () => {
+  const { ENV } = await import('./env');
+  const mutableEnv = ENV as { NODE_ENV: string; VOICE_AGENT_APP_URL: string };
+  const previousNodeEnv = mutableEnv.NODE_ENV;
+  const previousAppUrl = mutableEnv.VOICE_AGENT_APP_URL;
+  mutableEnv.NODE_ENV = 'production';
+  mutableEnv.VOICE_AGENT_APP_URL = 'http://localhost:3002';
+  try {
+    const lead = await createLead('Production URL Guard GmbH');
+    const response = await createHandoff({ leadId: lead.id });
+    const output = await response.text();
+    assert.equal(response.status, 503);
+    assert.deepEqual(JSON.parse(output), { error: 'voice_agent_app_not_configured' });
+    assert.equal(output.includes(process.env.VOICE_AGENT_INTEGRATION_TOKEN!), false);
+    assert.equal(output.includes(process.env.SESSION_SECRET!), false);
+
+    const status = await fetch(`${baseUrl}/api/voice-agent/status`, withSession());
+    assert.deepEqual(await status.json(), {
+      configured: false,
+      environment: 'production',
+      reason: 'app_url_invalid'
+    });
+  } finally {
+    mutableEnv.NODE_ENV = previousNodeEnv;
+    mutableEnv.VOICE_AGENT_APP_URL = previousAppUrl;
+  }
+});
+
 test('an existing canonical lead produces a short-lived handoff token', async () => {
   const lead = await createLead('Handoff Token GmbH');
   const response = await createHandoff({ leadId: lead.id });

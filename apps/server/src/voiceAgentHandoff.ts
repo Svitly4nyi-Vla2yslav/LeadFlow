@@ -35,6 +35,10 @@ export type IssueOptions = {
   lifetimeSeconds?: number;
 };
 
+export type VoiceAgentAppUrlStatus =
+  | { configured: true; environment: 'development' | 'production'; origin: string }
+  | { configured: false; environment: 'development' | 'production'; reason: 'app_url_missing' | 'app_url_invalid' };
+
 const signingSecret = () => ENV.SESSION_SECRET || ENV.ADMIN_PASSWORD;
 export const voiceAgentHandoffSigningConfigured = () => signingSecret().length >= 12;
 
@@ -116,12 +120,36 @@ export const verifyVoiceAgentHandoffResult = (token: string, nowMs = Date.now())
 export const verifyVoiceAgentHandoff = (token: string, nowMs = Date.now()): VoiceAgentHandoff | null =>
   verifyVoiceAgentHandoffResult(token, nowMs).handoff;
 
-export const getVoiceAgentAppUrl = () => {
+export const isProductionVoiceAgentEnvironment = () => ENV.NODE_ENV === 'production'
+  || Boolean(process.env.NETLIFY || process.env.AWS_LAMBDA_FUNCTION_NAME);
+
+const isLoopbackHostname = (hostname: string) => {
+  const normalized = hostname.toLowerCase().replace(/^\[|\]$/g, '').replace(/\.$/, '');
+  return normalized === 'localhost'
+    || normalized.endsWith('.localhost')
+    || /^127(?:\.\d{1,3}){3}$/.test(normalized)
+    || normalized === '::1'
+    || normalized === '0:0:0:0:0:0:0:1';
+};
+
+export const validateVoiceAgentAppUrl = (value: string, production = isProductionVoiceAgentEnvironment()): VoiceAgentAppUrlStatus => {
+  const environment = production ? 'production' : 'development';
+  if (!value.trim()) return { configured: false, environment, reason: 'app_url_missing' };
   try {
-    const url = new URL(ENV.VOICE_AGENT_APP_URL);
-    if (!['http:', 'https:'].includes(url.protocol) || url.username || url.password) return null;
-    return url.toString();
+    const url = new URL(value);
+    const isOriginOnly = url.pathname === '/' && !url.search && !url.hash;
+    const supportedProtocol = production ? url.protocol === 'https:' : ['http:', 'https:'].includes(url.protocol);
+    if (!supportedProtocol || url.username || url.password || !isOriginOnly || (production && isLoopbackHostname(url.hostname))) {
+      return { configured: false, environment, reason: 'app_url_invalid' };
+    }
+    return { configured: true, environment, origin: `${url.origin}/` };
   } catch {
-    return null;
+    return { configured: false, environment, reason: 'app_url_invalid' };
   }
+};
+
+export const getVoiceAgentAppStatus = () => validateVoiceAgentAppUrl(ENV.VOICE_AGENT_APP_URL);
+export const getVoiceAgentAppUrl = () => {
+  const status = getVoiceAgentAppStatus();
+  return status.configured ? status.origin : null;
 };

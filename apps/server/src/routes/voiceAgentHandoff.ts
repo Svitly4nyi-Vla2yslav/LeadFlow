@@ -1,9 +1,16 @@
 import { Router } from 'express';
 import { db } from '../db/memory';
 import { callTaskReadiness } from '../callTasks';
-import { getVoiceAgentAppUrl, issueTaskAwareVoiceAgentHandoff, issueVoiceAgentHandoff, voiceAgentHandoffSigningConfigured } from '../voiceAgentHandoff';
+import { getVoiceAgentAppStatus, issueTaskAwareVoiceAgentHandoff, issueVoiceAgentHandoff, voiceAgentHandoffSigningConfigured } from '../voiceAgentHandoff';
 
 const router = Router();
+
+router.get('/status', (_req, res) => {
+  const status = getVoiceAgentAppStatus();
+  return res.json(status.configured
+    ? { configured: true, environment: status.environment, origin: status.origin }
+    : { configured: false, environment: status.environment, reason: status.reason });
+});
 
 router.post('/handoff', (req, res) => {
   const body = req.body;
@@ -25,13 +32,13 @@ router.post('/handoff', (req, res) => {
     return res.status(409).json({ error: 'call_task_not_ready' });
   }
 
-  const voiceAgentAppUrl = getVoiceAgentAppUrl();
-  if (!voiceAgentAppUrl) return res.status(503).json({ error: 'Voice Agent application URL is not configured' });
+  const appStatus = getVoiceAgentAppStatus();
+  if (!appStatus.configured) return res.status(503).json({ error: 'voice_agent_app_not_configured' });
   if (!voiceAgentHandoffSigningConfigured()) return res.status(503).json({ error: 'Voice Agent handoff signing is not configured' });
 
   return res.json({
     handoffToken: task ? issueTaskAwareVoiceAgentHandoff(lead.id, task.id) : issueVoiceAgentHandoff(lead.id),
-    voiceAgentAppUrl
+    voiceAgentAppUrl: appStatus.origin
   });
 });
 

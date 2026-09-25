@@ -1,4 +1,5 @@
 {
+  "voiceAgent.productionNotConfigured":"Voice Agent не налаштований для production.","voiceAgent.unavailable":"Voice Agent зараз недоступний.","voiceAgent.openingEmma":"Відкриваємо Emma…","voiceAgent.retry":"Спробувати ще раз",
   "nav.dashboard":"Огляд","nav.clients":"Клієнти","nav.leads":"Ліди","nav.calls":"Дзвінки","nav.data":"Дані","nav.maps":"Карти","nav.email":"Пошта","nav.messages":"Повідомлення","nav.settings":"Налаштування","nav.mobile":"Головна мобільна навігація","nav.mobileDashboard":"Головна","nav.mobileLeads":"Ліди","nav.mobileCalls":"Дзвінки","nav.mobileMessages":"Контакти","nav.mobileSettings":"Ще",
   "language.select":"Вибрати мову","language.de":"Німецька","language.uk":"Українська","language.ru":"Російська","language.en":"Англійська",
   "common.loading":"Завантаження…","common.saving":"Збереження…","common.importing":"Імпорт…","common.notVerified":"не перевірено","common.technicalDetails":"Технічні деталі","common.yes":"Так","common.no":"Ні",
