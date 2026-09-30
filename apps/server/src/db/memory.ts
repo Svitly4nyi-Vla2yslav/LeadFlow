@@ -112,6 +112,26 @@ export const CALL_TASK_STATUSES = [
 
 export type CallTaskStatus = typeof CALL_TASK_STATUSES[number];
 
+export type CallTranscriptSegment = {
+  sequence: number;
+  speaker: 'CUSTOMER' | 'EMMA';
+  text: string;
+  startMs?: number;
+  endMs?: number;
+};
+
+export type CallTranscript = {
+  version: '1.0';
+  conversationId: string;
+  state: 'PARTIAL' | 'FINAL';
+  revision: number;
+  startedAt: string;
+  endedAt?: string;
+  durationMs?: number;
+  segments: CallTranscriptSegment[];
+  updatedAt: string;
+};
+
 export type CallTask = {
   id: string;
   leadId: string;
@@ -126,6 +146,7 @@ export type CallTask = {
   completedAt?: string;
   attemptCount: number;
   lastFailureReason?: string;
+  transcript?: CallTranscript;
   result?: {
     outcome?: string;
     summary?: string;

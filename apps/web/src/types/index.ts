@@ -49,6 +49,23 @@ export type Client = {
 export type Message = { id: string; clientId: string; channel: ContactChannel; direction: 'in' | 'out'; body: string; createdAt: string };
 
 export type CallTaskStatus = 'DRAFT' | 'READY' | 'DIALING' | 'IN_PROGRESS' | 'COMPLETED' | 'FAILED' | 'CANCELLED';
+export type CallTranscript = {
+  version: '1.0';
+  conversationId: string;
+  state: 'PARTIAL' | 'FINAL';
+  revision: number;
+  startedAt: string;
+  endedAt?: string;
+  durationMs?: number;
+  segments: Array<{
+    sequence: number;
+    speaker: 'CUSTOMER' | 'EMMA';
+    text: string;
+    startMs?: number;
+    endMs?: number;
+  }>;
+  updatedAt: string;
+};
 export type CallTask = {
   id: string;
   leadId: string;
@@ -63,6 +80,7 @@ export type CallTask = {
   completedAt?: string;
   attemptCount: number;
   lastFailureReason?: string;
+  transcript?: CallTranscript;
   result?: {
     outcome?: string; summary?: string; clientNeed?: string; confirmedPainPoints?: string;
     interestLevel?: 'LOW' | 'MEDIUM' | 'HIGH'; objections?: string[]; budgetSignal?: string;

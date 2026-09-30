@@ -39,6 +39,23 @@ test('mobile lead cards, progressive creation, call preparation and import UI ar
   assert.match(detail, /id="emma"/);
 });
 
+test('client detail shows a collapsible localized transcript with status, speakers and disclaimer', () => {
+  const detail = read('pages/ClientDetail.tsx');
+  const styles = read('styles/global.ts');
+  assert.match(detail, /transcript\.title/);
+  assert.match(detail, /transcript\.segments\.map/);
+  assert.match(detail, /transcript\.notice/);
+  assert.match(detail, /transcriptTime/);
+  assert.match(styles, /\.transcript-turn/);
+  for (const language of ['de', 'uk', 'ru']) {
+    const translations = resource(language);
+    for (const key of ['transcript.title', 'transcript.customer', 'transcript.emma', 'transcript.partial', 'transcript.final', 'transcript.notice', 'transcript.empty']) {
+      assert.equal(typeof translations[key], 'string');
+      assert.ok(translations[key].length > 0);
+    }
+  }
+});
+
 test('mobile shell uses dedicated bottom navigation and responsive safe-area styles', () => {
   assert.match(read('App.tsx'), /<MobileNav\/>/);
   const navigation = read('components/layout/MobileNav.tsx');

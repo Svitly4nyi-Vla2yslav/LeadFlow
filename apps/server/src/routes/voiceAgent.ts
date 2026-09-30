@@ -1,8 +1,9 @@
 import { Router } from 'express';
-import { addMessage, addVoiceInteraction, db, persistDb, updateClient } from '../db/memory';
+import { addMessage, addVoiceInteraction, db, persistDb, updateCallTask, updateClient } from '../db/memory';
 import { applyVoiceInteractionToLead, VoiceAgentInteractionV1Schema, voicePayloadHash } from '../voiceAgent';
 import { buildCallBrief, callTaskReadiness } from '../callTasks';
 import { verifyVoiceAgentHandoffResult } from '../voiceAgentHandoff';
+import { transcriptContentHash, transcriptFromEvent, VoiceAgentTranscriptV1Schema } from '../voiceTranscript';
 
 const router = Router();
 
@@ -140,6 +141,60 @@ router.post('/interactions', (req, res) => {
     crmStatusAfter: application.statusAfter,
     appliedChanges
   });
+});
+
+router.post('/call-transcript', (req, res) => {
+  const parsed = VoiceAgentTranscriptV1Schema.safeParse(req.body);
+  if (!parsed.success) {
+    return res.status(400).json({
+      error: 'invalid_payload',
+      issues: parsed.error.issues.map(issue => ({ path: issue.path.join('.'), message: issue.message }))
+    });
+  }
+
+  const event = parsed.data;
+  const lead = db.clients.find(client => client.id === event.leadRef.leadId);
+  if (!lead) return res.status(404).json({ error: 'lead_not_found' });
+
+  const task = db.callTasks.find(item => item.id === event.callTaskRef.callTaskId);
+  if (!task) return res.status(404).json({ error: 'call_task_not_found' });
+  if (task.leadId !== lead.id) return res.status(409).json({ error: 'call_task_mismatch' });
+
+  const existing = task.transcript;
+  const next = transcriptFromEvent(event);
+  const metadata = {
+    callTaskId: task.id,
+    conversationId: event.conversationId,
+    revision: event.revision,
+    segmentCount: event.segments.length,
+    state: event.state
+  };
+
+  if (existing?.conversationId === event.conversationId) {
+    if (event.revision < existing.revision) {
+      console.info('[Voice Transcript] stale_revision', metadata);
+      return res.status(409).json({ error: 'stale_revision' });
+    }
+    if (event.revision === existing.revision) {
+      if (transcriptContentHash(existing) !== transcriptContentHash(next)) {
+        console.info('[Voice Transcript] revision_conflict', metadata);
+        return res.status(409).json({ error: 'revision_conflict' });
+      }
+      console.info('[Voice Transcript] duplicate', metadata);
+      return res.json({ ok: true, duplicate: true, callTaskId: task.id, conversationId: existing.conversationId, revision: existing.revision, state: existing.state });
+    }
+    if (existing.state === 'FINAL' && event.state === 'PARTIAL') {
+      console.info('[Voice Transcript] final_downgrade', metadata);
+      return res.status(409).json({ error: 'final_cannot_be_downgraded' });
+    }
+  } else if (existing?.state === 'FINAL') {
+    console.info('[Voice Transcript] conversation_conflict', metadata);
+    return res.status(409).json({ error: 'final_conversation_conflict' });
+  }
+
+  updateCallTask(task, { ...task, transcript: next });
+  console.info('[Voice Transcript] accepted', metadata);
+  return res.status(201).json({ ok: true, duplicate: false, callTaskId: task.id, conversationId: next.conversationId, revision: next.revision, state: next.state });
 });
 
 export default router;

@@ -13,7 +13,7 @@ export const isDatabaseMutation = (event: MutationEvent) => {
   const method = (event.httpMethod || 'GET').toUpperCase();
   const path = event.path || (event.rawUrl ? new URL(event.rawUrl).pathname : '');
   return !['GET', 'HEAD', 'OPTIONS'].includes(method)
-    && /\/api\/(clients|messages|call-tasks|integrations\/voice-agent\/interactions)(\/|$)/.test(path);
+    && /\/api\/(clients|messages|call-tasks|integrations\/voice-agent\/interactions|integrations\/voice-agent\/call-transcript)(\/|$)/.test(path);
 };
 
 export const hydrateDatabase = (stored: StoredDatabase | null, target: Database = db) => {

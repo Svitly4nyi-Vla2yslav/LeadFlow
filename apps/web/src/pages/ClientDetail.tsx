@@ -26,6 +26,14 @@ const feedbackValue = (key: keyof NonNullable<CallTask['result']>, value: unknow
   }
   return String(value);
 };
+const transcriptTime = (milliseconds?: number) => {
+  if (milliseconds === undefined) return '';
+  const totalSeconds = Math.floor(milliseconds / 1000);
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+  return hours ? `${String(hours).padStart(2,'0')}:${String(minutes).padStart(2,'0')}:${String(seconds).padStart(2,'0')}` : `${String(minutes).padStart(2,'0')}:${String(seconds).padStart(2,'0')}`;
+};
 
 function Section({ title, children, open = false, id }: { title: string; children: ReactNode; open?: boolean; id?: string }) {
   return <Card as="details" open={open} id={id} className="detail-section"><summary><strong>{title}</strong></summary><div className="section-body">{children}</div></Card>;
@@ -36,7 +44,7 @@ export default function ClientDetail() {
   const [client, setClient] = useState<Client | null>(null); const [draft, setDraft] = useState<Partial<Client>>({});
   const [message, setMessage] = useState(emptyMessage); const [error, setError] = useState(''); const [notice, setNotice] = useState('');
   const [handoffState, setHandoffState] = useState<'ready'|'opening'|'error'>('ready'); const [handoffError, setHandoffError] = useState('');
-  const [callTask, setCallTask] = useState<CallTask | null>(null); const [lastFeedback, setLastFeedback] = useState<CallTask | null>(null);
+  const [callTask, setCallTask] = useState<CallTask | null>(null); const [lastFeedback, setLastFeedback] = useState<CallTask | null>(null); const [lastTranscript, setLastTranscript] = useState<CallTask | null>(null);
   const [callBrief, setCallBrief] = useState<CallBrief | null>(null);
   const [callDraft, setCallDraft] = useState(emptyCallDraft); const [callTaskBusy, setCallTaskBusy] = useState(false);
 
@@ -44,7 +52,7 @@ export default function ClientDetail() {
     try {
       const [clientResponse, tasksResponse] = await Promise.all([api.get(`/api/clients/${id}`), api.get('/api/call-tasks', { params: { leadId: id } })]);
       const tasks = tasksResponse.data as CallTask[]; const active = tasks.find(task => !['COMPLETED','FAILED','CANCELLED'].includes(task.status)) || null;
-      setClient(clientResponse.data); setDraft(clientResponse.data); setCallTask(active); setLastFeedback(tasks.find(task => task.result && Object.keys(task.result).length) || null);
+      setClient(clientResponse.data); setDraft(clientResponse.data); setCallTask(active); setLastFeedback(tasks.find(task => task.result && Object.keys(task.result).length) || null); setLastTranscript(tasks.find(task => task.transcript) || null);
       setCallBrief(active ? (await api.get(`/api/call-tasks/${active.id}/brief`)).data : null);
       setCallDraft(active ? { callObjective: active.callObjective, offerFocus: active.offerFocus || '', operatorNote: active.operatorNote || '', scheduledAt: active.scheduledAt ? active.scheduledAt.slice(0,16) : '' } : { ...emptyCallDraft, offerFocus: clientResponse.data.offerFocus || '', operatorNote: clientResponse.data.emmaFocus || '' });
       setError('');
@@ -88,6 +96,7 @@ export default function ClientDetail() {
   if (!client && !error) return <Card>{t('common.loading')}</Card>;
   if (!client) return <Card><p role="alert">{error}</p><Link to="/leads">{t('actions.backToLeads')}</Link></Card>;
   const result = lastFeedback?.result;
+  const transcript = lastTranscript?.transcript;
   const canCall = callTask?.status === 'READY' && !callTask.readinessIssues.length;
 
   return <div className="page-stack client-detail">
@@ -111,5 +120,6 @@ export default function ClientDetail() {
 
     <Section title={t('messages.logContact')}><form onSubmit={addMessage} className="field-grid"><label>{t('messages.channel')}<select value={message.channel} onChange={e=>setMessage({...message,channel:e.target.value as ContactChannel})}>{CONTACT_CHANNELS.map(value=><option key={value} value={value}>{t(contactChannelKeys[value])}</option>)}</select></label><label>{t('messages.direction')}<select value={message.direction} onChange={e=>setMessage({...message,direction:e.target.value as 'in'|'out'})}><option value="out">{t('direction.out')}</option><option value="in">{t('direction.in')}</option></select></label><label className="span-2">{t('messages.summary')}<textarea required value={message.body} onChange={e=>setMessage({...message,body:e.target.value})}/></label><Button type="submit">{t('messages.save')}</Button></form></Section>
     <Section title={t('sections.timeline')} open>{!timeline.length&&<p>{t('timeline.empty')}</p>}<div className="timeline">{timeline.map(item=><div key={item.key}><strong>{item.title}</strong><small>{new Date(item.date).toLocaleString(i18n.language)}</small>{item.detail&&<p>{item.detail}</p>}</div>)}</div></Section>
+    <Section title={t('transcript.title')}><div className="transcript-heading">{transcript&&<span className={`status-pill transcript-status ${transcript.state.toLowerCase()}`}>{t(`transcript.${transcript.state.toLowerCase()}`)}</span>}</div>{!transcript?<p className="muted">{t('transcript.empty')}</p>:<><div className="transcript-turns">{transcript.segments.map(segment=><div className="transcript-turn" key={segment.sequence}><div className="transcript-meta">{segment.startMs!==undefined&&<time>{transcriptTime(segment.startMs)}</time>}<strong>{segment.speaker==='CUSTOMER'?t('transcript.customer'):t('transcript.emma')}</strong></div><p>{segment.text}</p></div>)}</div><p className="transcript-notice">{t('transcript.notice')}</p></>}</Section>
   </div>;
 }

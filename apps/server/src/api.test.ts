@@ -42,6 +42,22 @@ const voicePayload = (leadId: string, overrides: Record<string, unknown> = {}) =
   ...overrides
 });
 
+const transcriptPayload = (leadId: string, callTaskId: string, overrides: Record<string, unknown> = {}) => ({
+  contractVersion: '1.0',
+  eventId: randomUUID(),
+  conversationId: randomUUID(),
+  revision: 1,
+  state: 'PARTIAL',
+  leadRef: { leadId },
+  callTaskRef: { callTaskId },
+  startedAt: '2026-09-22T10:00:00.000Z',
+  segments: [
+    { sequence: 1, speaker: 'CUSTOMER', text: 'Guten Tag.', startMs: 4_000, endMs: 5_000 },
+    { sequence: 2, speaker: 'EMMA', text: 'Guten Tag, mein Name ist Emma.', startMs: 6_000, endMs: 8_000 }
+  ],
+  ...overrides
+});
+
 const createLead = async (company: string, crmStatus = 'NEW', extra: Record<string, unknown> = {}) => {
   const response = await fetch(`${baseUrl}/api/clients`, withSession({
     method: 'POST', headers: { 'content-type': 'application/json' },
@@ -53,6 +69,10 @@ const createLead = async (company: string, crmStatus = 'NEW', extra: Record<stri
 
 const sendVoiceInteraction = (payload: unknown) => fetch(`${baseUrl}/api/integrations/voice-agent/interactions`, {
   method: 'POST', headers: voiceHeaders(), body: JSON.stringify(payload)
+});
+
+const sendTranscript = (payload: unknown, token?: string) => fetch(`${baseUrl}/api/integrations/voice-agent/call-transcript`, {
+  method: 'POST', headers: voiceHeaders(token), body: JSON.stringify(payload)
 });
 
 const createHandoff = (body: unknown, authenticated = true) => fetch(`${baseUrl}/api/voice-agent/handoff`, {
@@ -921,4 +941,158 @@ test('ordinary voice facts preserve WON and LOST terminal statuses', async () =>
   });
   assert.equal((await sendVoiceInteraction(lostPayload)).status, 201);
   assert.equal((await getLeadDetail(lostLead.id)).crmStatus, 'LOST');
+});
+
+test('voice transcript endpoint requires the server integration token', async () => {
+  const response = await fetch(`${baseUrl}/api/integrations/voice-agent/call-transcript`, {
+    method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({})
+  });
+  assert.equal(response.status, 401);
+  assert.equal((await sendTranscript({}, 'wrong-token-with-more-than-32-characters')).status, 401);
+});
+
+test('valid PARTIAL and FINAL transcripts preserve ordered multilingual text without changing VoiceInteraction', async () => {
+  const lead = await createLead('Transcript UTF-8 GmbH', 'NEW', { phone: '+49 5121 123456' });
+  const task = await (await createCallTask({ leadId: lead.id, callObjective: 'Mehrsprachigen Bedarf prüfen' })).json() as { id: string };
+  const conversationId = randomUUID();
+  const partial = transcriptPayload(lead.id, task.id, {
+    conversationId,
+    segments: [
+      { sequence: 1, speaker: 'CUSTOMER', text: '  Grüß Gott — вітаю!\nЗдравствуйте.  ', startMs: 4_000, endMs: 5_500 },
+      { sequence: 2, speaker: 'EMMA', text: 'Guten Tag, ich bin Emma.', startMs: 6_000, endMs: 8_000 }
+    ]
+  });
+  const { db } = await import('./db/memory');
+  const interactionsBefore = db.voiceInteractions.length;
+  const partialResponse = await sendTranscript(partial);
+  assert.equal(partialResponse.status, 201);
+
+  const storedPartial = db.callTasks.find(item => item.id === task.id)?.transcript;
+  assert.equal(storedPartial?.state, 'PARTIAL');
+  assert.equal(storedPartial?.segments[0].text, '  Grüß Gott — вітаю!\nЗдравствуйте.  ');
+  assert.equal(storedPartial?.segments[0].speaker, 'CUSTOMER');
+  assert.equal(storedPartial?.segments[1].speaker, 'EMMA');
+  assert.equal(db.voiceInteractions.length, interactionsBefore);
+
+  const final = transcriptPayload(lead.id, task.id, {
+    conversationId,
+    revision: 2,
+    state: 'FINAL',
+    endedAt: '2026-09-22T10:03:00.000Z',
+    segments: [...partial.segments, { sequence: 3, speaker: 'CUSTOMER', text: 'До побачення.', startMs: 175_000, endMs: 178_000 }]
+  });
+  const finalResponse = await sendTranscript(final);
+  assert.equal(finalResponse.status, 201);
+  const storedFinal = db.callTasks.find(item => item.id === task.id)?.transcript;
+  assert.equal(storedFinal?.state, 'FINAL');
+  assert.equal(storedFinal?.revision, 2);
+  assert.equal(storedFinal?.durationMs, 180_000);
+  assert.equal(storedFinal?.segments.length, 3);
+});
+
+test('transcripts require exact canonical lead and CallTask ownership', async () => {
+  const firstLead = await createLead('Transcript Owner GmbH', 'NEW', { phone: '+49 5121 111111' });
+  const secondLead = await createLead('Transcript Other GmbH', 'NEW', { phone: '+49 5121 222222' });
+  const task = await (await createCallTask({ leadId: firstLead.id, callObjective: 'Eigentümer prüfen' })).json() as { id: string };
+
+  const unknownLead = await sendTranscript(transcriptPayload(randomUUID(), task.id));
+  assert.equal(unknownLead.status, 404);
+  assert.equal((await unknownLead.json() as { error: string }).error, 'lead_not_found');
+
+  const unknownTask = await sendTranscript(transcriptPayload(firstLead.id, randomUUID()));
+  assert.equal(unknownTask.status, 404);
+  assert.equal((await unknownTask.json() as { error: string }).error, 'call_task_not_found');
+
+  const mismatch = await sendTranscript(transcriptPayload(secondLead.id, task.id));
+  assert.equal(mismatch.status, 409);
+  assert.equal((await mismatch.json() as { error: string }).error, 'call_task_mismatch');
+
+  const fuzzyLead = await sendTranscript(transcriptPayload('Transcript Owner GmbH', task.id));
+  assert.equal(fuzzyLead.status, 404);
+  assert.equal((await sendTranscript(transcriptPayload(` ${firstLead.id}`, task.id))).status, 400);
+  assert.equal((await sendTranscript(transcriptPayload(firstLead.id, `${task.id} `))).status, 400);
+});
+
+test('transcript revisions are idempotent, reject conflicts and stale snapshots, and never downgrade FINAL', async () => {
+  const lead = await createLead('Transcript Revision GmbH', 'NEW', { phone: '+49 5121 333333' });
+  const task = await (await createCallTask({ leadId: lead.id, callObjective: 'Revisionen prüfen' })).json() as { id: string };
+  const conversationId = randomUUID();
+  const first = transcriptPayload(lead.id, task.id, { conversationId, revision: 2 });
+  assert.equal((await sendTranscript(first)).status, 201);
+
+  const duplicate = await sendTranscript({ ...first, eventId: randomUUID() });
+  assert.equal(duplicate.status, 200);
+  assert.equal((await duplicate.json() as { duplicate: boolean }).duplicate, true);
+
+  const conflict = await sendTranscript({ ...first, eventId: randomUUID(), segments: [{ sequence: 1, speaker: 'EMMA', text: 'Changed.' }] });
+  assert.equal(conflict.status, 409);
+  assert.equal((await conflict.json() as { error: string }).error, 'revision_conflict');
+
+  const stale = await sendTranscript({ ...first, eventId: randomUUID(), revision: 1 });
+  assert.equal(stale.status, 409);
+  assert.equal((await stale.json() as { error: string }).error, 'stale_revision');
+
+  const final = await sendTranscript({ ...first, eventId: randomUUID(), revision: 3, state: 'FINAL', endedAt: '2026-09-22T10:01:00.000Z' });
+  assert.equal(final.status, 201);
+  const downgrade = await sendTranscript({ ...first, eventId: randomUUID(), revision: 4, state: 'PARTIAL' });
+  assert.equal(downgrade.status, 409);
+  assert.equal((await downgrade.json() as { error: string }).error, 'final_cannot_be_downgraded');
+
+  const otherConversation = await sendTranscript(transcriptPayload(lead.id, task.id, { conversationId: randomUUID(), state: 'FINAL' }));
+  assert.equal(otherConversation.status, 409);
+  assert.equal((await otherConversation.json() as { error: string }).error, 'final_conversation_conflict');
+});
+
+test('transcript payload limits and segment validation reject abusive or ambiguous input', async () => {
+  const lead = await createLead('Transcript Limits GmbH', 'NEW', { phone: '+49 5121 444444' });
+  const task = await (await createCallTask({ leadId: lead.id, callObjective: 'Grenzen prüfen' })).json() as { id: string };
+
+  const empty = transcriptPayload(lead.id, task.id, { segments: [{ sequence: 1, speaker: 'CUSTOMER', text: '   ' }] });
+  assert.equal((await sendTranscript(empty)).status, 400);
+
+  const oversizedSegment = transcriptPayload(lead.id, task.id, { segments: [{ sequence: 1, speaker: 'CUSTOMER', text: 'x'.repeat(4_001) }] });
+  assert.equal((await sendTranscript(oversizedSegment)).status, 400);
+
+  const oversizedAggregate = transcriptPayload(lead.id, task.id, {
+    segments: Array.from({ length: 63 }, (_, index) => ({ sequence: index + 1, speaker: index % 2 ? 'EMMA' : 'CUSTOMER', text: 'x'.repeat(4_000) }))
+  });
+  assert.equal((await sendTranscript(oversizedAggregate)).status, 400);
+
+  const tooManySegments = transcriptPayload(lead.id, task.id, {
+    segments: Array.from({ length: 2_001 }, (_, index) => ({ sequence: index + 1, speaker: index % 2 ? 'EMMA' : 'CUSTOMER', text: 'x' }))
+  });
+  assert.equal((await sendTranscript(tooManySegments)).status, 400);
+
+  const unordered = transcriptPayload(lead.id, task.id, { segments: [
+    { sequence: 2, speaker: 'CUSTOMER', text: 'First' },
+    { sequence: 1, speaker: 'EMMA', text: 'Second' }
+  ] });
+  assert.equal((await sendTranscript(unordered)).status, 400);
+});
+
+test('transcript survives local JSON persistence and Netlify hydrate/snapshot while legacy tasks remain valid', async () => {
+  const lead = await createLead('Transcript Persistence GmbH', 'NEW', { phone: '+49 5121 555555' });
+  const task = await (await createCallTask({ leadId: lead.id, callObjective: 'Persistenz prüfen' })).json() as { id: string };
+  assert.equal((await sendTranscript(transcriptPayload(lead.id, task.id))).status, 201);
+
+  const persisted = JSON.parse(readFileSync(process.env.LEADFLOW_DATA_FILE!, 'utf8')) as { callTasks: Array<{ id: string; transcript?: { state: string; segments: unknown[] } }> };
+  const persistedTask = persisted.callTasks.find(item => item.id === task.id);
+  assert.equal(persistedTask?.transcript?.state, 'PARTIAL');
+  assert.equal(persistedTask?.transcript?.segments.length, 2);
+
+  const { db } = await import('./db/memory');
+  const { hydrateDatabase, isDatabaseMutation, snapshotDatabase } = await import('./databaseSnapshot');
+  const snapshot = snapshotDatabase(db);
+  const isolated: import('./db/memory').Database = { clients: [], messages: [], voiceInteractions: [], callTasks: [] };
+  hydrateDatabase(snapshot, isolated);
+  assert.equal(isolated.callTasks.find(item => item.id === task.id)?.transcript?.segments[0].text, 'Guten Tag.');
+  assert.equal(isDatabaseMutation({ httpMethod: 'POST', path: '/api/integrations/voice-agent/call-transcript' }), true);
+
+  const legacyTask = { ...db.callTasks.find(item => item.id === task.id)! };
+  delete legacyTask.transcript;
+  const legacy = { clients: [db.clients.find(item => item.id === lead.id)!], messages: [], callTasks: [legacyTask] };
+  const legacyTarget: import('./db/memory').Database = { clients: [], messages: [], voiceInteractions: [], callTasks: [] };
+  hydrateDatabase(legacy, legacyTarget);
+  assert.equal(legacyTarget.callTasks[0].transcript, undefined);
+  assert.deepEqual(legacyTarget.voiceInteractions, []);
 });
