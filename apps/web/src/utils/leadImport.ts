@@ -20,16 +20,33 @@ const aliases: Record<string, typeof IMPORT_FIELDS[number]> = {
   nextfollowupdate: 'nextFollowUpDate', offeramount: 'offerAmount', lostreason: 'lostReason'
 };
 
+/**
+ * Нормалізує заголовок CSV: прибирає зовнішні пробіли, переводить у нижній регістр
+ * і видаляє типові роздільники, щоб зіставляти різні варіанти назв колонок.
+ */
 const normalizedHeader = (value: string) => value.trim().toLocaleLowerCase().replace(/[\s_./-]+/g, '');
 
+/**
+ * Для кожної вхідної колонки добирає відоме поле CRM або порожній рядок,
+ * якщо псевдонім не розпізнано. Ключі результату зберігають оригінальні заголовки.
+ */
 export const inferColumnMapping = (columns: string[]) => Object.fromEntries(
   columns.map(column => [column, aliases[normalizedHeader(column)] || ''])
 ) as Record<string, string>;
 
+/**
+ * Переносить значення рядків у поля CRM за переданою мапою.
+ * Колонки без цільового поля відкидаються; вхідні масиви й об'єкти не змінюються.
+ */
 export const applyColumnMapping = (rows: Record<string, unknown>[], mapping: Record<string, string>) => rows.map(row =>
   Object.fromEntries(Object.entries(row).flatMap(([column, value]) => mapping[column] ? [[mapping[column], value]] : []))
 );
 
+/**
+ * Розбирає CSV із комою або крапкою з комою, підтримує лапки, екрановані лапки
+ * та переноси рядків усередині quoted-комірок. Повертає масив об'єктів за заголовками.
+ * Некоректні лапки, порожні заголовки чи різна кількість колонок дають `invalid_csv`.
+ */
 export const parseCsv = (text: string) => {
   const firstLine = text.split(/\r?\n/, 1)[0] || '';
   const delimiter = (firstLine.match(/;/g) || []).length > (firstLine.match(/,/g) || []).length ? ';' : ',';
