@@ -66,6 +66,19 @@ test('mobile shell uses dedicated bottom navigation and responsive safe-area sty
   assert.match(styles, /\.desktop-only\{display:none/);
 });
 
+test('Obsidian Glass tokens, gold hierarchy, motion restraint and mobile transcript layout are shared', () => {
+  const theme = read('styles/theme.ts');
+  const global = read('styles/global.ts');
+  const card = read('components/ui/Card.tsx');
+  assert.match(theme, /bg:'#050505'/);
+  assert.match(theme, /accent:'#e5c477'/);
+  assert.match(theme, /cardStrong/);
+  assert.match(card, /backdrop-filter:blur/);
+  assert.match(global, /repeating-radial-gradient/);
+  assert.match(global, /prefers-reduced-motion/);
+  assert.match(global, /@media\(max-width:560px\)\{\.transcript-turn\{max-width:100%/);
+});
+
 test('every normal Emma launch sends an exact CallTask ID', () => {
   for (const page of ['pages/Leads.tsx', 'pages/Calls.tsx', 'pages/ClientDetail.tsx']) {
     const source = read(page);

@@ -958,8 +958,9 @@ test('valid PARTIAL and FINAL transcripts preserve ordered multilingual text wit
   const partial = transcriptPayload(lead.id, task.id, {
     conversationId,
     segments: [
-      { sequence: 1, speaker: 'CUSTOMER', text: '  Grüß Gott — вітаю!\nЗдравствуйте.  ', startMs: 4_000, endMs: 5_500 },
-      { sequence: 2, speaker: 'EMMA', text: 'Guten Tag, ich bin Emma.', startMs: 6_000, endMs: 8_000 }
+      { sequence: 1, speaker: 'CUSTOMER', text: '  Grüß', startMs: 4_000, endMs: 4_300 },
+      { sequence: 2, speaker: 'CUSTOMER', text: 'Gott — вітаю!\nЗдравствуйте.  ', startMs: 4_300, endMs: 5_500 },
+      { sequence: 3, speaker: 'EMMA', text: 'Guten Tag, ich bin Emma.', startMs: 6_000, endMs: 8_000 }
     ]
   });
   const { db } = await import('./db/memory');
@@ -969,7 +970,7 @@ test('valid PARTIAL and FINAL transcripts preserve ordered multilingual text wit
 
   const storedPartial = db.callTasks.find(item => item.id === task.id)?.transcript;
   assert.equal(storedPartial?.state, 'PARTIAL');
-  assert.equal(storedPartial?.segments[0].text, '  Grüß Gott — вітаю!\nЗдравствуйте.  ');
+  assert.equal(storedPartial?.segments[0].text, 'Grüß Gott — вітаю!\nЗдравствуйте.');
   assert.equal(storedPartial?.segments[0].speaker, 'CUSTOMER');
   assert.equal(storedPartial?.segments[1].speaker, 'EMMA');
   assert.equal(db.voiceInteractions.length, interactionsBefore);
@@ -979,7 +980,7 @@ test('valid PARTIAL and FINAL transcripts preserve ordered multilingual text wit
     revision: 2,
     state: 'FINAL',
     endedAt: '2026-09-22T10:03:00.000Z',
-    segments: [...partial.segments, { sequence: 3, speaker: 'CUSTOMER', text: 'До побачення.', startMs: 175_000, endMs: 178_000 }]
+    segments: [...partial.segments, { sequence: 4, speaker: 'CUSTOMER', text: 'До побачення.', startMs: 175_000, endMs: 178_000 }]
   });
   const finalResponse = await sendTranscript(final);
   assert.equal(finalResponse.status, 201);
