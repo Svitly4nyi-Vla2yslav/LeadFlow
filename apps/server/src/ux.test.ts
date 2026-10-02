@@ -70,8 +70,10 @@ test('Obsidian Glass tokens, gold hierarchy, motion restraint and mobile transcr
   const theme = read('styles/theme.ts');
   const global = read('styles/global.ts');
   const card = read('components/ui/Card.tsx');
-  assert.match(theme, /bg:'#050505'/);
-  assert.match(theme, /accent:'#e5c477'/);
+  assert.match(theme, /bg:\s*'#070809'/);
+  assert.match(theme, /accent:\s*'#D4AF37'/);
+  assert.match(theme, /text:\s*'#F6E7B8'/);
+  assert.match(theme, /radius:\s*'22px'/);
   assert.match(theme, /cardStrong/);
   assert.match(card, /backdrop-filter:blur/);
   assert.match(global, /repeating-radial-gradient/);

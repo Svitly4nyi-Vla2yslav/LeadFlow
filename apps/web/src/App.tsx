@@ -9,7 +9,7 @@ const Shell = styled.div`
   display:grid; grid-template-columns:260px minmax(0,1fr); min-height:100vh;
   @media (max-width: 900px){ grid-template-columns:1fr; padding-bottom:calc(70px + env(safe-area-inset-bottom)); }
 `;
-const Main = styled.main`padding:clamp(18px,3vw,34px);max-width:1500px;min-width:0;width:100%;margin:0 auto;@media(max-width:900px){padding:14px 12px 22px}`;
+const Main = styled.main`padding:clamp(18px,3vw,34px);max-width:1440px;min-width:0;width:100%;margin:0 auto;@media(max-width:900px){padding:14px 12px 22px}`;
 export default function App(){
   const element = useRoutes(routes);
   const loc = useLocation();
