@@ -1,9 +1,18 @@
 import 'dotenv/config';
 
+// Попередньо перетворює тривалість сесії на число для подальшого обмеження діапазону.
 const configuredSessionHours = Number(process.env.SESSION_HOURS || 12);
+/**
+ * Вважає істинним лише рядок `true` без урахування регістру та зовнішніх пробілів.
+ * Відсутні й усі інші значення повертають `false`.
+ */
 const parseBoolean = (value: string | undefined) => value?.trim().toLowerCase() === 'true';
 const nodeEnv = process.env.NODE_ENV || 'development';
 
+/**
+ * Нормалізована конфігурація сервера з локальними значеннями за замовчуванням.
+ * SESSION_HOURS обмежується діапазоном 1–168 годин, а нечислове значення замінюється на 12.
+ */
 export const ENV = {
   NODE_ENV: nodeEnv,
   PORT: Number(process.env.PORT || 3001),
