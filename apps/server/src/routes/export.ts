@@ -4,6 +4,8 @@ import { db } from '../db/memory';
 const r = Router();
 const csvValue = (value: unknown) => `"${String(value ?? '').replace(/"/g, '""')}"`;
 
+// Маршрут формує повний експорт клієнтів і повертає його як завантажуваний UTF-8 CSV-файл.
+// Дані читаються зі знімка CRM; єдиний побічний ефект — запис заголовків і тіла HTTP-відповіді.
 r.get('/clients.csv', (_req, res) => {
   const rows = [
     ['Lead ID', 'Company', 'Branche', 'Ort', 'Website', 'Contact Person', 'Phone', 'Email', 'Source', 'Preferred Language', 'Decision Maker', 'Current Situation', 'Pain Points', 'Audit Problem', 'Proposed Solution', 'Emma Focus', 'Offer Focus', 'Do Not Mention', 'CRM Status', 'Contact Channel', 'Last Contact Date', 'Next Follow-up Date', 'Offer Amount', 'Lost Reason', 'Notes'],
