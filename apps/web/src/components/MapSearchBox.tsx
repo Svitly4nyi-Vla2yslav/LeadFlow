@@ -6,6 +6,10 @@ import { useTranslation } from 'react-i18next';
 
 type Place = { place_id: string; name: string; address: string };
 
+/**
+ * Шукає компанії через places API, веде локальний вибір результатів
+ * і запускає одиничний або пакетний імпорт у CRM.
+ */
 export default function MapSearchBox(){
   const { t } = useTranslation();
   const [q, setQ] = useState(() => t('maps.defaultQuery'));
@@ -14,6 +18,7 @@ export default function MapSearchBox(){
   const [loading, setLoading] = useState(false);
   const [bulkLoading, setBulkLoading] = useState(false);
 
+  // Надсилає поточний запит, замінює список результатів і скидає старі позначки вибору.
   const search = async () => {
     setLoading(true);
     try {
@@ -23,8 +28,13 @@ export default function MapSearchBox(){
     } finally { setLoading(false); }
   };
 
+  // Інвертує вибір одного place_id, не змінюючи решту позначених результатів.
   const toggle = (id:string) => setSel(s => ({...s, [id]: !s[id]}));
 
+/**
+   * Відправляє всі позначені place_id одним запитом і показує кількість успішних імпортів.
+   * Якщо нічого не вибрано, мережевий запит не виконується.
+   */
   const importSelected = async () => {
     const ids = Object.keys(sel).filter(k => sel[k]);
     if(!ids.length) return alert(t('maps.selectFirst'));
@@ -54,6 +64,7 @@ export default function MapSearchBox(){
               title={t('maps.selectPlace', { name: p.name })}
             />
             <div><strong id={`place-name-${p.place_id}`}>{p.name}</strong><div style={{opacity:.7}}>{p.address}</div></div>
+            {/* Одинична дія створює клієнта лише для цього place_id і повідомляє про завершення. */}
             <Button onClick={async()=>{
               await api.post('/api/places/import', { place_id: p.place_id });
               alert(t('maps.clientCreated'));
