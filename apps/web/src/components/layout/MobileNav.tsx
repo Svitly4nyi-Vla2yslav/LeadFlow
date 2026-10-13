@@ -13,6 +13,11 @@ const Nav = styled.nav`
   }
 `;
 
+/**
+ * Рендерить компактну нижню навігацію для екранів до 900 px.
+ * Компонент не приймає аргументів: підписи та aria-label отримує з i18next,
+ * а активний пункт визначає NavLink за поточним маршрутом; побічних ефектів немає.
+ */
 export default function MobileNav() {
   const { t } = useTranslation();
   return <Nav aria-label={t('nav.mobile')}>
