@@ -13,6 +13,11 @@ const Aside = styled.aside`
 `;
 const Nav = styled.nav`display:grid;gap:7px;a{display:flex;align-items:center;min-height:44px;padding:10px 12px;border:1px solid transparent;border-radius:${({theme})=>theme.radii.sm};color:${({theme})=>theme.colors.subtle};transition:background .18s ease,border-color .18s ease,color .18s ease,transform .18s ease}.active{background:linear-gradient(135deg,rgba(212,175,55,.15),rgba(156,122,24,.07));border-color:rgba(212,175,55,.22);color:${({theme})=>theme.colors.accentStrong};box-shadow:inset 0 1px rgba(255,255,255,.035)}a:hover{background:rgba(255,255,255,.035);color:${({theme})=>theme.colors.text};transform:translateX(2px)}`;
 
+/**
+ * Формує повну навігацію CRM для широких екранів.
+ * Компонент не має аргументів; повертає локалізовані NavLink, які самі додають
+ * клас active відповідно до URL. На вузьких екранах панель приховує CSS.
+ */
 export default function Sidebar(){
   const { t } = useTranslation();
   return (
