@@ -8,10 +8,15 @@ type DashboardData = { total: number; counts: Record<string, number>; conversion
 const visibleStatuses = ['NEW', 'AUDITED', 'CONTACTED', 'REPLY', 'CALL', 'OFFER', 'FOLLOW-UP', 'WON', 'LOST'];
 const conversionKeys = ['AUDITED_TO_CONTACTED','CONTACTED_TO_REPLY','REPLY_TO_CALL','CALL_TO_OFFER','OFFER_TO_WON'];
 
+/**
+ * Завантажує зведені CRM-показники та показує статуси, конверсії й вартість воронки.
+ * Повертає окремі стани помилки та завантаження; формат чисел залежить від активної мови i18n.
+ */
 export default function Dashboard() {
   const { t, i18n } = useTranslation();
   const [data, setData] = useState<DashboardData | null>(null);
   const [error, setError] = useState('');
+  // Повторює запит після зміни перекладача, щоб можливе повідомлення про помилку було актуальною мовою.
   useEffect(() => { api.get('/api/dashboard').then(r => setData(r.data)).catch(() => setError(t('errors.dashboardLoad'))); }, [t]);
   if (error) return <Card><p role="alert">{error}</p></Card>;
   if (!data) return <Card>{t('common.loading')}</Card>;
@@ -34,3 +39,4 @@ export default function Dashboard() {
     </div>
   );
 }
+
