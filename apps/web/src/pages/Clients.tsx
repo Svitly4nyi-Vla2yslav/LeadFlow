@@ -5,10 +5,16 @@ import { api } from '../api/client';
 import { Client } from '../types';
 import { useTranslation } from 'react-i18next';
 
+/**
+ * Завантажує виграні ліди (`WON`) і подає їх як таблицю клієнтів.
+ * Компонент не змінює CRM-дані: виконує лише GET-запит, локалізує помилку
+ * та форматує суму пропозиції відповідно до активної мови.
+ */
 export default function Clients() {
   const { t, i18n } = useTranslation();
   const [items, setItems] = useState<Client[]>([]);
   const [error, setError] = useState('');
+  // При зміні локалізатора повторює запит, щоб можливе повідомлення про помилку було актуальною мовою.
   useEffect(() => { api.get('/api/clients', { params: { status: 'WON' } }).then(response => setItems(response.data)).catch(() => setError(t('errors.apiUnavailable'))); }, [t]);
   return <Card>
     <h1>{t('clients.title')}</h1>
