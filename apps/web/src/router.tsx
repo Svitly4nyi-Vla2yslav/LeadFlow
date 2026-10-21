@@ -9,6 +9,11 @@ import Leads from './pages/Leads';
 import Calls from './pages/Calls';
 import DataManagement from './pages/DataManagement';
 
+/**
+ * Описує відповідність URL основним сторінкам CRM для `useRoutes`.
+ * Динамічний сегмент `:id` передає сторінці клієнта канонічний ідентифікатор;
+ * сам масив не виконує навігацію й не має побічних ефектів.
+ */
 export const routes = [
   { path: '/', element: <Dashboard/> },
   { path: '/clients', element: <Clients/> },
