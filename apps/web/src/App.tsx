@@ -10,6 +10,11 @@ const Shell = styled.div`
   @media (max-width: 900px){ grid-template-columns:1fr; padding-bottom:calc(70px + env(safe-area-inset-bottom)); }
 `;
 const Main = styled.main`padding:clamp(18px,3vw,34px);max-width:1440px;min-width:0;width:100%;margin:0 auto;@media(max-width:900px){padding:14px 12px 22px}`;
+/**
+ * Формує спільну оболонку CRM навколо активного маршруту.
+ * Компонент монтує desktop- і mobile-навігацію, показує результат `useRoutes`
+ * та після зміни pathname повертає вікно на початок сторінки.
+ */
 export default function App(){
   const element = useRoutes(routes);
   const loc = useLocation();
