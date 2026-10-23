@@ -1,4 +1,8 @@
-import styled from 'styled-components'; const Card = styled.div`
+import styled from 'styled-components';
+
+// Спільна картка ізолює декоративний шар, бере поверхню й тіні з теми та зберігає довільний дочірній вміст.
+// Hover змінює лише рамку й тінь; компонент не керує даними, подіями або локальним станом.
+const Card = styled.div`
   position:relative;isolation:isolate;overflow:hidden;background:linear-gradient(145deg,${({theme})=>theme.colors.cardStrong},${({theme})=>theme.colors.card});
   border:1px solid ${({theme})=>theme.colors.border};border-radius:${({theme})=>theme.radius};padding:clamp(16px,2.4vw,24px);
   box-shadow:${({theme})=>theme.shadows.panel};backdrop-filter:blur(${({theme})=>theme.blur}) saturate(135%);-webkit-backdrop-filter:blur(${({theme})=>theme.blur}) saturate(135%);
