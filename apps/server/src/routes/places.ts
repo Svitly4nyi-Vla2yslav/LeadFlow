@@ -4,7 +4,12 @@ import { ENV } from '../env';
 
 const r = Router();
 
-// GET /api/places/search?q=Friseur%20Hildesheim
+/**
+ * Шукає місця за непорожнім query-параметром q через Google Places Text Search.
+ * У відповідь залишає лише поля, потрібні CRM; відсутній API-ключ дає 500, порожній q — 400.
+ *
+ * @sideEffects Виконує зовнішній HTTP-запит до Google Maps API.
+ */
 r.get('/search', async (req, res) => {
   if (!ENV.GOOGLE_API_KEY) return res.status(500).json({ error: 'GOOGLE_API_KEY not set' });
   const q = String(req.query.q || '').trim();
@@ -31,7 +36,12 @@ r.get('/search', async (req, res) => {
   }
 });
 
-// GET /api/places/details/:id
+/**
+ * Завантажує обмежений набір контактних деталей для place id із параметра маршруту.
+ * fields явно звужує відповідь до назви, адреси, сайту, телефону та типів.
+ *
+ * @sideEffects Виконує зовнішній HTTP-запит до Google Maps API.
+ */
 r.get('/details/:id', async (req, res) => {
   if (!ENV.GOOGLE_API_KEY) return res.status(500).json({ error: 'GOOGLE_API_KEY not set' });
   const id = req.params.id;
