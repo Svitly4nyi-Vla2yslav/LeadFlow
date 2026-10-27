@@ -3,6 +3,10 @@ import { CONTACT_CHANNELS, ContactChannel, addMessage, db } from '../db/memory';
 
 const router = Router();
 
+/**
+ * Повертає повідомлення всіх клієнтів або лише вказаного clientId.
+ * Результат сортується від найновішого за createdAt; маршрут тільки читає in-memory snapshot.
+ */
 router.get('/', (req, res) => {
   const clientId = String(req.query.clientId || '');
   const list = (clientId ? db.messages.filter(message => message.clientId === clientId) : db.messages)
@@ -10,6 +14,12 @@ router.get('/', (req, res) => {
   res.json(list);
 });
 
+/**
+ * Перевіряє клієнта, канал, напрям і текст, після чого додає короткий запис комунікації.
+ * Повертає 404 для невідомого клієнта, 400 для некоректних полів або 201 зі створеним записом.
+ *
+ * @sideEffects Додає повідомлення до поточного in-memory snapshot через addMessage.
+ */
 router.post('/', (req, res) => {
   const clientId = String(req.body?.clientId || '');
   const channel = String(req.body?.channel || '') as ContactChannel;
