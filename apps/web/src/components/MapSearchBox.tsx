@@ -7,8 +7,9 @@ import { useTranslation } from 'react-i18next';
 type Place = { place_id: string; name: string; address: string };
 
 /**
- * Шукає компанії через places API, веде локальний вибір результатів
- * і запускає одиничний або пакетний імпорт у CRM.
+ * Шукає компанії через Places API, зберігає запит, результати, вибір і стани завантаження локально.
+ * Компонент не приймає аргументів; одиничний та пакетний імпорт виконують HTTP-запити до CRM
+ * і повідомляють результат через браузерний `alert`, але сам список після імпорту не змінюють.
  */
 export default function MapSearchBox(){
   const { t } = useTranslation();
@@ -18,7 +19,7 @@ export default function MapSearchBox(){
   const [loading, setLoading] = useState(false);
   const [bulkLoading, setBulkLoading] = useState(false);
 
-  // Надсилає поточний запит, замінює список результатів і скидає старі позначки вибору.
+  /** Надсилає поточний `q`, повністю замінює результати й скидає вибір; `loading` очищається навіть після помилки. */
   const search = async () => {
     setLoading(true);
     try {
@@ -28,10 +29,10 @@ export default function MapSearchBox(){
     } finally { setLoading(false); }
   };
 
-  // Інвертує вибір одного place_id, не змінюючи решту позначених результатів.
+  /** Інвертує вибір одного `place_id` функціональним оновленням, не змінюючи решту позначок. */
   const toggle = (id:string) => setSel(s => ({...s, [id]: !s[id]}));
 
-/**
+  /**
    * Відправляє всі позначені place_id одним запитом і показує кількість успішних імпортів.
    * Якщо нічого не вибрано, мережевий запит не виконується.
    */
