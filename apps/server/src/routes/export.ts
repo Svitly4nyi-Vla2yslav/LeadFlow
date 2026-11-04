@@ -2,6 +2,10 @@ import { Router } from 'express';
 import { db } from '../db/memory';
 
 const r = Router();
+/**
+ * Перетворює довільне значення на безпечну CSV-комірку: `null`/`undefined` стають
+ * порожнім текстом, внутрішні лапки подвоюються, а результат завжди береться в лапки.
+ */
 const csvValue = (value: unknown) => `"${String(value ?? '').replace(/"/g, '""')}"`;
 
 // Маршрут формує повний експорт клієнтів і повертає його як завантажуваний UTF-8 CSV-файл.
