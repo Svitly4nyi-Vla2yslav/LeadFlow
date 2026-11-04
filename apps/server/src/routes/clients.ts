@@ -16,8 +16,14 @@ import { updateCallTask } from '../db/memory';
 
 const router = Router();
 
+// Повертає довідники CRM, щоб клієнтський інтерфейс не дублював допустимі значення.
 router.get('/meta', (_req, res) => res.json({ statuses: CRM_STATUSES, contactChannels: CONTACT_CHANNELS, lostReasons: LOST_REASONS }));
 
+/**
+ * Фільтрує клієнтів за статусом, простроченим follow-up і текстовим запитом.
+ * Результат упорядковується спочатку за найближчим follow-up, потім за часом оновлення;
+ * колекція `db.clients` не змінюється.
+ */
 router.get('/', (req, res) => {
   const query = String(req.query.q || '').trim().toLocaleLowerCase('de-DE');
   const status = String(req.query.status || '').trim();
@@ -38,6 +44,11 @@ router.get('/', (req, res) => {
   res.json(filtered);
 });
 
+/**
+ * Імпортує до 1000 канонічних рядків, санітизує та перевіряє кожен незалежно.
+ * Повертає лічильники створених/пропущених записів і помилки з номерами рядків;
+ * частковий успіх позначається HTTP 207.
+ */
 router.post('/import', (req, res) => {
   if (!Array.isArray(req.body?.leads)) return res.status(400).json({ error: 'leads[] is required' });
   if (req.body.leads.length > 1000) return res.status(400).json({ error: 'Maximum import size is 1000 leads' });
@@ -59,6 +70,7 @@ router.post('/import', (req, res) => {
   res.status(result.errors.length ? 207 : 200).json(result);
 });
 
+/** Створює одного клієнта або повертає знайдений дублікат із прапорцем `duplicate`. */
 router.post('/', (req, res) => {
   const draft = sanitizeClient(req.body || {});
   const error = validateClient(draft);
@@ -67,6 +79,7 @@ router.post('/', (req, res) => {
   res.status(saved.created ? 201 : 200).json({ ...saved.item, duplicate: !saved.created });
 });
 
+/** Повертає точного клієнта разом із його повідомленнями, відсортованими від нових до старих. */
 router.get('/:id', (req, res) => {
   const item = db.clients.find(client => client.id === req.params.id);
   if (!item) return res.status(404).json({ error: 'Lead not found' });
@@ -74,6 +87,10 @@ router.get('/:id', (req, res) => {
   res.json({ ...item, messages });
 });
 
+/**
+ * Оновлює клієнта, додає запис історії за зміни CRM-статусу та повторно оцінює
+ * пов’язані DRAFT/READY CallTask. Інші стани задач виклику не змінюються.
+ */
 router.patch('/:id', (req, res) => {
   const item = db.clients.find(client => client.id === req.params.id);
   if (!item) return res.status(404).json({ error: 'Lead not found' });
@@ -104,6 +121,7 @@ router.patch('/:id', (req, res) => {
   res.json(saved);
 });
 
+/** Видаляє клієнта лише за явного `?confirm=DELETE`; сховище також прибирає пов’язані повідомлення. */
 router.delete('/:id', (req, res) => {
   if (req.query.confirm !== 'DELETE') return res.status(400).json({ error: 'Add ?confirm=DELETE to remove this lead and its messages' });
   if (!removeClient(req.params.id)) return res.status(404).json({ error: 'Lead not found' });
