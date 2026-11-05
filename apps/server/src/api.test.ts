@@ -989,6 +989,8 @@ test('valid PARTIAL and FINAL transcripts preserve ordered multilingual text wit
   assert.equal(storedFinal?.revision, 2);
   assert.equal(storedFinal?.durationMs, 180_000);
   assert.equal(storedFinal?.segments.length, 3);
+  assert.equal(db.callTasks.find(item => item.id === task.id)?.status, 'COMPLETED');
+  assert.ok(db.callTasks.find(item => item.id === task.id)?.completedAt);
 });
 
 test('transcripts require exact canonical lead and CallTask ownership', async () => {

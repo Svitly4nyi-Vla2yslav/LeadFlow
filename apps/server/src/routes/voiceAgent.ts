@@ -25,6 +25,9 @@ router.post('/resolve-handoff', (req, res) => {
     const task = db.callTasks.find(item => item.id === handoff.callTaskId);
     if (!task) return res.status(404).json({ error: 'call_task_not_found' });
     if (task.leadId !== lead.id) return res.status(409).json({ error: 'call_task_mismatch' });
+    if (task.transcript?.state === 'FINAL') {
+      return res.status(409).json({ error: 'call_task_not_ready' });
+    }
     if (task.status !== 'READY' || callTaskReadiness(lead, task).length) {
       return res.status(409).json({ error: 'call_task_not_ready' });
     }
@@ -192,7 +195,13 @@ router.post('/call-transcript', (req, res) => {
     return res.status(409).json({ error: 'final_conversation_conflict' });
   }
 
-  updateCallTask(task, { ...task, transcript: next });
+  updateCallTask(task, {
+    ...task,
+    transcript: next,
+    ...(event.state === 'FINAL'
+      ? { status: 'COMPLETED' as const, completedAt: event.endedAt ?? new Date().toISOString() }
+      : {})
+  });
   console.info('[Voice Transcript] accepted', metadata);
   return res.status(201).json({ ok: true, duplicate: false, callTaskId: task.id, conversationId: next.conversationId, revision: next.revision, state: next.state });
 });

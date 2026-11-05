@@ -51,7 +51,7 @@ export default function ClientDetail() {
   const load = useCallback(async () => {
     try {
       const [clientResponse, tasksResponse] = await Promise.all([api.get(`/api/clients/${id}`), api.get('/api/call-tasks', { params: { leadId: id } })]);
-      const tasks = tasksResponse.data as CallTask[]; const active = tasks.find(task => !['COMPLETED','FAILED','CANCELLED'].includes(task.status)) || null;
+      const tasks = tasksResponse.data as CallTask[]; const active = tasks.find(task => !['COMPLETED','FAILED','CANCELLED'].includes(task.status) && task.transcript?.state !== 'FINAL') || null;
       setClient(clientResponse.data); setDraft(clientResponse.data); setCallTask(active); setLastFeedback(tasks.find(task => task.result && Object.keys(task.result).length) || null); setLastTranscript(tasks.find(task => task.transcript) || null);
       setCallBrief(active ? (await api.get(`/api/call-tasks/${active.id}/brief`)).data : null);
       setCallDraft(active ? { callObjective: active.callObjective, offerFocus: active.offerFocus || '', operatorNote: active.operatorNote || '', scheduledAt: active.scheduledAt ? active.scheduledAt.slice(0,16) : '' } : { ...emptyCallDraft, offerFocus: clientResponse.data.offerFocus || '', operatorNote: clientResponse.data.emmaFocus || '' });
