@@ -4,7 +4,6 @@ LeadFlow is a full-stack CRM for managing VS Web Studio prospects, clients, comm
 
 The repository is structured as a small monorepo with a React frontend and an Express API. The current single-user CRM flow includes server-side password protection, persistent local JSON storage and Netlify Blobs persistence; managed multi-user identity, relational storage and outbound integrations remain future production work.
 
-The current project review and completion plan are documented in [docs/PROJECT_STATUS_UA.md](docs/PROJECT_STATUS_UA.md).
 
 ## Features
 
