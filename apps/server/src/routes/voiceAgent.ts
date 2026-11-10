@@ -7,6 +7,10 @@ import { transcriptContentHash, transcriptFromEvent, VoiceAgentTranscriptV1Schem
 
 const router = Router();
 
+/**
+ * Перевіряє підписаний handoff і повертає дані ліда для голосового агента.
+ * Для токена v2 додатково звіряє належність та готовність CallTask; дані не змінює.
+ */
 router.post('/resolve-handoff', (req, res) => {
   const body = req.body;
   if (!body || typeof body !== 'object' || Array.isArray(body)
@@ -64,6 +68,10 @@ router.post('/resolve-handoff', (req, res) => {
   });
 });
 
+/**
+ * Приймає підсумок голосової взаємодії, перевіряє схему та ідемпотентність eventId.
+ * Після перевірок узгоджено додає повідомлення й взаємодію, оновлює ліда та зберігає БД.
+ */
 router.post('/interactions', (req, res) => {
   const parsed = VoiceAgentInteractionV1Schema.safeParse(req.body);
   if (!parsed.success) {
@@ -146,6 +154,10 @@ router.post('/interactions', (req, res) => {
   });
 });
 
+/**
+ * Записує ревізію транскрипту в пов'язаний CallTask.
+ * Відхиляє застарілі або конфліктні ревізії, а фінальний транскрипт завершує завдання.
+ */
 router.post('/call-transcript', (req, res) => {
   const parsed = VoiceAgentTranscriptV1Schema.safeParse(req.body);
   if (!parsed.success) {
