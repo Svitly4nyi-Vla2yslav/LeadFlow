@@ -17,6 +17,10 @@ const feedbackFields: Array<[keyof NonNullable<CallTask['result']>, string]> = [
   ['requestedInformation','feedback.requestedInformation'], ['nextAction','feedback.nextAction'], ['callbackAt','feedback.callbackAt'],
   ['calendarEventId','feedback.calendarEventId'], ['meetingStart','feedback.meetingStart'], ['meetingEnd','feedback.meetingEnd'], ['lostReason','feedback.lostReason']
 ];
+/**
+ * Нормалізує значення feedback для відображення: масиви об’єднує, рівень
+ * зацікавленості локалізує, а часові поля форматує у мові інтерфейсу.
+ */
 const feedbackValue = (key: keyof NonNullable<CallTask['result']>, value: unknown, language: string, t: (key: string) => string) => {
   if (Array.isArray(value)) return value.join(' · ');
   if (key === 'interestLevel' && typeof value === 'string') return t(`interestLevel.${value}`);
@@ -26,6 +30,11 @@ const feedbackValue = (key: keyof NonNullable<CallTask['result']>, value: unknow
   }
   return String(value);
 };
+/**
+ * Перетворює мілісекунди від початку дзвінка у MM:SS або HH:MM:SS.
+ *
+ * @returns Порожній рядок, якщо час сегмента відсутній.
+ */
 const transcriptTime = (milliseconds?: number) => {
   if (milliseconds === undefined) return '';
   const totalSeconds = Math.floor(milliseconds / 1000);
@@ -35,10 +44,17 @@ const transcriptTime = (milliseconds?: number) => {
   return hours ? `${String(hours).padStart(2,'0')}:${String(minutes).padStart(2,'0')}:${String(seconds).padStart(2,'0')}` : `${String(minutes).padStart(2,'0')}:${String(seconds).padStart(2,'0')}`;
 };
 
+/** Рендерить повторно використовувану розкривну секцію картки без власного стану. */
 function Section({ title, children, open = false, id }: { title: string; children: ReactNode; open?: boolean; id?: string }) {
   return <Card as="details" open={open} id={id} className="detail-section"><summary><strong>{title}</strong></summary><div className="section-body">{children}</div></Card>;
 }
 
+/**
+ * Координує редагування ліда, підготовку CallTask, запуск Emma, історію та транскрипт.
+ *
+ * Під час завантаження паралельно отримує клієнта й задачі дзвінків. Фінальний
+ * транскрипт не вважається активною задачею, але лишається доступним в історії.
+ */
 export default function ClientDetail() {
   const { id } = useParams(); const { t, i18n } = useTranslation();
   const [client, setClient] = useState<Client | null>(null); const [draft, setDraft] = useState<Partial<Client>>({});
@@ -48,6 +64,11 @@ export default function ClientDetail() {
   const [callBrief, setCallBrief] = useState<CallBrief | null>(null);
   const [callDraft, setCallDraft] = useState(emptyCallDraft); const [callTaskBusy, setCallTaskBusy] = useState(false);
 
+  /**
+   * Оновлює картку, задачі, останній feedback, транскрипт і Call Brief.
+   *
+   * @sideEffects Виконує кілька API-запитів та замінює пов’язаний локальний стан.
+   */
   const load = useCallback(async () => {
     try {
       const [clientResponse, tasksResponse] = await Promise.all([api.get(`/api/clients/${id}`), api.get('/api/call-tasks', { params: { leadId: id } })]);
@@ -60,8 +81,14 @@ export default function ClientDetail() {
   }, [id, t]);
   useEffect(() => { load(); }, [load]);
   useEffect(() => { if (client && window.location.hash === '#emma') document.getElementById('emma')?.scrollIntoView({ behavior: 'smooth' }); }, [client]);
+  /** Типобезпечно замінює одне поле чернетки клієнта без негайного API-запиту. */
   const set = (key: keyof Client, value: unknown) => setDraft(current => ({ ...current, [key]: value }));
 
+  /**
+   * Зберігає чернетку клієнта; кнопка prepare додатково створює або оновлює CallTask.
+   *
+   * @sideEffects Виконує PATCH/POST-запити, оновлює Call Brief і може встановити hash #emma.
+   */
   const save = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault(); setError(''); setNotice('');
     const submitter = (event.nativeEvent as SubmitEvent).submitter as HTMLButtonElement | null;
@@ -80,18 +107,25 @@ export default function ClientDetail() {
       window.location.hash = 'emma';
     } catch { setError(prepareAfterSave ? t('errors.callPrepare') : t('errors.changesSave')); }
   };
+  /** Записує контакт у журнал, очищає форму повідомлення та перечитує картку. */
   const addMessage = async (event: FormEvent) => { event.preventDefault(); setError(''); try { await api.post('/api/messages', { clientId: id, ...message }); setMessage(emptyMessage); setNotice(t('messages.saved')); await load(); } catch (exception: any) { setError(exception.response?.data?.error || t('errors.messageSave')); } };
+  /**
+   * Отримує короткоживучий handoff, відкриває voice-agent у новій вкладці
+   * й від’єднує opener; повторний запуск блокується станом opening.
+   */
   const callWithEmma = async () => {
     if (handoffState === 'opening' || !client || !callTask || callTask.status !== 'READY' || callTask.readinessIssues.length) return; setHandoffState('opening'); setHandoffError('');
     try { const response = await api.post('/api/voice-agent/handoff', { leadId: client.id, callTaskId: callTask.id }); const destination = new URL(response.data.voiceAgentAppUrl); destination.searchParams.set('handoff', response.data.handoffToken); const opened = window.open(destination.toString(), '_blank'); if (!opened) throw new Error(t('errors.popupBlocked')); opened.opener = null; setHandoffState('ready'); }
     catch (exception: any) { setHandoffState('error'); setHandoffError(voiceAgentLaunchError(exception, t)); }
   };
+  /** Створює або оновлює задачу дзвінка й завжди скидає busy у finally. */
   const prepareCall = async (event: FormEvent) => {
     event.preventDefault(); if (callTaskBusy || !client) return; setCallTaskBusy(true); setError(''); setNotice('');
     try { const payload = { ...callDraft, scheduledAt: callDraft.scheduledAt ? new Date(callDraft.scheduledAt).toISOString() : undefined }; const response = callTask ? await api.patch(`/api/call-tasks/${callTask.id}`, payload) : await api.post('/api/call-tasks', { leadId: client.id, ...payload }); setCallTask(response.data); setCallBrief((await api.get(`/api/call-tasks/${response.data.id}/brief`)).data); setNotice(response.data.status === 'READY' ? t('call.preparedReady') : t('call.savedDraft', { issues: response.data.readinessIssues.map((issue: string) => t(`readiness.${issue}`)).join(', ') })); }
     catch (exception: any) { setError(exception.response?.data?.error || t('errors.callPrepare')); } finally { setCallTaskBusy(false); }
   };
 
+  // Об’єднує статуси, ручні контакти й останній транскрипт у зворотно-хронологічну стрічку.
   const timeline = useMemo(() => !client ? [] : [...(client.statusHistory || []).map(event => ({ key:`s-${event.occurredAt}-${event.status}`, date:event.occurredAt, title:`${t('lead.status')}: ${t(`status.${event.status}`)}`, detail:event.summary || (event.lostReason ? t(`lostReason.${lostReasonKeys[LOST_REASONS.indexOf(event.lostReason)]}`) : '') })), ...(client.messages || []).map((item:Message) => ({ key:`m-${item.id}`, date:item.createdAt, title:`${t(`direction.${item.direction}`)} · ${t(contactChannelKeys[item.channel])}`, detail:item.body })), ...(lastTranscript?.transcript ? [{ key:`t-${lastTranscript.id}-${lastTranscript.transcript.revision}`, date:lastTranscript.transcript.endedAt || lastTranscript.transcript.startedAt, title:`${t('transcript.title')} · ${t(`transcript.${lastTranscript.transcript.state.toLowerCase()}`)}`, detail:lastTranscript.transcript.segments.map(segment => `${segment.speaker === 'CUSTOMER' ? t('transcript.customer') : t('transcript.emma')}: ${segment.text}`).join(' · ') }] : [])].sort((a,b) => b.date.localeCompare(a.date)), [client,lastTranscript,t]);
   if (!client && !error) return <Card>{t('common.loading')}</Card>;
   if (!client) return <Card><p role="alert">{error}</p><Link to="/leads">{t('actions.backToLeads')}</Link></Card>;
