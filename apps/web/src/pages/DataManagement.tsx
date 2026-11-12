@@ -15,6 +15,11 @@ const fieldLabelKeys: Record<typeof IMPORT_FIELDS[number], string> = {
   nextFollowUpDate:'lead.nextFollowUpDate', offerAmount:'lead.offerAmount', lostReason:'lead.lostReason'
 };
 
+/**
+ * Керує імпортом лідів із JSON або CSV, попереднім зіставленням колонок і експортом поточної бази.
+ * Компонент повертає форму попереднього перегляду; читання файлу відбувається в браузері,
+ * а підтверджений масив надсилається до API лише після явного натискання кнопки імпорту.
+ */
 export default function DataManagement() {
   const { t } = useTranslation();
   const [rows, setRows] = useState<Record<string, unknown>[]>([]);
@@ -24,6 +29,10 @@ export default function DataManagement() {
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
 
+  /**
+   * Читає вибраний файл, розбирає JSON/CSV, виводить набір колонок і пропонує початкове зіставлення.
+   * За помилки очищає попередній preview та зберігає локалізоване повідомлення; мережевих запитів не виконує.
+   */
   const chooseFile = async (file?: File) => {
     if (!file) return;
     try {
@@ -43,6 +52,10 @@ export default function DataManagement() {
   };
 
   const normalizedRows = applyColumnMapping(rows, mapping);
+  /**
+   * Перевіряє ліміт 1–1000 нормалізованих рядків і надсилає їх до POST /api/clients/import.
+   * Повернена статистика зберігається у стані, а busy гарантовано скидається після успіху чи помилки.
+   */
   const runImport = async () => {
     if (!normalizedRows.length || normalizedRows.length > 1000) { setError(t('import.tooMany')); return; }
     setBusy(true); setError('');
