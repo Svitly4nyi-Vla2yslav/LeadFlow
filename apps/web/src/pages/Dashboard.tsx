@@ -5,12 +5,15 @@ import { useTranslation } from 'react-i18next';
 
 type Conversion = { numerator: number; denominator: number; rate: number | null };
 type DashboardData = { total: number; counts: Record<string, number>; conversions: Record<string, Conversion>; overdueFollowUps: number; offerPipelineValue: number; wonValue: number };
+// Порядок відповідає канонічній CRM-воронці й визначає послідовність карток у UI.
 const visibleStatuses = ['NEW', 'AUDITED', 'CONTACTED', 'REPLY', 'CALL', 'OFFER', 'FOLLOW-UP', 'WON', 'LOST'];
+// Ключі збігаються з об'єктом conversions, який повертає GET /api/dashboard.
 const conversionKeys = ['AUDITED_TO_CONTACTED','CONTACTED_TO_REPLY','REPLY_TO_CALL','CALL_TO_OFFER','OFFER_TO_WON'];
 
 /**
  * Завантажує зведені CRM-показники та показує статуси, конверсії й вартість воронки.
  * Повертає окремі стани помилки та завантаження; формат чисел залежить від активної мови i18n.
+ * Значення rate показується у відсотках, а null — як тире, щоб відрізняти від реальної нульової конверсії.
  */
 export default function Dashboard() {
   const { t, i18n } = useTranslation();
