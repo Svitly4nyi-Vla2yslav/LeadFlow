@@ -155,6 +155,11 @@ export default function LaunchGate({ children }: { children: ReactNode }) {
     [t('launch.days'), countdown.days], [t('launch.hours'), countdown.hours], [t('launch.minutes'), countdown.minutes], [t('launch.seconds'), countdown.seconds]
   ], [countdown, t]);
 
+  /**
+   * Просить backend видати development-bypass сесію, захищаючись від повторного паралельного запиту.
+   * Успішна відповідь повинна явно підтвердити authenticated і mode; 403/404 відкривають password fallback,
+   * інші помилки показують локалізоване повідомлення. Побічні ефекти — API-запит і оновлення UI-стану.
+   */
   const tryDevUnlock = async () => {
     if (devUnlockPending.current) return;
     devUnlockPending.current = true;
@@ -175,12 +180,20 @@ export default function LaunchGate({ children }: { children: ReactNode }) {
     }
   };
 
+  /**
+   * Зберігає лише натискання в останньому чотирисекундному вікні.
+   * Після п’ятого натискання очищає історію та асинхронно запускає development unlock.
+   */
   const revealAccess = () => {
     const cutoff = Date.now() - TAP_WINDOW_MS;
     taps.current = [...taps.current.filter(time => time > cutoff), Date.now()];
     if (taps.current.length >= REQUIRED_TAPS) { taps.current = []; void tryDevUnlock(); }
   };
 
+  /**
+   * Скасовує HTML-submit і надсилає введений пароль до owner login endpoint.
+   * Успіх очищає чутливе поле та відкриває children; помилки 429/503 отримують окремі тексти.
+   */
   const login = async (event: FormEvent) => {
     event.preventDefault(); setSubmitting(true); setError('');
     try {
