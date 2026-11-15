@@ -97,6 +97,11 @@ const LoadingMark = styled.div`font-family:'Courier New',monospace;color:#d5b269
 
 type Countdown = { days: string; hours: string; minutes: string; seconds: string; reached: boolean };
 
+/**
+ * Обчислює залишок до VITE_LAUNCH_AT від поточного часу.
+ * @returns Рядки днів/годин/хвилин/секунд із нульовим доповненням і прапорець досягнення дати.
+ * Значення не стають від’ємними; функція читає Date.now(), але не змінює зовнішній стан.
+ */
 const calculateCountdown = (): Countdown => {
   const remaining = Math.max(0, new Date(TARGET).getTime() - Date.now());
   return {
@@ -108,6 +113,11 @@ const calculateCountdown = (): Countdown => {
   };
 };
 
+/**
+ * Перевіряє owner-сесію й повертає children лише після успішної автентифікації.
+ * До розблокування показує launch countdown та прихований вхід; компонент керує таймерами,
+ * глобальними keyboard/session-подіями й API-запитами, прибираючи слухачі під час cleanup.
+ */
 export default function LaunchGate({ children }: { children: ReactNode }) {
   const { t } = useTranslation();
   const [authState, setAuthState] = useState<'checking' | 'locked' | 'unlocked'>('checking');
