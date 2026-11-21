@@ -18,6 +18,8 @@ const Main = styled.main`padding:clamp(18px,3vw,34px);max-width:1440px;min-width
 export default function App(){
   const element = useRoutes(routes);
   const loc = useLocation();
+  // Реагує лише на зміну шляху: query/hash на тому самому маршруті не запускають прокрутку повторно.
+  // Виклик миттєвий і не потребує cleanup, оскільки слухачі чи таймери не створюються.
   useEffect(()=>{window.scrollTo(0,0)},[loc.pathname]);
   return (<Shell><Sidebar/><div style={{ minWidth: 0 }}><Topbar/><Main>{element}</Main></div><MobileNav/></Shell>);
 }
