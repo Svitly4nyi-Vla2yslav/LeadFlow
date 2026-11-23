@@ -15,6 +15,14 @@ export { hydrateDatabase } from '../../apps/server/src/databaseSnapshot';
 
 export { isDatabaseMutation } from '../../apps/server/src/databaseSnapshot';
 
+/**
+ * Підключає контекст Netlify Blobs для поточного виклику функції.
+ * Якщо payload містить токен і заголовок сайту, додатково налаштовує явний
+ * environment context; без event.blobs лише передає подію в connectLambda.
+ *
+ * @param event — нормалізована подія Netlify з необов'язковим blob-контекстом.
+ * @sideEffects Налаштовує глобальний контекст SDK Netlify Blobs для цього виклику.
+ */
 const connectStrongBlobContext = (event: FunctionEvent) => {
   connectLambda(event as never);
   if (!event.blobs) return;
@@ -23,6 +31,15 @@ const connectStrongBlobContext = (event: FunctionEvent) => {
   if (payload.token && siteID) setEnvironmentContext({ apiURL: 'https://api.netlify.com', siteID, token: payload.token });
 };
 
+/**
+ * Відновлює CRM зі strong-consistency blob, передає подію Express і після успішної
+ * мутації зберігає новий знімок з optimistic concurrency через ETag.
+ *
+ * @param event — HTTP-подія Netlify, за якою також визначається факт мутації.
+ * @param context — runtime-контекст, що без змін передається serverless-http.
+ * @returns Відповідь Express або 409, якщо blob паралельно змінив інший виклик.
+ * @sideEffects Читає Netlify Blobs, змінює in-memory db і за потреби записує її знімок.
+ */
 export const handler = async (event: FunctionEvent, context: unknown): Promise<FunctionResponse> => {
   connectStrongBlobContext(event);
   const store = getStore({ name: 'leadflow-crm', consistency: 'strong' });
